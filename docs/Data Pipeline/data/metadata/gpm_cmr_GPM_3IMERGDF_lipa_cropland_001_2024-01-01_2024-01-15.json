@@ -1,0 +1,161 @@
+{
+  "dataset": "GPM_IMERG",
+  "product": "GPM_3IMERGDF",
+  "product_info": {
+    "run_type": "Final",
+    "version": "07B",
+    "temporal_resolution": "daily",
+    "variables": [
+      "precipitation",
+      "randomError",
+      "precipitation_cnt"
+    ]
+  },
+  "aoi_id": "lipa_cropland_001",
+  "bbox": [
+    121.176299,
+    13.976575,
+    121.193002,
+    13.990451
+  ],
+  "temporal": "2024-01-01T00:00:00Z,2024-01-15T23:59:59Z",
+  "discovered_at": "2026-11-14T07:02:31Z",
+  "granule_count": 15,
+  "granules": [
+    {
+      "id": "G3087510500-GES_DISC",
+      "title": "GPM_3IMERGDF.07:3B-DAY.MS.MRG.3IMERG.20240101-S000000-E235959.V07B.nc4",
+      "collection_concept_id": "C2723754864-GES_DISC",
+      "time_start": "2024-01-01T00:00:00.000Z",
+      "time_end": "2024-01-01T23:59:59.999Z",
+      "data_url": "https://data.gesdisc.earthdata.nasa.gov/data/GPM_L3/GPM_3IMERGDF.07/2024/01/3B-DAY.MS.MRG.3IMERG.20240101-S000000-E235959.V07B.nc4",
+      "opendap_url": "https://opendap.earthdata.nasa.gov/collections/C2723754864-GES_DISC/granules/GPM_3IMERGDF.07%3A3B-DAY.MS.MRG.3IMERG.20240101-S000000-E235959.V07B.nc4"
+    },
+    {
+      "id": "G3087510289-GES_DISC",
+      "title": "GPM_3IMERGDF.07:3B-DAY.MS.MRG.3IMERG.20240102-S000000-E235959.V07B.nc4",
+      "collection_concept_id": "C2723754864-GES_DISC",
+      "time_start": "2024-01-02T00:00:00.000Z",
+      "time_end": "2024-01-02T23:59:59.999Z",
+      "data_url": "https://data.gesdisc.earthdata.nasa.gov/data/GPM_L3/GPM_3IMERGDF.07/2024/01/3B-DAY.MS.MRG.3IMERG.20240102-S000000-E235959.V07B.nc4",
+      "opendap_url": "https://opendap.earthdata.nasa.gov/collections/C2723754864-GES_DISC/granules/GPM_3IMERGDF.07%3A3B-DAY.MS.MRG.3IMERG.20240102-S000000-E235959.V07B.nc4"
+    },
+    {
+      "id": "G3087522811-GES_DISC",
+      "title": "GPM_3IMERGDF.07:3B-DAY.MS.MRG.3IMERG.20240103-S000000-E235959.V07B.nc4",
+      "collection_concept_id": "C2723754864-GES_DISC",
+      "time_start": "2024-01-03T00:00:00.000Z",
+      "time_end": "2024-01-03T23:59:59.999Z",
+      "data_url": "https://data.gesdisc.earthdata.nasa.gov/data/GPM_L3/GPM_3IMERGDF.07/2024/01/3B-DAY.MS.MRG.3IMERG.20240103-S000000-E235959.V07B.nc4",
+      "opendap_url": "https://opendap.earthdata.nasa.gov/collections/C2723754864-GES_DISC/granules/GPM_3IMERGDF.07%3A3B-DAY.MS.MRG.3IMERG.20240103-S000000-E235959.V07B.nc4"
+    },
+    {
+      "id": "G3087524463-GES_DISC",
+      "title": "GPM_3IMERGDF.07:3B-DAY.MS.MRG.3IMERG.20240104-S000000-E235959.V07B.nc4",
+      "collection_concept_id": "C2723754864-GES_DISC",
+      "time_start": "2024-01-04T00:00:00.000Z",
+      "time_end": "2024-01-04T23:59:59.999Z",
+      "data_url": "https://data.gesdisc.earthdata.nasa.gov/data/GPM_L3/GPM_3IMERGDF.07/2024/01/3B-DAY.MS.MRG.3IMERG.20240104-S000000-E235959.V07B.nc4",
+      "opendap_url": "https://opendap.earthdata.nasa.gov/collections/C2723754864-GES_DISC/granules/GPM_3IMERGDF.07%3A3B-DAY.MS.MRG.3IMERG.20240104-S000000-E235959.V07B.nc4"
+    },
+    {
+      "id": "G3087547284-GES_DISC",
+      "title": "GPM_3IMERGDF.07:3B-DAY.MS.MRG.3IMERG.20240105-S000000-E235959.V07B.nc4",
+      "collection_concept_id": "C2723754864-GES_DISC",
+      "time_start": "2024-01-05T00:00:00.000Z",
+      "time_end": "2024-01-05T23:59:59.999Z",
+      "data_url": "https://data.gesdisc.earthdata.nasa.gov/data/GPM_L3/GPM_3IMERGDF.07/2024/01/3B-DAY.MS.MRG.3IMERG.20240105-S000000-E235959.V07B.nc4",
+      "opendap_url": "https://opendap.earthdata.nasa.gov/collections/C2723754864-GES_DISC/granules/GPM_3IMERGDF.07%3A3B-DAY.MS.MRG.3IMERG.20240105-S000000-E235959.V07B.nc4"
+    },
+    {
+      "id": "G3087546266-GES_DISC",
+      "title": "GPM_3IMERGDF.07:3B-DAY.MS.MRG.3IMERG.20240106-S000000-E235959.V07B.nc4",
+      "collection_concept_id": "C2723754864-GES_DISC",
+      "time_start": "2024-01-06T00:00:00.000Z",
+      "time_end": "2024-01-06T23:59:59.999Z",
+      "data_url": "https://data.gesdisc.earthdata.nasa.gov/data/GPM_L3/GPM_3IMERGDF.07/2024/01/3B-DAY.MS.MRG.3IMERG.20240106-S000000-E235959.V07B.nc4",
+      "opendap_url": "https://opendap.earthdata.nasa.gov/collections/C2723754864-GES_DISC/granules/GPM_3IMERGDF.07%3A3B-DAY.MS.MRG.3IMERG.20240106-S000000-E235959.V07B.nc4"
+    },
+    {
+      "id": "G3087547285-GES_DISC",
+      "title": "GPM_3IMERGDF.07:3B-DAY.MS.MRG.3IMERG.20240107-S000000-E235959.V07B.nc4",
+      "collection_concept_id": "C2723754864-GES_DISC",
+      "time_start": "2024-01-07T00:00:00.000Z",
+      "time_end": "2024-01-07T23:59:59.999Z",
+      "data_url": "https://data.gesdisc.earthdata.nasa.gov/data/GPM_L3/GPM_3IMERGDF.07/2024/01/3B-DAY.MS.MRG.3IMERG.20240107-S000000-E235959.V07B.nc4",
+      "opendap_url": "https://opendap.earthdata.nasa.gov/collections/C2723754864-GES_DISC/granules/GPM_3IMERGDF.07%3A3B-DAY.MS.MRG.3IMERG.20240107-S000000-E235959.V07B.nc4"
+    },
+    {
+      "id": "G3087547210-GES_DISC",
+      "title": "GPM_3IMERGDF.07:3B-DAY.MS.MRG.3IMERG.20240108-S000000-E235959.V07B.nc4",
+      "collection_concept_id": "C2723754864-GES_DISC",
+      "time_start": "2024-01-08T00:00:00.000Z",
+      "time_end": "2024-01-08T23:59:59.999Z",
+      "data_url": "https://data.gesdisc.earthdata.nasa.gov/data/GPM_L3/GPM_3IMERGDF.07/2024/01/3B-DAY.MS.MRG.3IMERG.20240108-S000000-E235959.V07B.nc4",
+      "opendap_url": "https://opendap.earthdata.nasa.gov/collections/C2723754864-GES_DISC/granules/GPM_3IMERGDF.07%3A3B-DAY.MS.MRG.3IMERG.20240108-S000000-E235959.V07B.nc4"
+    },
+    {
+      "id": "G3087547216-GES_DISC",
+      "title": "GPM_3IMERGDF.07:3B-DAY.MS.MRG.3IMERG.20240109-S000000-E235959.V07B.nc4",
+      "collection_concept_id": "C2723754864-GES_DISC",
+      "time_start": "2024-01-09T00:00:00.000Z",
+      "time_end": "2024-01-09T23:59:59.999Z",
+      "data_url": "https://data.gesdisc.earthdata.nasa.gov/data/GPM_L3/GPM_3IMERGDF.07/2024/01/3B-DAY.MS.MRG.3IMERG.20240109-S000000-E235959.V07B.nc4",
+      "opendap_url": "https://opendap.earthdata.nasa.gov/collections/C2723754864-GES_DISC/granules/GPM_3IMERGDF.07%3A3B-DAY.MS.MRG.3IMERG.20240109-S000000-E235959.V07B.nc4"
+    },
+    {
+      "id": "G3087547398-GES_DISC",
+      "title": "GPM_3IMERGDF.07:3B-DAY.MS.MRG.3IMERG.20240110-S000000-E235959.V07B.nc4",
+      "collection_concept_id": "C2723754864-GES_DISC",
+      "time_start": "2024-01-10T00:00:00.000Z",
+      "time_end": "2024-01-10T23:59:59.999Z",
+      "data_url": "https://data.gesdisc.earthdata.nasa.gov/data/GPM_L3/GPM_3IMERGDF.07/2024/01/3B-DAY.MS.MRG.3IMERG.20240110-S000000-E235959.V07B.nc4",
+      "opendap_url": "https://opendap.earthdata.nasa.gov/collections/C2723754864-GES_DISC/granules/GPM_3IMERGDF.07%3A3B-DAY.MS.MRG.3IMERG.20240110-S000000-E235959.V07B.nc4"
+    },
+    {
+      "id": "G3087569250-GES_DISC",
+      "title": "GPM_3IMERGDF.07:3B-DAY.MS.MRG.3IMERG.20240111-S000000-E235959.V07B.nc4",
+      "collection_concept_id": "C2723754864-GES_DISC",
+      "time_start": "2024-01-11T00:00:00.000Z",
+      "time_end": "2024-01-11T23:59:59.999Z",
+      "data_url": "https://data.gesdisc.earthdata.nasa.gov/data/GPM_L3/GPM_3IMERGDF.07/2024/01/3B-DAY.MS.MRG.3IMERG.20240111-S000000-E235959.V07B.nc4",
+      "opendap_url": "https://opendap.earthdata.nasa.gov/collections/C2723754864-GES_DISC/granules/GPM_3IMERGDF.07%3A3B-DAY.MS.MRG.3IMERG.20240111-S000000-E235959.V07B.nc4"
+    },
+    {
+      "id": "G3087574911-GES_DISC",
+      "title": "GPM_3IMERGDF.07:3B-DAY.MS.MRG.3IMERG.20240112-S000000-E235959.V07B.nc4",
+      "collection_concept_id": "C2723754864-GES_DISC",
+      "time_start": "2024-01-12T00:00:00.000Z",
+      "time_end": "2024-01-12T23:59:59.999Z",
+      "data_url": "https://data.gesdisc.earthdata.nasa.gov/data/GPM_L3/GPM_3IMERGDF.07/2024/01/3B-DAY.MS.MRG.3IMERG.20240112-S000000-E235959.V07B.nc4",
+      "opendap_url": "https://opendap.earthdata.nasa.gov/collections/C2723754864-GES_DISC/granules/GPM_3IMERGDF.07%3A3B-DAY.MS.MRG.3IMERG.20240112-S000000-E235959.V07B.nc4"
+    },
+    {
+      "id": "G3087558722-GES_DISC",
+      "title": "GPM_3IMERGDF.07:3B-DAY.MS.MRG.3IMERG.20240113-S000000-E235959.V07B.nc4",
+      "collection_concept_id": "C2723754864-GES_DISC",
+      "time_start": "2024-01-13T00:00:00.000Z",
+      "time_end": "2024-01-13T23:59:59.999Z",
+      "data_url": "https://data.gesdisc.earthdata.nasa.gov/data/GPM_L3/GPM_3IMERGDF.07/2024/01/3B-DAY.MS.MRG.3IMERG.20240113-S000000-E235959.V07B.nc4",
+      "opendap_url": "https://opendap.earthdata.nasa.gov/collections/C2723754864-GES_DISC/granules/GPM_3IMERGDF.07%3A3B-DAY.MS.MRG.3IMERG.20240113-S000000-E235959.V07B.nc4"
+    },
+    {
+      "id": "G3087564861-GES_DISC",
+      "title": "GPM_3IMERGDF.07:3B-DAY.MS.MRG.3IMERG.20240114-S000000-E235959.V07B.nc4",
+      "collection_concept_id": "C2723754864-GES_DISC",
+      "time_start": "2024-01-14T00:00:00.000Z",
+      "time_end": "2024-01-14T23:59:59.999Z",
+      "data_url": "https://data.gesdisc.earthdata.nasa.gov/data/GPM_L3/GPM_3IMERGDF.07/2024/01/3B-DAY.MS.MRG.3IMERG.20240114-S000000-E235959.V07B.nc4",
+      "opendap_url": "https://opendap.earthdata.nasa.gov/collections/C2723754864-GES_DISC/granules/GPM_3IMERGDF.07%3A3B-DAY.MS.MRG.3IMERG.20240114-S000000-E235959.V07B.nc4"
+    },
+    {
+      "id": "G3087543810-GES_DISC",
+      "title": "GPM_3IMERGDF.07:3B-DAY.MS.MRG.3IMERG.20240115-S000000-E235959.V07B.nc4",
+      "collection_concept_id": "C2723754864-GES_DISC",
+      "time_start": "2024-01-15T00:00:00.000Z",
+      "time_end": "2024-01-15T23:59:59.999Z",
+      "data_url": "https://data.gesdisc.earthdata.nasa.gov/data/GPM_L3/GPM_3IMERGDF.07/2024/01/3B-DAY.MS.MRG.3IMERG.20240115-S000000-E235959.V07B.nc4",
+      "opendap_url": "https://opendap.earthdata.nasa.gov/collections/C2723754864-GES_DISC/granules/GPM_3IMERGDF.07%3A3B-DAY.MS.MRG.3IMERG.20240115-S000000-E235959.V07B.nc4"
+    }
+  ]
+}

@@ -1,0 +1,192 @@
+datasets:
+  NASA_POWER:
+    name: "NASA POWER Agroclimatology"
+    priority: 1
+    status: "active"
+    provider: "NASA Langley Research Center"
+    auth_required: false
+    access_method: "REST_JSON"
+    endpoint: "https://power.larc.nasa.gov/api/temporal/daily/point"
+    spatial_resolution: "0.5 deg x 0.625 deg (~55 km)"
+    temporal_resolution: "daily"
+    temporal_coverage_start: "1981-01-01"
+    spatial_bounds: [-180.0, -90.0, 180.0, 90.0]
+    observation_type: "reanalysis_satellite_assimilation"
+    fill_values: [-999, -999.0]
+    docs_url: "https://power.larc.nasa.gov/docs/"
+    variables:
+      T2M:
+        standard_name: "air_temperature_c"
+        unit: "degC"
+        description: "Mean air temperature at 2 meters"
+      T2M_MAX:
+        standard_name: "air_temperature_max_c"
+        unit: "degC"
+        description: "Maximum air temperature at 2 meters"
+      T2M_MIN:
+        standard_name: "air_temperature_min_c"
+        unit: "degC"
+        description: "Minimum air temperature at 2 meters"
+      PRECTOTCORR:
+        standard_name: "precipitation_mm"
+        unit: "mm/day"
+        description: "Bias-corrected total precipitation accumulation"
+      RH2M:
+        standard_name: "relative_humidity_pct"
+        unit: "%"
+        description: "Relative humidity at 2 meters"
+      ALLSKY_SFC_SW_DWN:
+        standard_name: "solar_radiation_mj_m2_day"
+        unit: "MJ/m2/day"
+        description: "All-sky surface shortwave downward irradiance"
+      WS2M:
+        standard_name: "wind_speed_m_s"
+        unit: "m/s"
+        description: "Wind speed at 2 meters"
+      GWETTOP:
+        standard_name: "surface_soil_wetness_index"
+        unit: "dimensionless"
+        description: "Surface soil wetness index (0-1, modeled assimilation)"
+      GWETROOT:
+        standard_name: "rootzone_soil_wetness_index"
+        unit: "dimensionless"
+        description: "Root-zone soil wetness index (0-1, modeled assimilation)"
+
+  GPM_IMERG:
+    name: "GPM IMERG Precipitation"
+    priority: 2
+    status: "active"
+    provider: "NASA GES DISC"
+    auth_required: true
+    access_method: "CMR_OPENDAP_NETCDF4"
+    cmr_url: "https://cmr.earthdata.nasa.gov/search/granules.json"
+    spatial_resolution: "0.1 deg x 0.1 deg (~11 km)"
+    temporal_coverage_start: "2000-06-01"
+    spatial_bounds: [-180.0, -90.0, 180.0, 90.0]
+    observation_type: "satellite"
+    docs_url: "https://gpm.nasa.gov/data/imerg"
+    collections:
+      GPM_3IMERGDF:
+        version: "07"
+        run_type: "Final"
+        temporal_resolution: "daily"
+        file_format: "NetCDF4"
+        latency: "~3.5 months (research-grade gauge-calibrated)"
+        variables:
+          precipitation:
+            standard_name: "precipitation_mm"
+            unit: "mm/day"
+            quantity_kind: "accumulated_precipitation"
+          precipitation_cnt:
+            standard_name: "precipitation_valid_sample_count"
+            unit: "count"
+          randomError:
+            standard_name: "precipitation_random_error_mm"
+            unit: "mm/day"
+      GPM_3IMERGDL:
+        version: "07"
+        run_type: "Late"
+        temporal_resolution: "daily"
+        file_format: "NetCDF4"
+        latency: "~14 hours (near-real-time crop monitoring)"
+        variables:
+          precipitation:
+            standard_name: "precipitation_mm"
+            unit: "mm/day"
+            quantity_kind: "accumulated_precipitation"
+      GPM_3IMERGHHE:
+        version: "07"
+        run_type: "Early"
+        temporal_resolution: "half-hourly"
+        file_format: "HDF5"
+        latency: "~4 hours (flash-flood / immediate rainfall rate)"
+        variables:
+          precipitationCal:
+            standard_name: "precipitation_rate_mm_hr"
+            unit: "mm/hr"
+            quantity_kind: "precipitation_rate"
+
+  SMAP:
+    name: "NASA SMAP Soil Moisture"
+    priority: 3
+    status: "active"
+    provider: "NASA NSIDC DAAC"
+    auth_required: true
+    access_method: "CMR_OPENDAP_HDF5"
+    cmr_url: "https://cmr.earthdata.nasa.gov/search/granules.json"
+    spatial_resolution: "9 km EASE-Grid 2.0"
+    temporal_coverage_start: "2015-03-31"
+    spatial_bounds: [-180.0, -85.044, 180.0, 85.044]
+    observation_type: "satellite"
+    docs_url: "https://smap.jpl.nasa.gov/data/"
+    collections:
+      SPL3SMP_E:
+        version: "006"
+        product_level: "L3 Enhanced Radiometer"
+        temporal_resolution: "daily"
+        file_format: "HDF5"
+        variables:
+          soil_moisture:
+            standard_name: "soil_moisture_surface_m3_m3"
+            unit: "m3/m3"
+            depth_layer: "surface (0-5 cm)"
+          retrieval_qual_flag:
+            standard_name: "smap_retrieval_quality_flag"
+            unit: "bitmask"
+      SPL4SMGP:
+        version: "008"
+        product_level: "L4 Geophysical Model Assimilation"
+        temporal_resolution: "3-hourly"
+        file_format: "HDF5"
+        variables:
+          sm_surface:
+            standard_name: "soil_moisture_surface_m3_m3"
+            unit: "m3/m3"
+            depth_layer: "surface (0-5 cm)"
+          sm_rootzone:
+            standard_name: "soil_moisture_rootzone_m3_m3"
+            unit: "m3/m3"
+            depth_layer: "root zone (0-100 cm)"
+
+  MODIS:
+    name: "MODIS Vegetation Indices (MOD13Q1)"
+    priority: 4
+    status: "planned_phase_6"
+    provider: "NASA LP DAAC"
+    auth_required: true
+    access_method: "CMR_OPENDAP_HDF4"
+    spatial_resolution: "250 m"
+    temporal_resolution: "16-day composite"
+    temporal_coverage_start: "2000-02-18"
+    spatial_bounds: [-180.0, -90.0, 180.0, 90.0]
+    observation_type: "satellite"
+    docs_url: "https://lpdaac.usgs.gov/products/mod13q1v061/"
+
+  ECOSTRESS:
+    name: "ECOSTRESS Land Surface Temperature & ET"
+    priority: 5
+    status: "planned_phase_6"
+    provider: "NASA LP DAAC"
+    auth_required: true
+    access_method: "AppEEARS_CMR"
+    spatial_resolution: "70 m"
+    temporal_resolution: "irregular (ISS overpass ~3-5 days)"
+    temporal_coverage_start: "2018-07-09"
+    spatial_bounds: [-180.0, -52.0, 180.0, 52.0]
+    observation_type: "satellite"
+    docs_url: "https://ecostress.jpl.nasa.gov/data"
+
+  NEX_GDDP_CMIP6:
+    name: "NASA NEX-GDDP-CMIP6 Climate Projections"
+    priority: 6
+    status: "planned_phase_6"
+    provider: "NASA NCCS"
+    auth_required: false
+    access_method: "THREDDS_S3_NETCDF"
+    spatial_resolution: "0.25 deg (~25 km)"
+    temporal_resolution: "daily"
+    temporal_coverage_start: "1950-01-01"
+    spatial_bounds: [-180.0, -60.0, 180.0, 90.0]
+    observation_type: "climate_projection"
+    docs_url: "https://www.nccs.nasa.gov/services/data-collections/land-based-products/nex-gddp-cmip6"
+

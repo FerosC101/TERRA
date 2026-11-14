@@ -1,0 +1,64 @@
+{
+  "run_timestamp": "2026-11-14T07:19:57Z",
+  "aoi": {
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "area_km2": 1.3372,
+    "area_ha": 133.72,
+    "centroid": {
+      "lat": 13.983842,
+      "lon": 121.184648
+    },
+    "bbox": [
+      121.176299,
+      13.976575,
+      121.193002,
+      13.990451
+    ]
+  },
+  "date_range": {
+    "start_date": "2024-01-01",
+    "end_date": "2024-01-03"
+  },
+  "earthdata_credentials_configured": true,
+  "total_records_upserted": 9,
+  "datasets": {
+    "NASA_POWER": {
+      "retrieval_status": "RETRIEVED_LIVE",
+      "records_processed": 3,
+      "quality_status": "VALID",
+      "missing_value_count": 0,
+      "warnings": []
+    },
+    "GPM_IMERG": {
+      "retrieval_status": "RETRIEVED_LIVE",
+      "product": "GPM_3IMERGDF",
+      "cmr_granules_discovered": 3,
+      "records_processed": 3,
+      "quality_status": "VALID",
+      "warnings": []
+    },
+    "SMAP": {
+      "retrieval_status": "PROCESSED",
+      "products": {
+        "SPL3SMP_E": {
+          "retrieval_status": "RETRIEVED_LIVE",
+          "cmr_granules_discovered": 3,
+          "records_processed": 3,
+          "message": null
+        }
+      },
+      "records_processed": 3,
+      "quality_status": "INCOMPLETE",
+      "warnings": [
+        "SMAP retrieval quality bit 0 set (flag=9) at 2024-01-02T00:00:00Z; retained with warning.",
+        "SMAP retrieval quality bit 0 set (flag=9) at 2024-01-03T00:00:00Z; retained with warning."
+      ]
+    }
+  },
+  "storage_outputs": {
+    "sqlite_db": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\data\\processed\\terra.db",
+    "json_repository": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\data\\processed\\terra_observations.json",
+    "parquet_repository": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\data\\processed\\terra_observations.parquet"
+  }
+}

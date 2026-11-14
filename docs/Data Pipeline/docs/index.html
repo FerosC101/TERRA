@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TERRA NASA Data Pipeline — Documentation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #ffffff;
+      --surface: #fafafa;
+      --text: #000000;
+      --text-muted: #525252;
+      --border: #e5e5e5;
+      --border-strong: #000000;
+
+      /* Status labels only: Green, Yellow, Red */
+      --green-bg: #dcfce7;
+      --green-fg: #166534;
+      --green-bd: #86efac;
+
+      --yellow-bg: #fef9c3;
+      --yellow-fg: #854d0e;
+      --yellow-bd: #fde047;
+
+      --red-bg: #fee2e2;
+      --red-fg: #991b1b;
+      --red-bd: #fca5a5;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+      font-size: 15px;
+      -webkit-font-smoothing: antialiased;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    aside {
+      width: 260px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      background: var(--bg);
+      border-right: 1px solid var(--border);
+      padding: 28px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .brand {
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand h1 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin: 0;
+      letter-spacing: -0.01em;
+      color: var(--text);
+    }
+
+    .brand span {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .nav-search {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.84rem;
+      outline: none;
+    }
+    .nav-search:focus { border-color: var(--border-strong); background: var(--bg); }
+
+    nav { display: flex; flex-direction: column; gap: 2px; }
+    nav a {
+      text-decoration: none;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      font-weight: 500;
+      padding: 7px 10px;
+      border-radius: 6px;
+      transition: background 0.12s, color 0.12s;
+    }
+    nav a:hover {
+      background: var(--surface);
+      color: var(--text);
+    }
+
+    /* Main Content */
+    main {
+      flex: 1;
+      max-width: 960px;
+      padding: 44px 48px 96px;
+      margin: 0 auto;
+    }
+
+    section {
+      margin-bottom: 52px;
+      scroll-margin-top: 28px;
+    }
+
+    h2 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin: 0 0 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    h3 {
+      font-size: 0.98rem;
+      font-weight: 600;
+      margin: 18px 0 8px;
+      color: var(--text);
+    }
+
+    p { color: var(--text-muted); margin: 0 0 14px; }
+
+    .hero {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 28px;
+      margin-bottom: 40px;
+    }
+
+    .hero h2 {
+      border: none;
+      padding: 0;
+      margin-bottom: 8px;
+      font-size: 1.9rem;
+      letter-spacing: -0.03em;
+    }
+
+    /* Labels: strictly Green, Yellow, Red (plus monochrome neutral) */
+    .label-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+    .label {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.74rem;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      white-space: nowrap;
+    }
+    .label.green { background: var(--green-bg); color: var(--green-fg); border-color: var(--green-bd); }
+    .label.yellow { background: var(--yellow-bg); color: var(--yellow-fg); border-color: var(--yellow-bd); }
+    .label.red { background: var(--red-bg); color: var(--red-fg); border-color: var(--red-bd); }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 14px;
+      margin: 20px 0 0;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 18px;
+      margin: 16px 0;
+    }
+
+    .card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 18px 20px;
+    }
+
+    .metric-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .metric-val {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      margin-top: 4px;
+    }
+    .metric-sub { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
+
+    /* Monochrome Architecture Flow */
+    .pipeline-flow {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin: 16px 0;
+    }
+    .flow-step {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-top: 2px solid var(--text);
+      border-radius: 6px;
+      padding: 10px 12px;
+      min-width: 132px;
+      flex: 1;
+    }
+    .flow-step strong { display: block; font-size: 0.84rem; font-weight: 600; color: var(--text); }
+    .flow-step small { font-size: 0.74rem; color: var(--text-muted); }
+    .flow-arrow { color: var(--text-muted); font-weight: 600; font-size: 0.95rem; }
+
+    /* Tables */
+    .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); }
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    th, td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { background: var(--surface); font-weight: 600; color: var(--text); font-size: 0.8rem; }
+    tr:last-child td { border-bottom: none; }
+
+    /* Code */
+    pre {
+      background: var(--surface);
+      color: var(--text);
+      padding: 14px 16px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-size: 0.8rem;
+      line-height: 1.55;
+      border: 1px solid var(--border);
+      position: relative;
+      margin: 0;
+    }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.86em; }
+    p code, td code, li code, small code {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 1px 5px;
+      border-radius: 4px;
+      color: var(--text);
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 3px 9px;
+      font-family: inherit;
+      font-size: 0.72rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .copy-btn:hover { border-color: var(--border-strong); }
+
+    /* Tabs */
+    .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+    .tab-btn {
+      background: var(--bg);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 7px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.83rem;
+      font-weight: 500;
+    }
+    .tab-btn:hover { color: var(--text); border-color: var(--text); }
+    .tab-btn.active {
+      background: var(--text);
+      color: var(--bg);
+      border-color: var(--text);
+    }
+
+    /* AOI SVG */
+    .aoi-box {
+      display: grid;
+      grid-template-columns: 1.05fr 1fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+    .svg-panel {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    svg#aoi-svg {
+      width: 100%;
+      height: 290px;
+      background: var(--surface);
+      border-radius: 6px;
+      border: 1px solid var(--border);
+    }
+    .vertex-tooltip {
+      font-size: 0.78rem;
+      color: var(--text);
+      min-height: 20px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    /* Monochrome Bars & Slider */
+    .bar-row { display: flex; align-items: center; gap: 10px; margin: 10px 0; font-size: 0.84rem; }
+    .bar-label { width: 155px; flex-shrink: 0; color: var(--text-muted); }
+    .bar-track { flex: 1; height: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: 999px; overflow: hidden; }
+    .bar-fill { height: 100%; background: var(--text); border-radius: 999px; }
+
+    input[type="range"] { width: 100%; accent-color: #000000; }
+
+    .endpoint-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 8px;
+      font-size: 0.87rem;
+    }
+
+    .btn-primary {
+      background: var(--text);
+      color: var(--bg);
+      border: 1px solid var(--text);
+      padding: 7px 14px;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 0.83rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .btn-primary:hover { opacity: 0.86; }
+
+    input[type="text"], select {
+      font-family: inherit;
+      font-size: 0.84rem;
+      padding: 7px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+    }
+    input[type="text"]:focus, select:focus { outline: none; border-color: var(--text); }
+
+    ul { margin: 0; padding-left: 18px; color: var(--text-muted); font-size: 0.88rem; }
+    li { margin-bottom: 6px; }
+
+    @media (max-width: 900px) {
+      body { flex-direction: column; }
+      aside { width: 100%; height: auto; position: static; border-right: none; border-bottom: 1px solid var(--border); }
+      main { padding: 24px 20px 60px; }
+      .aoi-box { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <aside>
+    <div class="brand">
+      <h1>TERRA Pipeline Docs</h1>
+      <span>NASA Earthdata Engineering · v1.0</span>
+    </div>
+
+    <input type="text" class="nav-search" id="navSearch" placeholder="Filter sections..." />
+
+    <nav id="sideNav">
+      <a href="#overview">1. Overview &amp; Status</a>
+      <a href="#architecture">2. System Architecture</a>
+      <a href="#aoi">3. Lipa Cropland AOI</a>
+      <a href="#datasets">4. NASA Datasets Catalog</a>
+      <a href="#live-results">5. Live Observations</a>
+      <a href="#storage">6. Storage &amp; Size Estimator</a>
+      <a href="#schema-qc">7. Schema &amp; Quality Control</a>
+      <a href="#api">8. TERRA FastAPI Reference</a>
+      <a href="#setup">9. Setup &amp; Earthdata Auth</a>
+      <a href="#troubleshooting">10. Tests &amp; Troubleshooting</a>
+    </nav>
+  </aside>
+
+  <main>
+    <div class="hero" id="overview">
+      <h2>TERRA NASA Earth Observation Data Pipeline</h2>
+      <p>
+        Automated, AOI-scoped retrieval, cleaning, harmonization, and FastAPI delivery of
+        <strong>NASA POWER</strong>, <strong>GPM IMERG</strong>, and <strong>SMAP</strong> observations
+        for <code>Lipa_Cropland_AOI</code> (Lipa City, Batangas, Philippines).
+      </p>
+      <div class="label-row">
+        <span class="label green">NASA POWER · Live Verified</span>
+        <span class="label green">GPM IMERG · Live Verified</span>
+        <span class="label green">SMAP L3 · Live Verified</span>
+        <span class="label green">FastAPI · 10 Endpoints</span>
+        <span class="label green">pytest · 8 / 8 Passing</span>
+      </div>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="metric-label">Authoritative AOI Area</div>
+          <div class="metric-val">1.3372 km²</div>
+          <div class="metric-sub">133.72 ha · 16-vertex Polygon</div>
+        </div>
+        <div class="card">
+          <div class="metric-label">Processed Repository</div>
+          <div class="metric-val">~0.36 MB</div>
+          <div class="metric-sub">SQLite + Parquet + JSON</div>
+        </div>
+        <div class="card">
+          <div class="metric-label">Raw Global Granules (3d)</div>
+          <div class="metric-val">1.99 GB</div>
+          <div class="metric-sub">~637 MB/d SMAP + ~26.7 MB/d GPM</div>
+        </div>
+      </div>
+    </div>
+
+    <section id="architecture">
+      <h2>2. System Architecture</h2>
+      <p>
+        Dataset collectors sit behind a unified interface while honoring each NASA protocol
+        (REST JSON for POWER; NASA CMR + Earthdata URS token redirects for GPM NetCDF4 and SMAP HDF5).
+      </p>
+      <div class="pipeline-flow">
+        <div class="flow-step"><strong>1. AOI &amp; Config</strong><small><code>farm_config.yaml</code> + GeoJSON</small></div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-step"><strong>2. CMR Discovery</strong><small>Granule coverage manifests</small></div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-step"><strong>3. Raw Cache</strong><small>Unchanged in <code>data/raw/</code></small></div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-step"><strong>4. Subset &amp; Units</strong><small>Nearest cell, <code>0.25°</code> guard</small></div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-step"><strong>5. QC &amp; Schema</strong><small>Extreme preservation, nulls</small></div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-step"><strong>6. Store &amp; API</strong><small>SQLite + Parquet + FastAPI</small></div>
+      </div>
+    </section>
+
+    <section id="aoi">
+      <h2>3. Lipa Cropland AOI</h2>
+      <div class="aoi-box">
+        <div class="svg-panel">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <strong style="font-size:0.88rem;">Lipa_Cropland_AOI (EPSG:4326)</strong>
+            <span class="label">Hover vertices</span>
+          </div>
+          <svg id="aoi-svg" viewBox="0 0 400 280" aria-label="Lipa Cropland Polygon"></svg>
+          <div class="vertex-tooltip" id="vertexTooltip">Centroid: 13.983842° N, 121.184648° E</div>
+        </div>
+
+        <div class="card">
+          <h3 style="margin-top:0;">Validated Spatial Metadata</h3>
+          <div class="table-wrap" style="margin-bottom:14px;">
+            <table>
+              <tbody>
+                <tr><td><strong>Location ID</strong></td><td><code>lipa_cropland_001</code></td></tr>
+                <tr><td><strong>Centroid</strong></td><td><code>13.983842° N, 121.184648° E</code></td></tr>
+                <tr><td><strong>BBox</strong></td><td><code>[121.176299, 13.976575, 121.193002, 13.990451]</code></td></tr>
+                <tr><td><strong>Area</strong></td><td><code>1.3372 km²</code> (<code>133.72 ha</code>)</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3>Scale Honesty Rules</h3>
+          <p style="font-size:0.85rem; margin-bottom:0;">
+            Because the farm AOI (<code>1.34 km²</code>) is smaller than native grid pixels
+            (POWER <code>~55 km</code>, GPM <code>~11 km</code>, SMAP <code>9 km</code>),
+            <code>raster_processor.py</code> uses <code>nearest_grid_cell_containing_aoi</code> and enforces a
+            <code>0.25°</code> (~27 km) swath distance check so SMAP orbital miss days report
+            <code>no_overpass_covering_aoi</code> instead of matching a distant pixel.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="datasets">
+      <h2>4. Supported NASA Datasets</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Priority</th>
+              <th>Dataset</th>
+              <th>Products / Collections</th>
+              <th>Variables &amp; Standard Units</th>
+              <th>Spatial / Temporal</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td><strong>NASA POWER</strong></td>
+              <td><code>NASA_POWER_AG_DAILY</code> (v2.10.3)</td>
+              <td><code>air_temperature_c</code> (degC), <code>precipitation_mm</code> (mm/day), <code>relative_humidity_pct</code> (%), <code>solar_radiation_mj_m2_day</code>, <code>wind_speed_m_s</code>, <code>surface_soil_wetness_index</code></td>
+              <td>0.5° × 0.625° (~55 km) · Daily</td>
+              <td><span class="label green">Live Verified</span></td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td><strong>GPM IMERG</strong></td>
+              <td><code>GPM_3IMERGDF</code> (Final ~3.5 mo), <code>GPM_3IMERGDL</code> (Late ~14 hr), <code>GPM_3IMERGHHE</code> (Early ~4 hr) V07B</td>
+              <td><code>precipitation_mm</code> (mm/day accumulation) vs. <code>precipitation_rate_mm_hr</code> (mm/hr rate), <code>randomError</code>, <code>precipitation_cnt</code></td>
+              <td>0.1° × 0.1° (~11 km) · Daily / 30-min</td>
+              <td><span class="label green">Live Verified (DF)</span></td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td><strong>SMAP</strong></td>
+              <td><code>SPL3SMP_E</code> v006 (Daily L3), <code>SPL4SMGP</code> v008 (3-Hr L4)</td>
+              <td><code>soil_moisture_surface_m3_m3</code> (m³/m³), <code>soil_moisture_rootzone_m3_m3</code>, <code>smap_retrieval_quality_flag</code></td>
+              <td>9 km EASE-Grid 2.0 · Daily / 3-Hr</td>
+              <td><span class="label green">Live Verified (L3)</span></td>
+            </tr>
+            <tr>
+              <td>4–6</td>
+              <td><strong>MODIS / ECOSTRESS / CMIP6</strong></td>
+              <td><code>MOD13Q1</code>, <code>ECO2LSTE</code>, <code>NEX_GDDP_CMIP6</code></td>
+              <td>NDVI/EVI, Land Surface Temp / ET, Future climate projections</td>
+              <td>250 m / 70 m / 0.25°</td>
+              <td><span class="label yellow">Planned Phase 6</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="live-results">
+      <h2>5. Live Verified Observations (2024-01-01 .. 2024-01-03)</h2>
+      <p>Actual retrieved and standardized observations processed for <code>Lipa_Cropland_AOI</code>:</p>
+
+      <div class="tabs">
+        <button class="tab-btn active" type="button" data-tab="power">NASA POWER (Daily)</button>
+        <button class="tab-btn" type="button" data-tab="gpm">GPM IMERG (Final V07B)</button>
+        <button class="tab-btn" type="button" data-tab="smap">SMAP L3 (SPL3SMP_E v006)</button>
+      </div>
+
+      <div class="card" id="tabContent"></div>
+    </section>
+
+    <section id="storage">
+      <h2>6. Storage Layers &amp; Disk Size Estimator</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3 style="margin-top:0;">Observed Disk Footprint (Current Run)</h3>
+          <div class="bar-row"><span class="bar-label">SMAP L3 Raw (3d)</span><div class="bar-track"><div class="bar-fill" style="width:96%"></div></div><span>1,911.4 MB</span></div>
+          <div class="bar-row"><span class="bar-label">GPM IMERG Raw (3d)</span><div class="bar-track"><div class="bar-fill" style="width:12%"></div></div><span>80.1 MB</span></div>
+          <div class="bar-row"><span class="bar-label">NASA POWER Raw</span><div class="bar-track"><div class="bar-fill" style="width:1%"></div></div><span>9.9 KB</span></div>
+          <div class="bar-row"><span class="bar-label">SQLite + JSON + Parquet</span><div class="bar-track"><div class="bar-fill" style="width:2%"></div></div><span>0.27 MB</span></div>
+          <p style="font-size:0.82rem; margin:12px 0 0;">
+            Raw files are global NetCDF4/HDF5 granules prior to clipping. After extraction, the entire
+            <code>data/processed/</code> SQLite, JSON, and Parquet store takes <strong>&lt; 0.5 MB</strong>.
+          </p>
+        </div>
+
+        <div class="card">
+          <h3 style="margin-top:0;">Download Size Estimator</h3>
+          <label for="daysSlider" style="font-size:0.85rem; color:var(--text-muted);">
+            Date Range Length: <strong id="daysLabel" style="color:var(--text);">7 days</strong>
+          </label>
+          <input type="range" id="daysSlider" min="1" max="90" value="7" />
+          <div class="grid-3" style="margin-top:14px;">
+            <div>
+              <div class="metric-label">SMAP Raw (.h5)</div>
+              <div class="metric-val" id="estSmap" style="font-size:1.15rem;">4.36 GB</div>
+            </div>
+            <div>
+              <div class="metric-label">GPM Raw (.nc4)</div>
+              <div class="metric-val" id="estGpm" style="font-size:1.15rem;">187 MB</div>
+            </div>
+            <div>
+              <div class="metric-label">Processed Repo</div>
+              <div class="metric-val" id="estProc" style="font-size:1.15rem;">~0.11 MB</div>
+            </div>
+          </div>
+          <p style="font-size:0.78rem; margin:12px 0 0;">
+            Observed rates: SMAP <code>~637 MB/day</code>, GPM <code>~26.7 MB/day</code>,
+            POWER <code>~0.4 KB/day</code>, Processed repo <code>~16 KB/day</code>.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="schema-qc">
+      <h2>7. Standardized Data Schema &amp; Quality Control</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3 style="margin-top:0;">Quality Status Labels</h3>
+          <ul>
+            <li><span class="label green">VALID</span> All checks passed; no missing or out-of-range values.</li>
+            <li><span class="label yellow">VALID_WITH_WARNINGS</span> Extreme weather (&ge; 100 mm/day rain, &ge; 40 °C), deduplication, or SMAP bitmask bit-0 set (values retained).</li>
+            <li><span class="label yellow">INCOMPLETE</span> Missing values (<code>-999</code>, <code>-9999</code>, or <code>no_overpass_covering_aoi</code>) preserved as <code>null</code> — never coerced to <code>0</code>.</li>
+            <li><span class="label red">INVALID</span> Zero valid records or invalid physical bounds (e.g., <code>RH &gt; 100%</code>).</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 style="margin-top:0;">Sample JSON Record</h3>
+          <pre><button class="copy-btn" data-copy="schemaPre">Copy</button><code id="schemaPre">{
+  "record_id": "lipa_cropland_001_SMAP_SPL3SMP_E_20240102T000000Z",
+  "location_id": "lipa_cropland_001",
+  "timestamp": "2024-01-02T00:00:00Z",
+  "flat_observations": {
+    "soil_moisture_surface_m3_m3": 0.408539,
+    "smap_retrieval_quality_flag": 9.0
+  },
+  "metadata": {
+    "sources": ["SMAP"],
+    "quality_status": "VALID_WITH_WARNINGS",
+    "observation_types": ["satellite"],
+    "spatial_resolution": {"SMAP": "9 km EASE-Grid 2.0"}
+  }
+}</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section id="api">
+      <h2>8. TERRA FastAPI Reference</h2>
+      <p>
+        Start the server with <code>python main.py --action serve --port 8000</code> and test live endpoints below
+        (or open <code>http://localhost:8000/docs</code>):
+      </p>
+
+      <div class="card" style="margin-bottom:16px;">
+        <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+          <input type="text" id="apiBase" value="http://localhost:8000" style="min-width:210px;" />
+          <select id="apiEndpoint">
+            <option value="/health">GET /health</option>
+            <option value="/aoi">GET /aoi</option>
+            <option value="/datasets">GET /datasets</option>
+            <option value="/observations?start_date=2024-01-01&end_date=2024-01-03">GET /observations?start_date=2024-01-01&amp;end_date=2024-01-03</option>
+            <option value="/observations/precipitation">GET /observations/precipitation</option>
+            <option value="/observations/soil-moisture">GET /observations/soil-moisture</option>
+            <option value="/observations/temperature">GET /observations/temperature</option>
+            <option value="/observations/vegetation">GET /observations/vegetation</option>
+            <option value="/metadata">GET /metadata</option>
+            <option value="/pipeline/status">GET /pipeline/status</option>
+          </select>
+          <button class="btn-primary" type="button" id="runApiBtn">Send Request</button>
+        </div>
+        <pre style="margin-top:12px; max-height:260px;"><code id="apiOutput">Click "Send Request" while `python main.py --action serve` is running locally.</code></pre>
+      </div>
+
+      <div class="endpoint-card"><span class="label green">GET</span> <code>/observations</code> — Filter by <code>start_date</code>, <code>end_date</code>, <code>dataset</code>, <code>variable</code>, <code>aoi_id</code>, <code>quality_status</code>.</div>
+      <div class="endpoint-card"><span class="label green">GET</span> <code>/observations/precipitation</code> — Separates daily accumulation (<code>mm/day</code>) from rate (<code>mm/hr</code>).</div>
+      <div class="endpoint-card"><span class="label green">GET</span> <code>/observations/soil-moisture</code> — Distinguishes satellite volumetric <code>m³/m³</code> (SMAP) from modeled wetness indices (POWER).</div>
+      <div class="endpoint-card"><span class="label green">GET</span> <code>/observations/temperature</code> — Daily mean, max, and min air temperature (<code>degC</code>).</div>
+      <div class="endpoint-card"><span class="label yellow">GET</span> <code>/observations/vegetation</code> — Reserved for Phase 6 MODIS <code>MOD13Q1</code> NDVI/EVI.</div>
+    </section>
+
+    <section id="setup">
+      <h2>9. Setup, Earthdata Auth &amp; CLI Commands</h2>
+      <pre><button class="copy-btn" data-copy="cliPre">Copy</button><code id="cliPre"># Install dependencies &amp; configure Earthdata token
+pip install -r requirements.txt
+cp .env.example .env
+# Edit .env and set EARTHDATA_TOKEN=... (approve GESDISC + NSIDC Cumulus Data on urs.earthdata.nasa.gov)
+
+# Run full pipeline for a 3-day window
+python main.py --start-date 2024-01-01 --end-date 2024-01-03
+
+# Individual actions
+python main.py --action discover
+python main.py --action download
+python main.py --action process
+python main.py --action serve --port 8000</code></pre>
+    </section>
+
+    <section id="troubleshooting">
+      <h2>10. Tests &amp; Troubleshooting</h2>
+      <div class="card">
+        <p style="margin-bottom:10px;">
+          <span class="label green">8 / 8 Passing</span>
+          <strong>Run automated suite:</strong> <code>pytest -v</code>
+        </p>
+        <ul>
+          <li><span class="label red">401 / 403 Error</span> Approve <code>NASA GESDISC DATA ARCHIVE</code>, <code>NSIDC Cumulus Data</code>, and <code>NSIDC_DATAPOOL_OPS</code> in your URS profile.</li>
+          <li><span class="label yellow">Swath Gap</span> <code>no_overpass_covering_aoi</code> in SMAP is expected on days when SMAP's 2–3 day tropical orbit misses Lipa.</li>
+          <li><span class="label yellow">3.5 mo Lag</span> Switch <code>preferred_product</code> in <code>config/farm_config.yaml</code> from <code>GPM_3IMERGDF</code> to <code>GPM_3IMERGDL</code> for ~14-hour latency.</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // 1. Sidebar filter
+    const navSearch = document.getElementById("navSearch");
+    const navLinks = Array.from(document.querySelectorAll("#sideNav a"));
+    navSearch.addEventListener("input", () => {
+      const q = navSearch.value.trim().toLowerCase();
+      navLinks.forEach((a) => {
+        a.style.display = a.textContent.toLowerCase().includes(q) ? "block" : "none";
+      });
+    });
+
+    // 2. Plot exact 16-vertex Lipa Cropland polygon in crisp white/black + green/yellow/red markers
+    const coords = [
+      [121.180302, 13.987887], [121.181271, 13.984303], [121.17961, 13.983545],
+      [121.179512, 13.982984], [121.176299, 13.981375], [121.178408, 13.976575],
+      [121.183187, 13.978996], [121.182508, 13.98123], [121.184092, 13.98201],
+      [121.185371, 13.979918], [121.193002, 13.982692], [121.188807, 13.990451],
+      [121.186069, 13.98934], [121.184397, 13.988404], [121.183664, 13.98934],
+      [121.180302, 13.987887]
+    ];
+    const minLon = 121.176299, maxLon = 121.193002, minLat = 13.976575, maxLat = 13.990451;
+    const pad = 34, w = 400, h = 280;
+    const project = ([lon, lat]) => [
+      pad + ((lon - minLon) / (maxLon - minLon)) * (w - 2 * pad),
+      h - pad - ((lat - minLat) / (maxLat - minLat)) * (h - 2 * pad)
+    ];
+    const svg = document.getElementById("aoi-svg");
+    const tooltip = document.getElementById("vertexTooltip");
+    const pts = coords.map(project);
+
+    const poly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+    poly.setAttribute("points", pts.map(p => p.join(",")).join(" "));
+    poly.setAttribute("fill", "#dcfce7");
+    poly.setAttribute("stroke", "#166534");
+    poly.setAttribute("stroke-width", "2");
+    svg.appendChild(poly);
+
+    const [cx, cy] = project([121.184648, 13.983842]);
+    const cDot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    cDot.setAttribute("cx", cx);
+    cDot.setAttribute("cy", cy);
+    cDot.setAttribute("r", "5");
+    cDot.setAttribute("fill", "#facc15");
+    cDot.setAttribute("stroke", "#000000");
+    cDot.setAttribute("stroke-width", "1.2");
+    svg.appendChild(cDot);
+
+    coords.slice(0, -1).forEach((c, idx) => {
+      const [vx, vy] = pts[idx];
+      const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      dot.setAttribute("cx", vx);
+      dot.setAttribute("cy", vy);
+      dot.setAttribute("r", "3.8");
+      dot.setAttribute("fill", "#000000");
+      dot.style.cursor = "pointer";
+      dot.addEventListener("mouseenter", () => {
+        dot.setAttribute("fill", "#dc2626");
+        dot.setAttribute("r", "5");
+        tooltip.textContent = `Vertex #${idx + 1}: lat=${c[1]}° N, lon=${c[0]}° E`;
+      });
+      dot.addEventListener("mouseleave", () => {
+        dot.setAttribute("fill", "#000000");
+        dot.setAttribute("r", "3.8");
+      });
+      svg.appendChild(dot);
+    });
+
+    // 3. Tabbed Live Data Explorer
+    const tabData = {
+      power: `
+        <h3 style="margin-top:0;">NASA POWER Agroclimatology (NASA_POWER_AG_DAILY v2.10.3)</h3>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Date (UTC)</th><th>Temp Mean / Min / Max</th><th>Precip</th><th>RH2M</th><th>Solar</th><th>Wetness (Top / Root)</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>2024-01-01</td><td>25.96 °C (24.27–28.65)</td><td>3.42 mm/d</td><td>92.39%</td><td>16.68 MJ/m²/d</td><td>0.92 / 0.95</td><td><span class="label green">VALID</span></td></tr>
+            <tr><td>2024-01-02</td><td>25.87 °C (23.63–29.52)</td><td>2.34 mm/d</td><td>90.39%</td><td>14.89 MJ/m²/d</td><td>0.92 / 0.95</td><td><span class="label green">VALID</span></td></tr>
+            <tr><td>2024-01-03</td><td>25.94 °C (23.47–29.94)</td><td>1.32 mm/d</td><td>89.15%</td><td>14.28 MJ/m²/d</td><td>0.91 / 0.94</td><td><span class="label green">VALID</span></td></tr>
+          </tbody>
+        </table></div>`,
+      gpm: `
+        <h3 style="margin-top:0;">GPM IMERG Final Run (GPM_3IMERGDF V07B · ~11 km grid center 13.95° N, 121.15° E)</h3>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Date (UTC)</th><th>Precipitation</th><th>Random Error</th><th>Valid Samples</th><th>Extraction Mode</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>2024-01-01</td><td>0.0 mm/day</td><td>2.764801 mm/day</td><td>48 / 48</td><td>nearest_grid_cell_containing_aoi</td><td><span class="label green">VALID</span></td></tr>
+            <tr><td>2024-01-02</td><td>0.0 mm/day</td><td>2.764801 mm/day</td><td>48 / 48</td><td>nearest_grid_cell_containing_aoi</td><td><span class="label green">VALID</span></td></tr>
+            <tr><td>2024-01-03</td><td>0.0 mm/day</td><td>2.764801 mm/day</td><td>48 / 48</td><td>nearest_grid_cell_containing_aoi</td><td><span class="label green">VALID</span></td></tr>
+          </tbody>
+        </table></div>`,
+      smap: `
+        <h3 style="margin-top:0;">SMAP L3 Enhanced 9 km Soil Moisture (SPL3SMP_E v006)</h3>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Date (UTC)</th><th>Surface Soil Moisture</th><th>Quality Bitmask</th><th>Extraction Mode</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>2024-01-01</td><td><code>null</code></td><td><code>null</code></td><td><span class="label red">no_overpass_covering_aoi</span></td><td><span class="label yellow">INCOMPLETE</span></td></tr>
+            <tr><td>2024-01-02</td><td><strong>0.408539 m³/m³</strong></td><td>9</td><td>nearest_grid_cell_containing_aoi</td><td><span class="label yellow">VALID_WITH_WARNINGS</span></td></tr>
+            <tr><td>2024-01-03</td><td><strong>0.474740 m³/m³</strong></td><td>9</td><td>nearest_grid_cell_containing_aoi</td><td><span class="label yellow">VALID_WITH_WARNINGS</span></td></tr>
+          </tbody>
+        </table></div>`
+    };
+    const tabContent = document.getElementById("tabContent");
+    const tabButtons = Array.from(document.querySelectorAll(".tab-btn[data-tab]"));
+    const renderTab = (key) => {
+      tabButtons.forEach(b => b.classList.toggle("active", b.dataset.tab === key));
+      tabContent.innerHTML = tabData[key];
+    };
+    tabButtons.forEach(btn => btn.addEventListener("click", () => renderTab(btn.dataset.tab)));
+    renderTab("power");
+
+    // 4. Storage Estimator
+    const slider = document.getElementById("daysSlider");
+    const updateEst = () => {
+      const days = Number(slider.value);
+      document.getElementById("daysLabel").textContent = `${days} day${days > 1 ? "s" : ""}`;
+      const smapMb = days * 637.1;
+      document.getElementById("estSmap").textContent = smapMb >= 1024 ? `${(smapMb / 1024).toFixed(2)} GB` : `${Math.round(smapMb)} MB`;
+      const gpmMb = days * 26.7;
+      document.getElementById("estGpm").textContent = gpmMb >= 1024 ? `${(gpmMb / 1024).toFixed(2)} GB` : `${Math.round(gpmMb)} MB`;
+      const procMb = (days * 16) / 1024;
+      document.getElementById("estProc").textContent = `~${procMb.toFixed(2)} MB`;
+    };
+    slider.addEventListener("input", updateEst);
+    updateEst();
+
+    // 5. Copy buttons
+    document.querySelectorAll(".copy-btn").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const target = document.getElementById(btn.dataset.copy);
+        await navigator.clipboard.writeText(target.textContent);
+        btn.textContent = "Copied";
+        setTimeout(() => { btn.textContent = "Copy"; }, 1400);
+      });
+    });
+
+    // 6. Live FastAPI Tester
+    document.getElementById("runApiBtn").addEventListener("click", async () => {
+      const base = document.getElementById("apiBase").value.replace(/\/+$/, "");
+      const ep = document.getElementById("apiEndpoint").value;
+      const out = document.getElementById("apiOutput");
+      out.textContent = `Fetching ${base}${ep} ...`;
+      try {
+        const res = await fetch(`${base}${ep}`);
+        const data = await res.json();
+        out.textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        out.textContent = `Could not reach ${base}${ep}. Start server with: python main.py --action serve --port 8000\n\nError: ${err.message}`;
+      }
+    });
+  </script>
+</body>
+</html>
