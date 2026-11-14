@@ -1,0 +1,2594 @@
+{
+  "experiment": "E-004",
+  "dataKind": "SIMULATED — synthetic FieldDay records, not field or NASA data",
+  "commit": "fea3f89",
+  "workingTreeDirty": true,
+  "sourceSha256": {
+    "lib/science/discovery/engine.ts": "0586cce32fc98475",
+    "lib/science/discovery/candidates.ts": "77ef121f809e346b",
+    "lib/science/discovery/evaluate.ts": "f2fbece79d39da8c",
+    "lib/demo/syntheticFieldDays.ts": "4e9ae92389c0b310",
+    "lib/demo/soilModel.ts": "05a4b24f845051c1",
+    "data/discoveryRules.ts": "0248e24ef98071fc",
+    "data/crops.ts": "5f3b7fc4ae3e0f77",
+    "data/fields.ts": "128b275759b39c8e",
+    "scripts/evaluate-discovery-e004.ts": "063ba2cb929e869e",
+    "scripts/discoveryHarness.ts": "52decf5a395647c3",
+    "experiments/E-003/results.json": "e57563b752bc8ac7"
+  },
+  "detectorVersion": "0.2.0",
+  "setup": {
+    "testSeeds": "51-100",
+    "shares": [
+      0.1,
+      0.2,
+      0.3
+    ],
+    "eventSeed": "seed + 1000",
+    "gapSeed": "seed + 2000",
+    "days": 240,
+    "start": "2026-05-01",
+    "plantedOn": "2026-06-01",
+    "crop": "corn",
+    "climate": "Illustrative demo climatology (NASA POWER-style variables)",
+    "soilModel": "fao56",
+    "stationGaps": "3% random days + one 5-day outage starting day 20-215",
+    "matchToleranceDays": 14,
+    "frozenFromE003": {
+      "fieldZThreshold": -1.5,
+      "minHistory": 20,
+      "imergMaxFilledDays": 2,
+      "ndviMinSlowdown": 0.08
+    },
+    "candidates": [
+      "moisture-divergence: field-z",
+      "rain-departure: imerg-fill"
+    ]
+  },
+  "test": {
+    "0.1": {
+      "baseline": {
+        "A_clean": {
+          "moisture-divergence": {
+            "eventsExpected": 0,
+            "eventsDetected": 0,
+            "recall": null,
+            "recallCI95": null,
+            "chanceRecall": null,
+            "chanceRecallCI95": null,
+            "attributableRecall": null,
+            "attributableRecallCI95": null,
+            "detections": 148,
+            "precision": null,
+            "alarmsPer100Days": 1.23,
+            "runsWithAnyDetection": 48,
+            "delayDaysMedian": null,
+            "delayDaysRange": null
+          },
+          "rain-departure": {
+            "eventsExpected": 0,
+            "eventsDetected": 0,
+            "recall": null,
+            "recallCI95": null,
+            "chanceRecall": null,
+            "chanceRecallCI95": null,
+            "attributableRecall": null,
+            "attributableRecallCI95": null,
+            "detections": 279,
+            "precision": null,
+            "alarmsPer100Days": 2.33,
+            "runsWithAnyDetection": 50,
+            "delayDaysMedian": null,
+            "delayDaysRange": null
+          },
+          "ndvi-change": {
+            "eventsExpected": 0,
+            "eventsDetected": 0,
+            "recall": null,
+            "recallCI95": null,
+            "chanceRecall": null,
+            "chanceRecallCI95": null,
+            "attributableRecall": null,
+            "attributableRecallCI95": null,
+            "detections": 0,
+            "precision": null,
+            "alarmsPer100Days": 0,
+            "runsWithAnyDetection": 0,
+            "delayDaysMedian": null,
+            "delayDaysRange": null
+          },
+          "sensor-offset": {
+            "eventsExpected": 0,
+            "eventsDetected": 0,
+            "recall": null,
+            "recallCI95": null,
+            "chanceRecall": null,
+            "chanceRecallCI95": null,
+            "attributableRecall": null,
+            "attributableRecallCI95": null,
+            "detections": 0,
+            "precision": null,
+            "alarmsPer100Days": 0,
+            "runsWithAnyDetection": 0,
+            "delayDaysMedian": null,
+            "delayDaysRange": null
+          }
+        },
+        "B_allEvents": {
+          "moisture-divergence": {
+            "eventsExpected": 50,
+            "eventsDetected": 24,
+            "recall": 0.48,
+            "recallCI95": [
+              0.348,
+              0.615
+            ],
+            "chanceRecall": 0.06,
+            "chanceRecallCI95": [
+              0.021,
+              0.162
+            ],
+            "attributableRecall": 0.46,
+            "attributableRecallCI95": [
+              0.33,
+              0.596
+            ],
+            "detections": 167,
+            "precision": 0.174,
+            "alarmsPer100Days": 1.39,
+            "runsWithAnyDetection": 48,
+            "delayDaysMedian": 5.5,
+            "delayDaysRange": [
+              0,
+              18
+            ]
+          },
+          "rain-departure": {
+            "eventsExpected": 100,
+            "eventsDetected": 80,
+            "recall": 0.8,
+            "recallCI95": [
+              0.711,
+              0.867
+            ],
+            "chanceRecall": 0.43,
+            "chanceRecallCI95": [
+              0.337,
+              0.528
+            ],
+            "attributableRecall": 0.7,
+            "attributableRecallCI95": [
+              0.604,
+              0.781
+            ],
+            "detections": 317,
+            "precision": 0.3,
+            "alarmsPer100Days": 2.64,
+            "runsWithAnyDetection": 50,
+            "delayDaysMedian": 8,
+            "delayDaysRange": [
+              0,
+              31
+            ]
+          },
+          "ndvi-change": {
+            "eventsExpected": 50,
+            "eventsDetected": 9,
+            "recall": 0.18,
+            "recallCI95": [
+              0.098,
+              0.308
+            ],
+            "chanceRecall": 0,
+            "chanceRecallCI95": [
+              0,
+              0.071
+            ],
+            "attributableRecall": 0.18,
+            "attributableRecallCI95": [
+              0.098,
+              0.308
+            ],
+            "detections": 9,
+            "precision": 1,
+            "alarmsPer100Days": 0.08,
+            "runsWithAnyDetection": 9,
+            "delayDaysMedian": 0,
+            "delayDaysRange": [
+              0,
+              0
+            ]
+          },
+          "sensor-offset": {
+            "eventsExpected": 50,
+            "eventsDetected": 50,
+            "recall": 1,
+            "recallCI95": [
+              0.929,
+              1
+            ],
+            "chanceRecall": 0,
+            "chanceRecallCI95": [
+              0,
+              0.071
+            ],
+            "attributableRecall": 1,
+            "attributableRecallCI95": [
+              0.929,
+              1
+            ],
+            "detections": 50,
+            "precision": 1,
+            "alarmsPer100Days": 0.42,
+            "runsWithAnyDetection": 50,
+            "delayDaysMedian": 64,
+            "delayDaysRange": [
+              61,
+              73
+            ]
+          }
+        },
+        "C_drySpellLength": {
+          "7": {
+            "rain-departure": {
+              "eventsExpected": 50,
+              "eventsDetected": 36,
+              "recall": 0.72,
+              "recallCI95": [
+                0.583,
+                0.825
+              ],
+              "chanceRecall": 0.36,
+              "chanceRecallCI95": [
+                0.241,
+                0.499
+              ],
+              "attributableRecall": 0.6,
+              "attributableRecallCI95": [
+                0.462,
+                0.724
+              ],
+              "detections": 301,
+              "precision": 0.133,
+              "alarmsPer100Days": 2.51,
+              "runsWithAnyDetection": 50,
+              "delayDaysMedian": 6.5,
+              "delayDaysRange": [
+                1,
+                18
+              ]
+            },
+            "moisture-divergence": {
+              "eventsExpected": 50,
+              "eventsDetected": 18,
+              "recall": 0.36,
+              "recallCI95": [
+                0.241,
+                0.499
+              ],
+              "chanceRecall": 0.04,
+              "chanceRecallCI95": [
+                0.011,
+                0.135
+              ],
+              "attributableRecall": 0.34,
+              "attributableRecallCI95": [
+                0.224,
+                0.478
+              ],
+              "detections": 170,
+              "precision": 0.141,
+              "alarmsPer100Days": 1.42,
+              "runsWithAnyDetection": 48,
+              "delayDaysMedian": 4,
+              "delayDaysRange": [
+                0,
+                7
+              ]
+            }
+          },
+          "14": {
+            "rain-departure": {
+              "eventsExpected": 50,
+              "eventsDetected": 41,
+              "recall": 0.82,
+              "recallCI95": [
+                0.692,
+                0.902
+              ],
+              "chanceRecall": 0.44,
+              "chanceRecallCI95": [
+                0.312,
+                0.577
+              ],
+              "attributableRecall": 0.7,
+              "attributableRecallCI95": [
+                0.562,
+                0.809
+              ],
+              "detections": 296,
+              "precision": 0.149,
+              "alarmsPer100Days": 2.47,
+              "runsWithAnyDetection": 50,
+              "delayDaysMedian": 8,
+              "delayDaysRange": [
+                1,
+                21
+              ]
+            },
+            "moisture-divergence": {
+              "eventsExpected": 50,
+              "eventsDetected": 24,
+              "recall": 0.48,
+              "recallCI95": [
+                0.348,
+                0.615
+              ],
+              "chanceRecall": 0.04,
+              "chanceRecallCI95": [
+                0.011,
+                0.135
+              ],
+              "attributableRecall": 0.46,
+              "attributableRecallCI95": [
+                0.33,
+                0.596
+              ],
+              "detections": 174,
+              "precision": 0.167,
+              "alarmsPer100Days": 1.45,
+              "runsWithAnyDetection": 48,
+              "delayDaysMedian": 5.5,
+              "delayDaysRange": [
+                0,
+                18
+              ]
+            }
+          },
+          "28": {
+            "rain-departure": {
+              "eventsExpected": 50,
+              "eventsDetected": 44,
+              "recall": 0.88,
+              "recallCI95": [
+                0.762,
+                0.944
+              ],
+              "chanceRecall": 0.64,
+              "chanceRecallCI95": [
+                0.501,
+                0.759
+              ],
+              "attributableRecall": 0.76,
+              "attributableRecallCI95": [
+                0.626,
+                0.857
+              ],
+              "detections": 279,
+              "precision": 0.158,
+              "alarmsPer100Days": 2.33,
+              "runsWithAnyDetection": 50,
+              "delayDaysMedian": 8,
+              "delayDaysRange": [
+                1,
+                27
+              ]
+            },
+            "moisture-divergence": {
+              "eventsExpected": 50,
+              "eventsDetected": 33,
+              "recall": 0.66,
+              "recallCI95": [
+                0.522,
+                0.776
+              ],
+              "chanceRecall": 0.08,
+              "chanceRecallCI95": [
+                0.032,
+                0.188
+              ],
+              "attributableRecall": 0.64,
+              "attributableRecallCI95": [
+                0.501,
+                0.759
+              ],
+              "detections": 184,
+              "precision": 0.223,
+              "alarmsPer100Days": 1.53,
+              "runsWithAnyDetection": 48,
+              "delayDaysMedian": 6,
+              "delayDaysRange": [
+                0,
+                27
+              ]
+            }
+          }
+        }
+      },
+      "candidate": {
+        "A_clean": {
+          "moisture-divergence": {
+            "eventsExpected": 0,
+            "eventsDetected": 0,
+            "recall": null,
+            "recallCI95": null,
+            "chanceRecall": null,
+            "chanceRecallCI95": null,
+            "attributableRecall": null,
+            "attributableRecallCI95": null,
+            "detections": 138,
+            "precision": null,
+            "alarmsPer100Days": 1.15,
+            "runsWithAnyDetection": 48,
+            "delayDaysMedian": null,
+            "delayDaysRange": null
+          },
+          "rain-departure": {
+            "eventsExpected": 0,
+            "eventsDetected": 0,
+            "recall": null,
+            "recallCI95": null,
+            "chanceRecall": null,
+            "chanceRecallCI95": null,
+            "attributableRecall": null,
+            "attributableRecallCI95": null,
+            "detections": 405,
+            "precision": null,
+            "alarmsPer100Days": 3.38,
+            "runsWithAnyDetection": 50,
+            "delayDaysMedian": null,
+            "delayDaysRange": null
+          },
+          "ndvi-change": {
+            "eventsExpected": 0,
+            "eventsDetected": 0,
+            "recall": null,
+            "recallCI95": null,
+            "chanceRecall": null,
+            "chanceRecallCI95": null,
+            "attributableRecall": null,
+            "attributableRecallCI95": null,
+            "detections": 0,
+            "precision": null,
+            "alarmsPer100Days": 0,
+            "runsWithAnyDetection": 0,
+            "delayDaysMedian": null,
+            "delayDaysRange": null
+          },
+          "sensor-offset": {
+            "eventsExpected": 0,
+            "eventsDetected": 0,
+            "recall": null,
+            "recallCI95": null,
+            "chanceRecall": null,
+            "chanceRecallCI95": null,
+            "attributableRecall": null,
+            "attributableRecallCI95": null,
+            "detections": 0,
+            "precision": null,
+            "alarmsPer100Days": 0,
+            "runsWithAnyDetection": 0,
+            "delayDaysMedian": null,
+            "delayDaysRange": null
+          }
+        },
+        "B_allEvents": {
+          "moisture-divergence": {
+            "eventsExpected": 50,
+            "eventsDetected": 27,
+            "recall": 0.54,
+            "recallCI95": [
+              0.404,
+              0.67
+            ],
+            "chanceRecall": 0.14,
+            "chanceRecallCI95": [
+              0.07,
+              0.262
+            ],
+            "attributableRecall": 0.52,
+            "attributableRecallCI95": [
+              0.385,
+              0.652
+            ],
+            "detections": 115,
+            "precision": 0.278,
+            "alarmsPer100Days": 0.96,
+            "runsWithAnyDetection": 47,
+            "delayDaysMedian": 4,
+            "delayDaysRange": [
+              0,
+              18
+            ]
+          },
+          "rain-departure": {
+            "eventsExpected": 100,
+            "eventsDetected": 92,
+            "recall": 0.92,
+            "recallCI95": [
+              0.85,
+              0.959
+            ],
+            "chanceRecall": 0.63,
+            "chanceRecallCI95": [
+              0.532,
+              0.718
+            ],
+            "attributableRecall": 0.84,
+            "attributableRecallCI95": [
+              0.756,
+              0.899
+            ],
+            "detections": 431,
+            "precision": 0.281,
+            "alarmsPer100Days": 3.59,
+            "runsWithAnyDetection": 50,
+            "delayDaysMedian": 7,
+            "delayDaysRange": [
+              0,
+              26
+            ]
+          },
+          "ndvi-change": {
+            "eventsExpected": 50,
+            "eventsDetected": 9,
+            "recall": 0.18,
+            "recallCI95": [
+              0.098,
+              0.308
+            ],
+            "chanceRecall": 0,
+            "chanceRecallCI95": [
+              0,
+              0.071
+            ],
+            "attributableRecall": 0.18,
+            "attributableRecallCI95": [
+              0.098,
+              0.308
+            ],
+            "detections": 9,
+            "precision": 1,
+            "alarmsPer100Days": 0.08,
+            "runsWithAnyDetection": 9,
+            "delayDaysMedian": 0,
+            "delayDaysRange": [
+              0,
+              0
+            ]
+          },
+          "sensor-offset": {
+            "eventsExpected": 50,
+            "eventsDetected": 50,
+            "recall": 1,
+            "recallCI95": [
+              0.929,
+              1
+            ],
+            "chanceRecall": 0,
+            "chanceRecallCI95": [
+              0,
+              0.071
+            ],
+            "attributableRecall": 1,
+            "attributableRecallCI95": [
+              0.929,
+              1
+            ],
+            "detections": 50,
+            "precision": 1,
+            "alarmsPer100Days": 0.42,
+            "runsWithAnyDetection": 50,
+            "delayDaysMedian": 64,
+            "delayDaysRange": [
+              61,
+              73
+            ]
+          }
+        },
+        "C_drySpellLength": {
+          "7": {
+            "rain-departure": {
+              "eventsExpected": 50,
+              "eventsDetected": 41,
+              "recall": 0.82,
+              "recallCI95": [
+                0.692,
+                0.902
+              ],
+              "chanceRecall": 0.52,
+              "chanceRecallCI95": [
+                0.385,
+                0.652
+              ],
+              "attributableRecall": 0.74,
+              "attributableRecallCI95": [
+                0.604,
+                0.841
+              ],
+              "detections": 421,
+              "precision": 0.114,
+              "alarmsPer100Days": 3.51,
+              "runsWithAnyDetection": 50,
+              "delayDaysMedian": 6,
+              "delayDaysRange": [
+                0,
+                13
+              ]
+            },
+            "moisture-divergence": {
+              "eventsExpected": 50,
+              "eventsDetected": 22,
+              "recall": 0.44,
+              "recallCI95": [
+                0.312,
+                0.577
+              ],
+              "chanceRecall": 0.12,
+              "chanceRecallCI95": [
+                0.056,
+                0.238
+              ],
+              "attributableRecall": 0.4,
+              "attributableRecallCI95": [
+                0.276,
+                0.538
+              ],
+              "detections": 143,
+              "precision": 0.203,
+              "alarmsPer100Days": 1.19,
+              "runsWithAnyDetection": 49,
+              "delayDaysMedian": 4,
+              "delayDaysRange": [
+                0,
+                7
+              ]
+            }
+          },
+          "14": {
+            "rain-departure": {
+              "eventsExpected": 50,
+              "eventsDetected": 47,
+              "recall": 0.94,
+              "recallCI95": [
+                0.838,
+                0.979
+              ],
+              "chanceRecall": 0.62,
+              "chanceRecallCI95": [
+                0.482,
+                0.741
+              ],
+              "attributableRecall": 0.86,
+              "attributableRecallCI95": [
+                0.738,
+                0.93
+              ],
+              "detections": 412,
+              "precision": 0.126,
+              "alarmsPer100Days": 3.43,
+              "runsWithAnyDetection": 50,
+              "delayDaysMedian": 7,
+              "delayDaysRange": [
+                0,
+                20
+              ]
+            },
+            "moisture-divergence": {
+              "eventsExpected": 50,
+              "eventsDetected": 27,
+              "recall": 0.54,
+              "recallCI95": [
+                0.404,
+                0.67
+              ],
+              "chanceRecall": 0.14,
+              "chanceRecallCI95": [
+                0.07,
+                0.262
+              ],
+              "attributableRecall": 0.52,
+              "attributableRecallCI95": [
+                0.385,
+                0.652
+              ],
+              "detections": 125,
+              "precision": 0.272,
+              "alarmsPer100Days": 1.04,
+              "runsWithAnyDetection": 50,
+              "delayDaysMedian": 4,
+              "delayDaysRange": [
+                0,
+                18
+              ]
+            }
+          },
+          "28": {
+            "rain-departure": {
+              "eventsExpected": 50,
+              "eventsDetected": 47,
+              "recall": 0.94,
+              "recallCI95": [
+                0.838,
+                0.979
+              ],
+              "chanceRecall": 0.8,
+              "chanceRecallCI95": [
+                0.67,
+                0.888
+              ],
+              "attributableRecall": 0.86,
+              "attributableRecallCI95": [
+                0.738,
+                0.93
+              ],
+              "detections": 385,
+              "precision": 0.122,
+              "alarmsPer100Days": 3.21,
+              "runsWithAnyDetection": 50,
+              "delayDaysMedian": 7,
+              "delayDaysRange": [
+                0,
+                20
+              ]
+            },
+            "moisture-divergence": {
+              "eventsExpected": 50,
+              "eventsDetected": 36,
+              "recall": 0.72,
+              "recallCI95": [
+                0.583,
+                0.825
+              ],
+              "chanceRecall": 0.18,
+              "chanceRecallCI95": [
+                0.098,
+                0.308
+              ],
+              "attributableRecall": 0.7,
+              "attributableRecallCI95": [
+                0.562,
+                0.809
+              ],
+              "detections": 116,
+              "precision": 0.388,
+              "alarmsPer100Days": 0.97,
+              "runsWithAnyDetection": 50,
+              "delayDaysMedian": 5,
+              "delayDaysRange": [
+                0,
+                27
+              ]
+            }
+          }
+        }
+      },
+      "baselineWithoutGaps_A_clean": {
+        "moisture-divergence": {
+          "eventsExpected": 0,
+          "eventsDetected": 0,
+          "recall": null,
+          "recallCI95": null,
+          "chanceRecall": null,
+          "chanceRecallCI95": null,
+          "attributableRecall": null,
+          "attributableRecallCI95": null,
+          "detections": 157,
+          "precision": null,
+          "alarmsPer100Days": 1.31,
+          "runsWithAnyDetection": 48,
+          "delayDaysMedian": null,
+          "delayDaysRange": null
+        },
+        "rain-departure": {
+          "eventsExpected": 0,
+          "eventsDetected": 0,
+          "recall": null,
+          "recallCI95": null,
+          "chanceRecall": null,
+          "chanceRecallCI95": null,
+          "attributableRecall": null,
+          "attributableRecallCI95": null,
+          "detections": 430,
+          "precision": null,
+          "alarmsPer100Days": 3.58,
+          "runsWithAnyDetection": 50,
+          "delayDaysMedian": null,
+          "delayDaysRange": null
+        },
+        "ndvi-change": {
+          "eventsExpected": 0,
+          "eventsDetected": 0,
+          "recall": null,
+          "recallCI95": null,
+          "chanceRecall": null,
+          "chanceRecallCI95": null,
+          "attributableRecall": null,
+          "attributableRecallCI95": null,
+          "detections": 0,
+          "precision": null,
+          "alarmsPer100Days": 0,
+          "runsWithAnyDetection": 0,
+          "delayDaysMedian": null,
+          "delayDaysRange": null
+        },
+        "sensor-offset": {
+          "eventsExpected": 0,
+          "eventsDetected": 0,
+          "recall": null,
+          "recallCI95": null,
+          "chanceRecall": null,
+          "chanceRecallCI95": null,
+          "attributableRecall": null,
+          "attributableRecallCI95": null,
+          "detections": 0,
+          "precision": null,
+          "alarmsPer100Days": 0,
+          "runsWithAnyDetection": 0,
+          "delayDaysMedian": null,
+          "delayDaysRange": null
+        }
+      }
+    },
+    "0.2": {
+      "baseline": {
+        "A_clean": {
+          "moisture-divergence": {
+            "eventsExpected": 0,
+            "eventsDetected": 0,
+            "recall": null,
+            "recallCI95": null,
+            "chanceRecall": null,
+            "chanceRecallCI95": null,
+            "attributableRecall": null,
+            "attributableRecallCI95": null,
+            "detections": 166,
+            "precision": null,
+            "alarmsPer100Days": 1.38,
+            "runsWithAnyDetection": 48,
+            "delayDaysMedian": null,
+            "delayDaysRange": null
+          },
+          "rain-departure": {
+            "eventsExpected": 0,
+            "eventsDetected": 0,
+            "recall": null,
+            "recallCI95": null,
+            "chanceRecall": null,
+            "chanceRecallCI95": null,
+            "attributableRecall": null,
+            "attributableRecallCI95": null,
+            "detections": 279,
+            "precision": null,
+            "alarmsPer100Days": 2.33,
+            "runsWithAnyDetection": 50,
+            "delayDaysMedian": null,
+            "delayDaysRange": null
+          },
+          "ndvi-change": {
+            "eventsExpected": 0,
+            "eventsDetected": 0,
+            "recall": null,
+            "recallCI95": null,
+            "chanceRecall": null,
+            "chanceRecallCI95": null,
+            "attributableRecall": null,
+            "attributableRecallCI95": null,
+            "detections": 0,
+            "precision": null,
+            "alarmsPer100Days": 0,
+            "runsWithAnyDetection": 0,
+            "delayDaysMedian": null,
+            "delayDaysRange": null
+          },
+          "sensor-offset": {
+            "eventsExpected": 0,
+            "eventsDetected": 0,
+            "recall": null,
+            "recallCI95": null,
+            "chanceRecall": null,
+            "chanceRecallCI95": null,
+            "attributableRecall": null,
+            "attributableRecallCI95": null,
+            "detections": 0,
+            "precision": null,
+            "alarmsPer100Days": 0,
+            "runsWithAnyDetection": 0,
+            "delayDaysMedian": null,
+            "delayDaysRange": null
+          }
+        },
+        "B_allEvents": {
+          "moisture-divergence": {
+            "eventsExpected": 50,
+            "eventsDetected": 41,
+            "recall": 0.82,
+            "recallCI95": [
+              0.692,
+              0.902
+            ],
+            "chanceRecall": 0.06,
+            "chanceRecallCI95": [
+              0.021,
+              0.162
+            ],
+            "attributableRecall": 0.8,
+            "attributableRecallCI95": [
+              0.67,
+              0.888
+            ],
+            "detections": 202,
+            "precision": 0.248,
+            "alarmsPer100Days": 1.68,
+            "runsWithAnyDetection": 49,
+            "delayDaysMedian": 6,
+            "delayDaysRange": [
+              0,
+              11
+            ]
+          },
+          "rain-departure": {
+            "eventsExpected": 100,
+            "eventsDetected": 80,
+            "recall": 0.8,
+            "recallCI95": [
+              0.711,
+              0.867
+            ],
+            "chanceRecall": 0.43,
+            "chanceRecallCI95": [
+              0.337,
+              0.528
+            ],
+            "attributableRecall": 0.7,
+            "attributableRecallCI95": [
+              0.604,
+              0.781
+            ],
+            "detections": 317,
+            "precision": 0.3,
+            "alarmsPer100Days": 2.64,
+            "runsWithAnyDetection": 50,
+            "delayDaysMedian": 8,
+            "delayDaysRange": [
+              0,
+              31
+            ]
+          },
+          "ndvi-change": {
+            "eventsExpected": 50,
+            "eventsDetected": 9,
+            "recall": 0.18,
+            "recallCI95": [
+              0.098,
+              0.308
+            ],
+            "chanceRecall": 0,
+            "chanceRecallCI95": [
+              0,
+              0.071
+            ],
+            "attributableRecall": 0.18,
+            "attributableRecallCI95": [
+              0.098,
+              0.308
+            ],
+            "detections": 9,
+            "precision": 1,
+            "alarmsPer100Days": 0.08,
+            "runsWithAnyDetection": 9,
+            "delayDaysMedian": 0,
+            "delayDaysRange": [
+              0,
+              0
+            ]
+          },
+          "sensor-offset": {
+            "eventsExpected": 50,
+            "eventsDetected": 50,
+            "recall": 1,
+            "recallCI95": [
+              0.929,
+              1
+            ],
+            "chanceRecall": 0,
+            "chanceRecallCI95": [
+              0,
+              0.071
+            ],
+            "attributableRecall": 1,
+            "attributableRecallCI95": [
+              0.929,
+              1
+            ],
+            "detections": 50,
+            "precision": 1,
+            "alarmsPer100Days": 0.42,
+            "runsWithAnyDetection": 50,
+            "delayDaysMedian": 64,
+            "delayDaysRange": [
+              61,
+              73
+            ]
+          }
+        },
+        "C_drySpellLength": {
+          "7": {
+            "rain-departure": {
+              "eventsExpected": 50,
+              "eventsDetected": 36,
+              "recall": 0.72,
+              "recallCI95": [
+                0.583,
+                0.825
+              ],
+              "chanceRecall": 0.36,
+              "chanceRecallCI95": [
+                0.241,
+                0.499
+              ],
+              "attributableRecall": 0.6,
+              "attributableRecallCI95": [
+                0.462,
+                0.724
+              ],
+              "detections": 301,
+              "precision": 0.133,
+              "alarmsPer100Days": 2.51,
+              "runsWithAnyDetection": 50,
+              "delayDaysMedian": 6.5,
+              "delayDaysRange": [
+                1,
+                18
+              ]
+            },
+            "moisture-divergence": {
+              "eventsExpected": 50,
+              "eventsDetected": 31,
+              "recall": 0.62,
+              "recallCI95": [
+                0.482,
+                0.741
+              ],
+              "chanceRecall": 0.04,
+              "chanceRecallCI95": [
+                0.011,
+                0.135
+              ],
+              "attributableRecall": 0.6,
+              "attributableRecallCI95": [
+                0.462,
+                0.724
+              ],
+              "detections": 201,
+              "precision": 0.184,
+              "alarmsPer100Days": 1.68,
+              "runsWithAnyDetection": 49,
+              "delayDaysMedian": 4,
+              "delayDaysRange": [
+                0,
+                7
+              ]
+            }
+          },
+          "14": {
+            "rain-departure": {
+              "eventsExpected": 50,
+              "eventsDetected": 41,
+              "recall": 0.82,
+              "recallCI95": [
+                0.692,
+                0.902
+              ],
+              "chanceRecall": 0.44,
+              "chanceRecallCI95": [
+                0.312,
+                0.577
+              ],
+              "attributableRecall": 0.7,
+              "attributableRecallCI95": [
+                0.562,
+                0.809
+              ],
+              "detections": 296,
+              "precision": 0.149,
+              "alarmsPer100Days": 2.47,
+              "runsWithAnyDetection": 50,
+              "delayDaysMedian": 8,
+              "delayDaysRange": [
+                1,
+                21
+              ]
+            },
+            "moisture-divergence": {
+              "eventsExpected": 50,
+              "eventsDetected": 41,
+              "recall": 0.82,
+              "recallCI95": [
+                0.692,
+                0.902
+              ],
+              "chanceRecall": 0.04,
+              "chanceRecallCI95": [
+                0.011,
+                0.135
+              ],
+              "attributableRecall": 0.8,
+              "attributableRecallCI95": [
+                0.67,
+                0.888
+              ],
+              "detections": 212,
+              "precision": 0.231,
+              "alarmsPer100Days": 1.77,
+              "runsWithAnyDetection": 49,
+              "delayDaysMedian": 5,
+              "delayDaysRange": [
+                0,
+                11
+              ]
+            }
+          },
+          "28": {
+            "rain-departure": {
+              "eventsExpected": 50,
+              "eventsDetected": 44,
+              "recall": 0.88,
+              "recallCI95": [
+                0.762,
+                0.944
+              ],
+              "chanceRecall": 0.64,
+              "chanceRecallCI95": [
+                0.501,
+                0.759
+              ],
+              "attributableRecall": 0.76,
+              "attributableRecallCI95": [
+                0.626,
+                0.857
+              ],
+              "detections": 279,
+              "precision": 0.158,
+              "alarmsPer100Days": 2.33,
+              "runsWithAnyDetection": 50,
+              "delayDaysMedian": 8,
+              "delayDaysRange": [
+                1,
+                27
+              ]
+            },
+            "moisture-divergence": {
+              "eventsExpected": 50,
+              "eventsDetected": 43,
+              "recall": 0.86,
+              "recallCI95": [
+                0.738,
+                0.93
+              ],
+              "chanceRecall": 0.08,
+              "chanceRecallCI95": [
+                0.032,
+                0.188
+              ],
+              "attributableRecall": 0.84,
+              "attributableRecallCI95": [
+                0.715,
+                0.917
+              ],
+              "detections": 223,
+              "precision": 0.283,
+              "alarmsPer100Days": 1.86,
+              "runsWithAnyDetection": 49,
+              "delayDaysMedian": 6,
+              "delayDaysRange": [
+                0,
+                26
+              ]
+            }
+          }
+        }
+      },
+      "candidate": {
+        "A_clean": {
+          "moisture-divergence": {
+            "eventsExpected": 0,
+            "eventsDetected": 0,
+            "recall": null,
+            "recallCI95": null,
+            "chanceRecall": null,
+            "chanceRecallCI95": null,
+            "attributableRecall": null,
+            "attributableRecallCI95": null,
+            "detections": 150,
+            "precision": null,
+            "alarmsPer100Days": 1.25,
+            "runsWithAnyDetection": 48,
+            "delayDaysMedian": null,
+            "delayDaysRange": null
+          },
+          "rain-departure": {
+            "eventsExpected": 0,
+            "eventsDetected": 0,
+            "recall": null,
+            "recallCI95": null,
+            "chanceRecall": null,
+            "chanceRecallCI95": null,
+            "attributableRecall": null,
+            "attributableRecallCI95": null,
+            "detections": 405,
+            "precision": null,
+            "alarmsPer100Days": 3.38,
+            "runsWithAnyDetection": 50,
+            "delayDaysMedian": null,
+            "delayDaysRange": null
+          },
+          "ndvi-change": {
+            "eventsExpected": 0,
+            "eventsDetected": 0,
+            "recall": null,
+            "recallCI95": null,
+            "chanceRecall": null,
+            "chanceRecallCI95": null,
+            "attributableRecall": null,
+            "attributableRecallCI95": null,
+            "detections": 0,
+            "precision": null,
+            "alarmsPer100Days": 0,
+            "runsWithAnyDetection": 0,
+            "delayDaysMedian": null,
+            "delayDaysRange": null
+          },
+          "sensor-offset": {
+            "eventsExpected": 0,
+            "eventsDetected": 0,
+            "recall": null,
+            "recallCI95": null,
+            "chanceRecall": null,
+            "chanceRecallCI95": null,
+            "attributableRecall": null,
+            "attributableRecallCI95": null,
+            "detections": 0,
+            "precision": null,
+            "alarmsPer100Days": 0,
+            "runsWithAnyDetection": 0,
+            "delayDaysMedian": null,
+            "delayDaysRange": null
+          }
+        },
+        "B_allEvents": {
+          "moisture-divergence": {
+            "eventsExpected": 50,
+            "eventsDetected": 41,
+            "recall": 0.82,
+            "recallCI95": [
+              0.692,
+              0.902
+            ],
+            "chanceRecall": 0.16,
+            "chanceRecallCI95": [
+              0.083,
+              0.285
+            ],
+            "attributableRecall": 0.76,
+            "attributableRecallCI95": [
+              0.626,
+              0.857
+            ],
+            "detections": 133,
+            "precision": 0.376,
+            "alarmsPer100Days": 1.11,
+            "runsWithAnyDetection": 48,
+            "delayDaysMedian": 4,
+            "delayDaysRange": [
+              0,
+              11
+            ]
+          },
+          "rain-departure": {
+            "eventsExpected": 100,
+            "eventsDetected": 92,
+            "recall": 0.92,
+            "recallCI95": [
+              0.85,
+              0.959
+            ],
+            "chanceRecall": 0.63,
+            "chanceRecallCI95": [
+              0.532,
+              0.718
+            ],
+            "attributableRecall": 0.84,
+            "attributableRecallCI95": [
+              0.756,
+              0.899
+            ],
+            "detections": 431,
+            "precision": 0.281,
+            "alarmsPer100Days": 3.59,
+            "runsWithAnyDetection": 50,
+            "delayDaysMedian": 7,
+            "delayDaysRange": [
+              0,
+              26
+            ]
+          },
+          "ndvi-change": {
+            "eventsExpected": 50,
+            "eventsDetected": 9,
+            "recall": 0.18,
+            "recallCI95": [
+              0.098,
+              0.308
+            ],
+            "chanceRecall": 0,
+            "chanceRecallCI95": [
+              0,
+              0.071
+            ],
+            "attributableRecall": 0.18,
+            "attributableRecallCI95": [
+              0.098,
+              0.308
+            ],
+            "detections": 9,
+            "precision": 1,
+            "alarmsPer100Days": 0.08,
+            "runsWithAnyDetection": 9,
+            "delayDaysMedian": 0,
+            "delayDaysRange": [
+              0,
+              0
+            ]
+          },
+          "sensor-offset": {
+            "eventsExpected": 50,
+            "eventsDetected": 50,
+            "recall": 1,
+            "recallCI95": [
+              0.929,
+              1
+            ],
+            "chanceRecall": 0,
+            "chanceRecallCI95": [
+              0,
+              0.071
+            ],
+            "attributableRecall": 1,
+            "attributableRecallCI95": [
+              0.929,
+              1
+            ],
+            "detections": 50,
+            "precision": 1,
+            "alarmsPer100Days": 0.42,
+            "runsWithAnyDetection": 50,
+            "delayDaysMedian": 64,
+            "delayDaysRange": [
+              61,
+              73
+            ]
+          }
+        },
+        "C_drySpellLength": {
+          "7": {
+            "rain-departure": {
+              "eventsExpected": 50,
+              "eventsDetected": 41,
+              "recall": 0.82,
+              "recallCI95": [
+                0.692,
+                0.902
+              ],
+              "chanceRecall": 0.52,
+              "chanceRecallCI95": [
+                0.385,
+                0.652
+              ],
+              "attributableRecall": 0.74,
+              "attributableRecallCI95": [
+                0.604,
+                0.841
+              ],
+              "detections": 421,
+              "precision": 0.114,
+              "alarmsPer100Days": 3.51,
+              "runsWithAnyDetection": 50,
+              "delayDaysMedian": 6,
+              "delayDaysRange": [
+                0,
+                13
+              ]
+            },
+            "moisture-divergence": {
+              "eventsExpected": 50,
+              "eventsDetected": 29,
+              "recall": 0.58,
+              "recallCI95": [
+                0.442,
+                0.706
+              ],
+              "chanceRecall": 0.16,
+              "chanceRecallCI95": [
+                0.083,
+                0.285
+              ],
+              "attributableRecall": 0.5,
+              "attributableRecallCI95": [
+                0.366,
+                0.634
+              ],
+              "detections": 150,
+              "precision": 0.213,
+              "alarmsPer100Days": 1.25,
+              "runsWithAnyDetection": 49,
+              "delayDaysMedian": 4,
+              "delayDaysRange": [
+                0,
+                7
+              ]
+            }
+          },
+          "14": {
+            "rain-departure": {
+              "eventsExpected": 50,
+              "eventsDetected": 47,
+              "recall": 0.94,
+              "recallCI95": [
+                0.838,
+                0.979
+              ],
+              "chanceRecall": 0.62,
+              "chanceRecallCI95": [
+                0.482,
+                0.741
+              ],
+              "attributableRecall": 0.86,
+              "attributableRecallCI95": [
+                0.738,
+                0.93
+              ],
+              "detections": 412,
+              "precision": 0.126,
+              "alarmsPer100Days": 3.43,
+              "runsWithAnyDetection": 50,
+              "delayDaysMedian": 7,
+              "delayDaysRange": [
+                0,
+                20
+              ]
+            },
+            "moisture-divergence": {
+              "eventsExpected": 50,
+              "eventsDetected": 41,
+              "recall": 0.82,
+              "recallCI95": [
+                0.692,
+                0.902
+              ],
+              "chanceRecall": 0.16,
+              "chanceRecallCI95": [
+                0.083,
+                0.285
+              ],
+              "attributableRecall": 0.76,
+              "attributableRecallCI95": [
+                0.626,
+                0.857
+              ],
+              "detections": 136,
+              "precision": 0.353,
+              "alarmsPer100Days": 1.13,
+              "runsWithAnyDetection": 50,
+              "delayDaysMedian": 5,
+              "delayDaysRange": [
+                0,
+                11
+              ]
+            }
+          },
+          "28": {
+            "rain-departure": {
+              "eventsExpected": 50,
+              "eventsDetected": 47,
+              "recall": 0.94,
+              "recallCI95": [
+                0.838,
+                0.979
+              ],
+              "chanceRecall": 0.8,
+              "chanceRecallCI95": [
+                0.67,
+                0.888
+              ],
+              "attributableRecall": 0.86,
+              "attributableRecallCI95": [
+                0.738,
+                0.93
+              ],
+              "detections": 385,
+              "precision": 0.122,
+              "alarmsPer100Days": 3.21,
+              "runsWithAnyDetection": 50,
+              "delayDaysMedian": 7,
+              "delayDaysRange": [
+                0,
+                20
+              ]
+            },
+            "moisture-divergence": {
+              "eventsExpected": 50,
+              "eventsDetected": 41,
+              "recall": 0.82,
+              "recallCI95": [
+                0.692,
+                0.902
+              ],
+              "chanceRecall": 0.24,
+              "chanceRecallCI95": [
+                0.143,
+                0.374
+              ],
+              "attributableRecall": 0.78,
+              "attributableRecallCI95": [
+                0.648,
+                0.872
+              ],
+              "detections": 144,
+              "precision": 0.438,
+              "alarmsPer100Days": 1.2,
+              "runsWithAnyDetection": 49,
+              "delayDaysMedian": 5,
+              "delayDaysRange": [
+                0,
+                11
+              ]
+            }
+          }
+        }
+      },
+      "baselineWithoutGaps_A_clean": {
+        "moisture-divergence": {
+          "eventsExpected": 0,
+          "eventsDetected": 0,
+          "recall": null,
+          "recallCI95": null,
+          "chanceRecall": null,
+          "chanceRecallCI95": null,
+          "attributableRecall": null,
+          "attributableRecallCI95": null,
+          "detections": 179,
+          "precision": null,
+          "alarmsPer100Days": 1.49,
+          "runsWithAnyDetection": 48,
+          "delayDaysMedian": null,
+          "delayDaysRange": null
+        },
+        "rain-departure": {
+          "eventsExpected": 0,
+          "eventsDetected": 0,
+          "recall": null,
+          "recallCI95": null,
+          "chanceRecall": null,
+          "chanceRecallCI95": null,
+          "attributableRecall": null,
+          "attributableRecallCI95": null,
+          "detections": 430,
+          "precision": null,
+          "alarmsPer100Days": 3.58,
+          "runsWithAnyDetection": 50,
+          "delayDaysMedian": null,
+          "delayDaysRange": null
+        },
+        "ndvi-change": {
+          "eventsExpected": 0,
+          "eventsDetected": 0,
+          "recall": null,
+          "recallCI95": null,
+          "chanceRecall": null,
+          "chanceRecallCI95": null,
+          "attributableRecall": null,
+          "attributableRecallCI95": null,
+          "detections": 0,
+          "precision": null,
+          "alarmsPer100Days": 0,
+          "runsWithAnyDetection": 0,
+          "delayDaysMedian": null,
+          "delayDaysRange": null
+        },
+        "sensor-offset": {
+          "eventsExpected": 0,
+          "eventsDetected": 0,
+          "recall": null,
+          "recallCI95": null,
+          "chanceRecall": null,
+          "chanceRecallCI95": null,
+          "attributableRecall": null,
+          "attributableRecallCI95": null,
+          "detections": 0,
+          "precision": null,
+          "alarmsPer100Days": 0,
+          "runsWithAnyDetection": 0,
+          "delayDaysMedian": null,
+          "delayDaysRange": null
+        }
+      }
+    },
+    "0.3": {
+      "baseline": {
+        "A_clean": {
+          "moisture-divergence": {
+            "eventsExpected": 0,
+            "eventsDetected": 0,
+            "recall": null,
+            "recallCI95": null,
+            "chanceRecall": null,
+            "chanceRecallCI95": null,
+            "attributableRecall": null,
+            "attributableRecallCI95": null,
+            "detections": 213,
+            "precision": null,
+            "alarmsPer100Days": 1.78,
+            "runsWithAnyDetection": 50,
+            "delayDaysMedian": null,
+            "delayDaysRange": null
+          },
+          "rain-departure": {
+            "eventsExpected": 0,
+            "eventsDetected": 0,
+            "recall": null,
+            "recallCI95": null,
+            "chanceRecall": null,
+            "chanceRecallCI95": null,
+            "attributableRecall": null,
+            "attributableRecallCI95": null,
+            "detections": 279,
+            "precision": null,
+            "alarmsPer100Days": 2.33,
+            "runsWithAnyDetection": 50,
+            "delayDaysMedian": null,
+            "delayDaysRange": null
+          },
+          "ndvi-change": {
+            "eventsExpected": 0,
+            "eventsDetected": 0,
+            "recall": null,
+            "recallCI95": null,
+            "chanceRecall": null,
+            "chanceRecallCI95": null,
+            "attributableRecall": null,
+            "attributableRecallCI95": null,
+            "detections": 0,
+            "precision": null,
+            "alarmsPer100Days": 0,
+            "runsWithAnyDetection": 0,
+            "delayDaysMedian": null,
+            "delayDaysRange": null
+          },
+          "sensor-offset": {
+            "eventsExpected": 0,
+            "eventsDetected": 0,
+            "recall": null,
+            "recallCI95": null,
+            "chanceRecall": null,
+            "chanceRecallCI95": null,
+            "attributableRecall": null,
+            "attributableRecallCI95": null,
+            "detections": 0,
+            "precision": null,
+            "alarmsPer100Days": 0,
+            "runsWithAnyDetection": 0,
+            "delayDaysMedian": null,
+            "delayDaysRange": null
+          }
+        },
+        "B_allEvents": {
+          "moisture-divergence": {
+            "eventsExpected": 50,
+            "eventsDetected": 46,
+            "recall": 0.92,
+            "recallCI95": [
+              0.812,
+              0.968
+            ],
+            "chanceRecall": 0.24,
+            "chanceRecallCI95": [
+              0.143,
+              0.374
+            ],
+            "attributableRecall": 0.86,
+            "attributableRecallCI95": [
+              0.738,
+              0.93
+            ],
+            "detections": 248,
+            "precision": 0.25,
+            "alarmsPer100Days": 2.07,
+            "runsWithAnyDetection": 50,
+            "delayDaysMedian": 4,
+            "delayDaysRange": [
+              0,
+              14
+            ]
+          },
+          "rain-departure": {
+            "eventsExpected": 100,
+            "eventsDetected": 80,
+            "recall": 0.8,
+            "recallCI95": [
+              0.711,
+              0.867
+            ],
+            "chanceRecall": 0.43,
+            "chanceRecallCI95": [
+              0.337,
+              0.528
+            ],
+            "attributableRecall": 0.7,
+            "attributableRecallCI95": [
+              0.604,
+              0.781
+            ],
+            "detections": 317,
+            "precision": 0.3,
+            "alarmsPer100Days": 2.64,
+            "runsWithAnyDetection": 50,
+            "delayDaysMedian": 8,
+            "delayDaysRange": [
+              0,
+              31
+            ]
+          },
+          "ndvi-change": {
+            "eventsExpected": 50,
+            "eventsDetected": 9,
+            "recall": 0.18,
+            "recallCI95": [
+              0.098,
+              0.308
+            ],
+            "chanceRecall": 0,
+            "chanceRecallCI95": [
+              0,
+              0.071
+            ],
+            "attributableRecall": 0.18,
+            "attributableRecallCI95": [
+              0.098,
+              0.308
+            ],
+            "detections": 9,
+            "precision": 1,
+            "alarmsPer100Days": 0.08,
+            "runsWithAnyDetection": 9,
+            "delayDaysMedian": 0,
+            "delayDaysRange": [
+              0,
+              0
+            ]
+          },
+          "sensor-offset": {
+            "eventsExpected": 50,
+            "eventsDetected": 50,
+            "recall": 1,
+            "recallCI95": [
+              0.929,
+              1
+            ],
+            "chanceRecall": 0,
+            "chanceRecallCI95": [
+              0,
+              0.071
+            ],
+            "attributableRecall": 1,
+            "attributableRecallCI95": [
+              0.929,
+              1
+            ],
+            "detections": 50,
+            "precision": 1,
+            "alarmsPer100Days": 0.42,
+            "runsWithAnyDetection": 50,
+            "delayDaysMedian": 64,
+            "delayDaysRange": [
+              61,
+              73
+            ]
+          }
+        },
+        "C_drySpellLength": {
+          "7": {
+            "rain-departure": {
+              "eventsExpected": 50,
+              "eventsDetected": 36,
+              "recall": 0.72,
+              "recallCI95": [
+                0.583,
+                0.825
+              ],
+              "chanceRecall": 0.36,
+              "chanceRecallCI95": [
+                0.241,
+                0.499
+              ],
+              "attributableRecall": 0.6,
+              "attributableRecallCI95": [
+                0.462,
+                0.724
+              ],
+              "detections": 301,
+              "precision": 0.133,
+              "alarmsPer100Days": 2.51,
+              "runsWithAnyDetection": 50,
+              "delayDaysMedian": 6.5,
+              "delayDaysRange": [
+                1,
+                18
+              ]
+            },
+            "moisture-divergence": {
+              "eventsExpected": 50,
+              "eventsDetected": 41,
+              "recall": 0.82,
+              "recallCI95": [
+                0.692,
+                0.902
+              ],
+              "chanceRecall": 0.2,
+              "chanceRecallCI95": [
+                0.112,
+                0.33
+              ],
+              "attributableRecall": 0.74,
+              "attributableRecallCI95": [
+                0.604,
+                0.841
+              ],
+              "detections": 252,
+              "precision": 0.198,
+              "alarmsPer100Days": 2.1,
+              "runsWithAnyDetection": 50,
+              "delayDaysMedian": 4,
+              "delayDaysRange": [
+                0,
+                8
+              ]
+            }
+          },
+          "14": {
+            "rain-departure": {
+              "eventsExpected": 50,
+              "eventsDetected": 41,
+              "recall": 0.82,
+              "recallCI95": [
+                0.692,
+                0.902
+              ],
+              "chanceRecall": 0.44,
+              "chanceRecallCI95": [
+                0.312,
+                0.577
+              ],
+              "attributableRecall": 0.7,
+              "attributableRecallCI95": [
+                0.562,
+                0.809
+              ],
+              "detections": 296,
+              "precision": 0.149,
+              "alarmsPer100Days": 2.47,
+              "runsWithAnyDetection": 50,
+              "delayDaysMedian": 8,
+              "delayDaysRange": [
+                1,
+                21
+              ]
+            },
+            "moisture-divergence": {
+              "eventsExpected": 50,
+              "eventsDetected": 46,
+              "recall": 0.92,
+              "recallCI95": [
+                0.812,
+                0.968
+              ],
+              "chanceRecall": 0.2,
+              "chanceRecallCI95": [
+                0.112,
+                0.33
+              ],
+              "attributableRecall": 0.86,
+              "attributableRecallCI95": [
+                0.738,
+                0.93
+              ],
+              "detections": 260,
+              "precision": 0.235,
+              "alarmsPer100Days": 2.17,
+              "runsWithAnyDetection": 50,
+              "delayDaysMedian": 4,
+              "delayDaysRange": [
+                0,
+                14
+              ]
+            }
+          },
+          "28": {
+            "rain-departure": {
+              "eventsExpected": 50,
+              "eventsDetected": 44,
+              "recall": 0.88,
+              "recallCI95": [
+                0.762,
+                0.944
+              ],
+              "chanceRecall": 0.64,
+              "chanceRecallCI95": [
+                0.501,
+                0.759
+              ],
+              "attributableRecall": 0.76,
+              "attributableRecallCI95": [
+                0.626,
+                0.857
+              ],
+              "detections": 279,
+              "precision": 0.158,
+              "alarmsPer100Days": 2.33,
+              "runsWithAnyDetection": 50,
+              "delayDaysMedian": 8,
+              "delayDaysRange": [
+                1,
+                27
+              ]
+            },
+            "moisture-divergence": {
+              "eventsExpected": 50,
+              "eventsDetected": 46,
+              "recall": 0.92,
+              "recallCI95": [
+                0.812,
+                0.968
+              ],
+              "chanceRecall": 0.3,
+              "chanceRecallCI95": [
+                0.191,
+                0.438
+              ],
+              "attributableRecall": 0.86,
+              "attributableRecallCI95": [
+                0.738,
+                0.93
+              ],
+              "detections": 261,
+              "precision": 0.257,
+              "alarmsPer100Days": 2.17,
+              "runsWithAnyDetection": 50,
+              "delayDaysMedian": 4,
+              "delayDaysRange": [
+                0,
+                14
+              ]
+            }
+          }
+        }
+      },
+      "candidate": {
+        "A_clean": {
+          "moisture-divergence": {
+            "eventsExpected": 0,
+            "eventsDetected": 0,
+            "recall": null,
+            "recallCI95": null,
+            "chanceRecall": null,
+            "chanceRecallCI95": null,
+            "attributableRecall": null,
+            "attributableRecallCI95": null,
+            "detections": 161,
+            "precision": null,
+            "alarmsPer100Days": 1.34,
+            "runsWithAnyDetection": 50,
+            "delayDaysMedian": null,
+            "delayDaysRange": null
+          },
+          "rain-departure": {
+            "eventsExpected": 0,
+            "eventsDetected": 0,
+            "recall": null,
+            "recallCI95": null,
+            "chanceRecall": null,
+            "chanceRecallCI95": null,
+            "attributableRecall": null,
+            "attributableRecallCI95": null,
+            "detections": 405,
+            "precision": null,
+            "alarmsPer100Days": 3.38,
+            "runsWithAnyDetection": 50,
+            "delayDaysMedian": null,
+            "delayDaysRange": null
+          },
+          "ndvi-change": {
+            "eventsExpected": 0,
+            "eventsDetected": 0,
+            "recall": null,
+            "recallCI95": null,
+            "chanceRecall": null,
+            "chanceRecallCI95": null,
+            "attributableRecall": null,
+            "attributableRecallCI95": null,
+            "detections": 0,
+            "precision": null,
+            "alarmsPer100Days": 0,
+            "runsWithAnyDetection": 0,
+            "delayDaysMedian": null,
+            "delayDaysRange": null
+          },
+          "sensor-offset": {
+            "eventsExpected": 0,
+            "eventsDetected": 0,
+            "recall": null,
+            "recallCI95": null,
+            "chanceRecall": null,
+            "chanceRecallCI95": null,
+            "attributableRecall": null,
+            "attributableRecallCI95": null,
+            "detections": 0,
+            "precision": null,
+            "alarmsPer100Days": 0,
+            "runsWithAnyDetection": 0,
+            "delayDaysMedian": null,
+            "delayDaysRange": null
+          }
+        },
+        "B_allEvents": {
+          "moisture-divergence": {
+            "eventsExpected": 50,
+            "eventsDetected": 46,
+            "recall": 0.92,
+            "recallCI95": [
+              0.812,
+              0.968
+            ],
+            "chanceRecall": 0.26,
+            "chanceRecallCI95": [
+              0.159,
+              0.396
+            ],
+            "attributableRecall": 0.82,
+            "attributableRecallCI95": [
+              0.692,
+              0.902
+            ],
+            "detections": 161,
+            "precision": 0.36,
+            "alarmsPer100Days": 1.34,
+            "runsWithAnyDetection": 50,
+            "delayDaysMedian": 4,
+            "delayDaysRange": [
+              0,
+              10
+            ]
+          },
+          "rain-departure": {
+            "eventsExpected": 100,
+            "eventsDetected": 92,
+            "recall": 0.92,
+            "recallCI95": [
+              0.85,
+              0.959
+            ],
+            "chanceRecall": 0.63,
+            "chanceRecallCI95": [
+              0.532,
+              0.718
+            ],
+            "attributableRecall": 0.84,
+            "attributableRecallCI95": [
+              0.756,
+              0.899
+            ],
+            "detections": 431,
+            "precision": 0.281,
+            "alarmsPer100Days": 3.59,
+            "runsWithAnyDetection": 50,
+            "delayDaysMedian": 7,
+            "delayDaysRange": [
+              0,
+              26
+            ]
+          },
+          "ndvi-change": {
+            "eventsExpected": 50,
+            "eventsDetected": 9,
+            "recall": 0.18,
+            "recallCI95": [
+              0.098,
+              0.308
+            ],
+            "chanceRecall": 0,
+            "chanceRecallCI95": [
+              0,
+              0.071
+            ],
+            "attributableRecall": 0.18,
+            "attributableRecallCI95": [
+              0.098,
+              0.308
+            ],
+            "detections": 9,
+            "precision": 1,
+            "alarmsPer100Days": 0.08,
+            "runsWithAnyDetection": 9,
+            "delayDaysMedian": 0,
+            "delayDaysRange": [
+              0,
+              0
+            ]
+          },
+          "sensor-offset": {
+            "eventsExpected": 50,
+            "eventsDetected": 50,
+            "recall": 1,
+            "recallCI95": [
+              0.929,
+              1
+            ],
+            "chanceRecall": 0,
+            "chanceRecallCI95": [
+              0,
+              0.071
+            ],
+            "attributableRecall": 1,
+            "attributableRecallCI95": [
+              0.929,
+              1
+            ],
+            "detections": 50,
+            "precision": 1,
+            "alarmsPer100Days": 0.42,
+            "runsWithAnyDetection": 50,
+            "delayDaysMedian": 64,
+            "delayDaysRange": [
+              61,
+              73
+            ]
+          }
+        },
+        "C_drySpellLength": {
+          "7": {
+            "rain-departure": {
+              "eventsExpected": 50,
+              "eventsDetected": 41,
+              "recall": 0.82,
+              "recallCI95": [
+                0.692,
+                0.902
+              ],
+              "chanceRecall": 0.52,
+              "chanceRecallCI95": [
+                0.385,
+                0.652
+              ],
+              "attributableRecall": 0.74,
+              "attributableRecallCI95": [
+                0.604,
+                0.841
+              ],
+              "detections": 421,
+              "precision": 0.114,
+              "alarmsPer100Days": 3.51,
+              "runsWithAnyDetection": 50,
+              "delayDaysMedian": 6,
+              "delayDaysRange": [
+                0,
+                13
+              ]
+            },
+            "moisture-divergence": {
+              "eventsExpected": 50,
+              "eventsDetected": 37,
+              "recall": 0.74,
+              "recallCI95": [
+                0.604,
+                0.841
+              ],
+              "chanceRecall": 0.24,
+              "chanceRecallCI95": [
+                0.143,
+                0.374
+              ],
+              "attributableRecall": 0.62,
+              "attributableRecallCI95": [
+                0.482,
+                0.741
+              ],
+              "detections": 171,
+              "precision": 0.257,
+              "alarmsPer100Days": 1.43,
+              "runsWithAnyDetection": 50,
+              "delayDaysMedian": 4,
+              "delayDaysRange": [
+                0,
+                8
+              ]
+            }
+          },
+          "14": {
+            "rain-departure": {
+              "eventsExpected": 50,
+              "eventsDetected": 47,
+              "recall": 0.94,
+              "recallCI95": [
+                0.838,
+                0.979
+              ],
+              "chanceRecall": 0.62,
+              "chanceRecallCI95": [
+                0.482,
+                0.741
+              ],
+              "attributableRecall": 0.86,
+              "attributableRecallCI95": [
+                0.738,
+                0.93
+              ],
+              "detections": 412,
+              "precision": 0.126,
+              "alarmsPer100Days": 3.43,
+              "runsWithAnyDetection": 50,
+              "delayDaysMedian": 7,
+              "delayDaysRange": [
+                0,
+                20
+              ]
+            },
+            "moisture-divergence": {
+              "eventsExpected": 50,
+              "eventsDetected": 46,
+              "recall": 0.92,
+              "recallCI95": [
+                0.812,
+                0.968
+              ],
+              "chanceRecall": 0.24,
+              "chanceRecallCI95": [
+                0.143,
+                0.374
+              ],
+              "attributableRecall": 0.82,
+              "attributableRecallCI95": [
+                0.692,
+                0.902
+              ],
+              "detections": 163,
+              "precision": 0.356,
+              "alarmsPer100Days": 1.36,
+              "runsWithAnyDetection": 50,
+              "delayDaysMedian": 4,
+              "delayDaysRange": [
+                0,
+                10
+              ]
+            }
+          },
+          "28": {
+            "rain-departure": {
+              "eventsExpected": 50,
+              "eventsDetected": 47,
+              "recall": 0.94,
+              "recallCI95": [
+                0.838,
+                0.979
+              ],
+              "chanceRecall": 0.8,
+              "chanceRecallCI95": [
+                0.67,
+                0.888
+              ],
+              "attributableRecall": 0.86,
+              "attributableRecallCI95": [
+                0.738,
+                0.93
+              ],
+              "detections": 385,
+              "precision": 0.122,
+              "alarmsPer100Days": 3.21,
+              "runsWithAnyDetection": 50,
+              "delayDaysMedian": 7,
+              "delayDaysRange": [
+                0,
+                20
+              ]
+            },
+            "moisture-divergence": {
+              "eventsExpected": 50,
+              "eventsDetected": 46,
+              "recall": 0.92,
+              "recallCI95": [
+                0.812,
+                0.968
+              ],
+              "chanceRecall": 0.34,
+              "chanceRecallCI95": [
+                0.224,
+                0.478
+              ],
+              "attributableRecall": 0.82,
+              "attributableRecallCI95": [
+                0.692,
+                0.902
+              ],
+              "detections": 163,
+              "precision": 0.387,
+              "alarmsPer100Days": 1.36,
+              "runsWithAnyDetection": 50,
+              "delayDaysMedian": 4,
+              "delayDaysRange": [
+                0,
+                10
+              ]
+            }
+          }
+        }
+      },
+      "baselineWithoutGaps_A_clean": {
+        "moisture-divergence": {
+          "eventsExpected": 0,
+          "eventsDetected": 0,
+          "recall": null,
+          "recallCI95": null,
+          "chanceRecall": null,
+          "chanceRecallCI95": null,
+          "attributableRecall": null,
+          "attributableRecallCI95": null,
+          "detections": 232,
+          "precision": null,
+          "alarmsPer100Days": 1.93,
+          "runsWithAnyDetection": 50,
+          "delayDaysMedian": null,
+          "delayDaysRange": null
+        },
+        "rain-departure": {
+          "eventsExpected": 0,
+          "eventsDetected": 0,
+          "recall": null,
+          "recallCI95": null,
+          "chanceRecall": null,
+          "chanceRecallCI95": null,
+          "attributableRecall": null,
+          "attributableRecallCI95": null,
+          "detections": 430,
+          "precision": null,
+          "alarmsPer100Days": 3.58,
+          "runsWithAnyDetection": 50,
+          "delayDaysMedian": null,
+          "delayDaysRange": null
+        },
+        "ndvi-change": {
+          "eventsExpected": 0,
+          "eventsDetected": 0,
+          "recall": null,
+          "recallCI95": null,
+          "chanceRecall": null,
+          "chanceRecallCI95": null,
+          "attributableRecall": null,
+          "attributableRecallCI95": null,
+          "detections": 0,
+          "precision": null,
+          "alarmsPer100Days": 0,
+          "runsWithAnyDetection": 0,
+          "delayDaysMedian": null,
+          "delayDaysRange": null
+        },
+        "sensor-offset": {
+          "eventsExpected": 0,
+          "eventsDetected": 0,
+          "recall": null,
+          "recallCI95": null,
+          "chanceRecall": null,
+          "chanceRecallCI95": null,
+          "attributableRecall": null,
+          "attributableRecallCI95": null,
+          "detections": 0,
+          "precision": null,
+          "alarmsPer100Days": 0,
+          "runsWithAnyDetection": 0,
+          "delayDaysMedian": null,
+          "delayDaysRange": null
+        }
+      }
+    }
+  },
+  "decisions": {
+    "moisture-divergence": {
+      "adopt": false,
+      "perShare": [
+        {
+          "share": 0.1,
+          "attributableB": {
+            "baseline": 0.46,
+            "candidate": 0.52
+          },
+          "attributableC": {
+            "7": {
+              "baseline": 0.34,
+              "candidate": 0.4
+            },
+            "14": {
+              "baseline": 0.46,
+              "candidate": 0.52
+            },
+            "28": {
+              "baseline": 0.64,
+              "candidate": 0.7
+            }
+          },
+          "cleanPer100Days": {
+            "baseline": 1.23,
+            "candidate": 1.15,
+            "reference": 1.23,
+            "referenceKind": "same-records"
+          },
+          "detectionOk": true,
+          "falseAlarmsOk": true,
+          "benefit": true
+        },
+        {
+          "share": 0.2,
+          "attributableB": {
+            "baseline": 0.8,
+            "candidate": 0.76
+          },
+          "attributableC": {
+            "7": {
+              "baseline": 0.6,
+              "candidate": 0.5
+            },
+            "14": {
+              "baseline": 0.8,
+              "candidate": 0.76
+            },
+            "28": {
+              "baseline": 0.84,
+              "candidate": 0.78
+            }
+          },
+          "cleanPer100Days": {
+            "baseline": 1.38,
+            "candidate": 1.25,
+            "reference": 1.38,
+            "referenceKind": "same-records"
+          },
+          "detectionOk": true,
+          "falseAlarmsOk": true,
+          "benefit": false
+        },
+        {
+          "share": 0.3,
+          "attributableB": {
+            "baseline": 0.86,
+            "candidate": 0.82
+          },
+          "attributableC": {
+            "7": {
+              "baseline": 0.74,
+              "candidate": 0.62
+            },
+            "14": {
+              "baseline": 0.86,
+              "candidate": 0.82
+            },
+            "28": {
+              "baseline": 0.86,
+              "candidate": 0.82
+            }
+          },
+          "cleanPer100Days": {
+            "baseline": 1.78,
+            "candidate": 1.34,
+            "reference": 1.78,
+            "referenceKind": "same-records"
+          },
+          "detectionOk": false,
+          "falseAlarmsOk": true,
+          "benefit": true
+        }
+      ]
+    },
+    "rain-departure": {
+      "adopt": true,
+      "perShare": [
+        {
+          "share": 0.1,
+          "attributableB": {
+            "baseline": 0.7,
+            "candidate": 0.84
+          },
+          "attributableC": {
+            "7": {
+              "baseline": 0.6,
+              "candidate": 0.74
+            },
+            "14": {
+              "baseline": 0.7,
+              "candidate": 0.86
+            },
+            "28": {
+              "baseline": 0.76,
+              "candidate": 0.86
+            }
+          },
+          "cleanPer100Days": {
+            "baseline": 2.33,
+            "candidate": 3.38,
+            "reference": 3.58,
+            "referenceKind": "no-gap-records"
+          },
+          "detectionOk": true,
+          "falseAlarmsOk": true,
+          "benefit": true
+        },
+        {
+          "share": 0.2,
+          "attributableB": {
+            "baseline": 0.7,
+            "candidate": 0.84
+          },
+          "attributableC": {
+            "7": {
+              "baseline": 0.6,
+              "candidate": 0.74
+            },
+            "14": {
+              "baseline": 0.7,
+              "candidate": 0.86
+            },
+            "28": {
+              "baseline": 0.76,
+              "candidate": 0.86
+            }
+          },
+          "cleanPer100Days": {
+            "baseline": 2.33,
+            "candidate": 3.38,
+            "reference": 3.58,
+            "referenceKind": "no-gap-records"
+          },
+          "detectionOk": true,
+          "falseAlarmsOk": true,
+          "benefit": true
+        },
+        {
+          "share": 0.3,
+          "attributableB": {
+            "baseline": 0.7,
+            "candidate": 0.84
+          },
+          "attributableC": {
+            "7": {
+              "baseline": 0.6,
+              "candidate": 0.74
+            },
+            "14": {
+              "baseline": 0.7,
+              "candidate": 0.86
+            },
+            "28": {
+              "baseline": 0.76,
+              "candidate": 0.86
+            }
+          },
+          "cleanPer100Days": {
+            "baseline": 2.33,
+            "candidate": 3.38,
+            "reference": 3.58,
+            "referenceKind": "no-gap-records"
+          },
+          "detectionOk": true,
+          "falseAlarmsOk": true,
+          "benefit": true
+        }
+      ]
+    }
+  }
+}
