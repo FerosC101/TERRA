@@ -1,20 +1,20 @@
 {
   "experiment": "E-004",
   "dataKind": "SIMULATED — synthetic FieldDay records, not field or NASA data",
-  "commit": "76019cb",
+  "commit": "fea3f89",
   "workingTreeDirty": true,
   "sourceSha256": {
-    "lib/science/discovery/engine.ts": "eb90a62fc0318609",
-    "lib/science/discovery/candidates.ts": "96be02e0469dc6ca",
+    "lib/science/discovery/engine.ts": "0586cce32fc98475",
+    "lib/science/discovery/candidates.ts": "77ef121f809e346b",
     "lib/science/discovery/evaluate.ts": "f2fbece79d39da8c",
-    "lib/demo/syntheticFieldDays.ts": "2394872c05d7de57",
+    "lib/demo/syntheticFieldDays.ts": "4e9ae92389c0b310",
     "lib/demo/soilModel.ts": "05a4b24f845051c1",
-    "data/discoveryRules.ts": "42794b4a854fcb7f",
+    "data/discoveryRules.ts": "0248e24ef98071fc",
     "data/crops.ts": "5f3b7fc4ae3e0f77",
-    "data/fields.ts": "f1a3e7e9abf3c7a8",
-    "scripts/evaluate-discovery-e004.ts": "a3c862d60d0ab9ae",
+    "data/fields.ts": "128b275759b39c8e",
+    "scripts/evaluate-discovery-e004.ts": "063ba2cb929e869e",
     "scripts/discoveryHarness.ts": "52decf5a395647c3",
-    "experiments/E-003/results.json": "3839b7b9072662b7"
+    "experiments/E-003/results.json": "e57563b752bc8ac7"
   },
   "detectorVersion": "0.2.0",
   "setup": {

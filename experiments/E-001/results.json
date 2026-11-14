@@ -1,16 +1,16 @@
 {
   "experiment": "E-001",
   "dataKind": "SIMULATED — synthetic FieldDay records, not field or NASA data",
-  "commit": "76019cb",
-  "workingTreeDirty": true,
+  "commit": "fea3f89",
+  "workingTreeDirty": false,
   "sourceSha256": {
-    "lib/science/discovery/engine.ts": "eb90a62fc0318609",
+    "lib/science/discovery/engine.ts": "0586cce32fc98475",
     "lib/science/discovery/evaluate.ts": "f2fbece79d39da8c",
-    "lib/demo/syntheticFieldDays.ts": "2394872c05d7de57",
-    "data/discoveryRules.ts": "42794b4a854fcb7f",
+    "lib/demo/syntheticFieldDays.ts": "4e9ae92389c0b310",
+    "data/discoveryRules.ts": "0248e24ef98071fc",
     "data/crops.ts": "5f3b7fc4ae3e0f77",
-    "data/fields.ts": "f1a3e7e9abf3c7a8",
-    "scripts/evaluate-discovery.ts": "71c345a103a4ee57",
+    "data/fields.ts": "128b275759b39c8e",
+    "scripts/evaluate-discovery.ts": "2772a90df8cfff43",
     "scripts/discoveryHarness.ts": "52decf5a395647c3"
   },
   "detectorVersion": "0.2.0",
