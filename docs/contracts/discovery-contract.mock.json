@@ -1,0 +1,225 @@
+{
+  "_mock": "MOCK DATA. Illustrates the proposed Discovery Engine contract (docs/ai-ml/DECISIONS.md D-002, types/discovery-contract.ts). Every value is invented; only the NASA product ids are real names. Not an observation of any field.",
+  "_assumptions": [
+    "The IMERG and POWER periods are shown as UTC days. Which period each NASA daily value really covers is not yet verified (docs/ai-ml/CONTEXT.md, Open questions).",
+    "No station sampling interval is shown because the logging interval is not yet known."
+  ],
+  "fieldLocation": {
+    "fieldId": "north-terrace",
+    "timeZone": "Asia/Manila"
+  },
+  "fieldDay": {
+    "fieldId": "north-terrace",
+    "date": "2026-11-01",
+    "values": [
+      {
+        "variable": "soil_moisture",
+        "source": "station",
+        "product": "TERRA Station 01 soil moisture probe",
+        "provenance": "measurement",
+        "value": 0.325,
+        "unit": "m3/m3",
+        "depthCm": 10,
+        "sensorId": "TS-01-SM10",
+        "aggregation": "mean",
+        "period": {
+          "start": "2026-10-31T16:00:00Z",
+          "end": "2026-11-01T15:59:59Z"
+        },
+        "quality": "ok"
+      },
+      {
+        "variable": "soil_moisture",
+        "source": "station",
+        "product": "TERRA Station 01 soil moisture probe",
+        "provenance": "measurement",
+        "value": 0.412,
+        "unit": "m3/m3",
+        "depthCm": 40,
+        "sensorId": "TS-01-SM40",
+        "aggregation": "mean",
+        "period": {
+          "start": "2026-10-31T16:00:00Z",
+          "end": "2026-11-01T15:59:59Z"
+        },
+        "quality": "ok"
+      },
+      {
+        "variable": "soil_temperature",
+        "source": "station",
+        "product": "TERRA Station 01 soil temperature probe",
+        "provenance": "measurement",
+        "value": 29.4,
+        "unit": "degC",
+        "depthCm": 10,
+        "sensorId": "TS-01-ST10",
+        "aggregation": "mean",
+        "period": {
+          "start": "2026-10-31T16:00:00Z",
+          "end": "2026-11-01T15:59:59Z"
+        },
+        "quality": "ok"
+      },
+      {
+        "variable": "precipitation",
+        "source": "station",
+        "product": "TERRA Station 01 rain gauge",
+        "provenance": "measurement",
+        "value": 12.5,
+        "unit": "mm/day",
+        "depthCm": null,
+        "sensorId": "TS-01-RG",
+        "aggregation": "total",
+        "period": {
+          "start": "2026-10-31T16:00:00Z",
+          "end": "2026-11-01T15:59:59Z"
+        },
+        "quality": "ok"
+      },
+      {
+        "variable": "precipitation",
+        "source": "imerg",
+        "product": "GPM_3IMERGDF 07B",
+        "provenance": "satellite",
+        "value": 9.8,
+        "unit": "mm/day",
+        "depthCm": null,
+        "aggregation": "total",
+        "period": {
+          "start": "2026-11-01T00:00:00Z",
+          "end": "2026-11-01T23:59:59Z"
+        },
+        "quality": "ok"
+      },
+      {
+        "variable": "soil_moisture",
+        "source": "smap",
+        "product": "SPL3SMP_E",
+        "provenance": "satellite",
+        "value": 0.29,
+        "unit": "m3/m3",
+        "depthCm": null,
+        "aggregation": "instant",
+        "period": {
+          "start": "2026-10-31T22:00:00Z",
+          "end": "2026-10-31T22:00:00Z"
+        },
+        "quality": "ok"
+      },
+      {
+        "variable": "ndvi",
+        "source": "modis",
+        "product": "MOD13Q1",
+        "provenance": "satellite",
+        "value": 0.68,
+        "unit": "dimensionless",
+        "depthCm": null,
+        "aggregation": "composite",
+        "period": {
+          "start": "2026-10-16T00:00:00Z",
+          "end": "2026-10-31T23:59:59Z"
+        },
+        "quality": "warning",
+        "qualityNote": "Mock example of a flagged value: partial cloud in the composite period."
+      },
+      {
+        "variable": "et0",
+        "source": "power",
+        "product": "NASA_POWER_AG_DAILY (FAO-56 ET0 computed by the TERRA pipeline)",
+        "provenance": "model",
+        "value": 3.9,
+        "unit": "mm/day",
+        "depthCm": null,
+        "aggregation": "total",
+        "period": {
+          "start": "2026-11-01T00:00:00Z",
+          "end": "2026-11-01T23:59:59Z"
+        },
+        "quality": "ok"
+      },
+      {
+        "variable": "air_temperature_max",
+        "source": "power",
+        "product": "NASA_POWER_AG_DAILY",
+        "provenance": "model",
+        "value": 31.2,
+        "unit": "degC",
+        "depthCm": null,
+        "aggregation": "max",
+        "period": {
+          "start": "2026-11-01T00:00:00Z",
+          "end": "2026-11-01T23:59:59Z"
+        },
+        "quality": "ok"
+      },
+      {
+        "variable": "land_surface_temperature",
+        "source": "ecostress",
+        "product": "ECO_L2T_LSTE",
+        "provenance": "satellite",
+        "value": null,
+        "unit": "degC",
+        "depthCm": null,
+        "aggregation": "instant",
+        "period": {
+          "start": "2026-11-01T00:00:00Z",
+          "end": "2026-11-01T23:59:59Z"
+        },
+        "quality": "missing",
+        "qualityNote": "No ECOSTRESS acquisition over the field this day."
+      }
+    ]
+  },
+  "anomalyRecord": {
+    "id": "north-terrace:moisture-divergence:2026-11-01",
+    "fieldId": "north-terrace",
+    "detector": "moisture-divergence",
+    "detectorVersion": "0.2.0",
+    "detectedAt": "2026-11-01T16:30:00Z",
+    "window": {
+      "start": "2026-10-18",
+      "end": "2026-11-01"
+    },
+    "signals": [
+      {
+        "variable": "soil_moisture",
+        "source": "station",
+        "depthCm": 10,
+        "statistic": "change",
+        "observed": -0.061,
+        "baseline": -0.008,
+        "baselineKind": "own-history",
+        "unit": "m3/m3",
+        "zScore": -2.4,
+        "rule": "change <= -0.05"
+      },
+      {
+        "variable": "soil_moisture",
+        "source": "station",
+        "depthCm": 40,
+        "statistic": "change",
+        "observed": -0.012,
+        "baseline": 0,
+        "baselineKind": "rule",
+        "unit": "m3/m3",
+        "zScore": null,
+        "rule": "abs(change) <= 0.03"
+      }
+    ],
+    "coverage": [
+      {
+        "variable": "soil_moisture",
+        "source": "station",
+        "daysWithData": 15,
+        "daysInWindow": 15
+      }
+    ],
+    "location": {
+      "lat": 16.87346,
+      "lng": 121.58404
+    },
+    "spatialSupport": "point",
+    "confidence": 0.69,
+    "confidenceBasis": "heuristic"
+  }
+}
