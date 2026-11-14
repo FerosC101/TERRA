@@ -103,7 +103,7 @@ export function Reports() {
       <article className="mx-auto max-w-[880px] rounded-xl border border-line bg-surface px-6 pb-4 pt-8 shadow-card sm:px-12 sm:pt-10 print:max-w-none print:border-0 print:p-0 print:shadow-none">
         <header className="pb-8">
           <div className="flex items-center justify-between gap-4">
-            <span className="flex items-center gap-2"><LogoMark size={26} /><span className="text-[15px] font-semibold tracking-[0.14em] text-ink">TERRA</span></span>
+            <span className="flex items-center gap-2"><LogoMark size={22} /><span className="text-[15px] font-semibold tracking-[0.14em] text-ink">TERRA</span></span>
             <span className="text-[13px] text-muted">Generated {longDate(report.generatedOn)}</span>
           </div>
           <h1 className="mt-8 text-[30px] font-semibold leading-tight tracking-tight text-ink">{report.field.name}</h1>
