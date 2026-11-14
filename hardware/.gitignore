@@ -1,0 +1,21 @@
+# Python bytecode & environments
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+
+# Blender backups & thumbnails
+*.blend1
+*.blend2
+.thumbnails/
+
+# OS & temporary files
+.DS_Store
+Thumbs.db
+_video_frames/
+
+# Local reference documents (kept locally, excluded from hardware PR)
+NASA - Team 1.docx
+NASA - Team 1.md
