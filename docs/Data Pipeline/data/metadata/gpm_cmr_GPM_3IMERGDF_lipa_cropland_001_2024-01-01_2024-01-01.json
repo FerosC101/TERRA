@@ -1,0 +1,35 @@
+{
+  "dataset": "GPM_IMERG",
+  "product": "GPM_3IMERGDF",
+  "product_info": {
+    "run_type": "Final",
+    "version": "07B",
+    "temporal_resolution": "daily",
+    "variables": [
+      "precipitation",
+      "randomError",
+      "precipitation_cnt"
+    ]
+  },
+  "aoi_id": "lipa_cropland_001",
+  "bbox": [
+    121.176299,
+    13.976575,
+    121.193002,
+    13.990451
+  ],
+  "temporal": "2024-01-01T00:00:00Z,2024-01-01T23:59:59Z",
+  "discovered_at": "2026-11-14T07:13:22Z",
+  "granule_count": 1,
+  "granules": [
+    {
+      "id": "G3087510500-GES_DISC",
+      "title": "GPM_3IMERGDF.07:3B-DAY.MS.MRG.3IMERG.20240101-S000000-E235959.V07B.nc4",
+      "collection_concept_id": "C2723754864-GES_DISC",
+      "time_start": "2024-01-01T00:00:00.000Z",
+      "time_end": "2024-01-01T23:59:59.999Z",
+      "data_url": "https://data.gesdisc.earthdata.nasa.gov/data/GPM_L3/GPM_3IMERGDF.07/2024/01/3B-DAY.MS.MRG.3IMERG.20240101-S000000-E235959.V07B.nc4",
+      "opendap_url": "https://opendap.earthdata.nasa.gov/collections/C2723754864-GES_DISC/granules/GPM_3IMERGDF.07%3A3B-DAY.MS.MRG.3IMERG.20240101-S000000-E235959.V07B.nc4"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+# Secrets & environment (keep .env ignored, allow .env.example)
+.env
+!.env.example
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Ignore large raw global satellite granules (~2 GB) and machine-local cache index
+data/raw/
+data/metadata/retrieval_cache_index.json
