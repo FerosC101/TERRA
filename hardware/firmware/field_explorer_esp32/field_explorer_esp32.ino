@@ -62,14 +62,14 @@
 #define PIN_STATUS_LED           2  // Emerald Status LED / Edge AI Anomaly Indicator
 
 // ---------------- STATION IDENTITY & CALIBRATION CONSTANTS ------------------
-// Aligned with FerosC101/TERRA data/fields.ts (North Terrace Field, TS-01)
+// Aligned with FerosC101/TERRA data/fields.ts (Lipa Cropland, TS-01) and the NASA pipeline AOI lipa_cropland_001
 #define STATION_ID            "TS-01"
 #define NODE_ID               "TERRA-POD-A1"
-#define FIELD_ID              "north-terrace"
-#define COOP_CLUSTER          "CAGAYAN-ISABELA-NORTH-TERRACE"
-#define LATITUDE_DEG          16.8731f
-#define LONGITUDE_DEG         121.5846f
-#define SOIL_AWC_MM_PER_M     150.0f      // Clay loam AWC from data/fields.ts
+#define FIELD_ID              "lipa-cropland"
+#define COOP_CLUSTER          "BATANGAS-LIPA-CROPLAND"
+#define LATITUDE_DEG          13.9847f
+#define LONGITUDE_DEG         121.1858f
+#define SOIL_AWC_MM_PER_M     150.0f      // Loam AWC from data/fields.ts
 #define SAMPLE_INTERVAL_MS    5000UL      // 5s in live demo mode (900000UL = 15m in field)
 #define RAIN_MM_PER_TIP       0.20f       // 0.2 mm per bucket tip
 #define Z_SCORE_ALERT_THRESH  2.00f       // |Z| >= 2.0 triggers Edge AI Discovery alert

@@ -1,4 +1,5 @@
-import { DATA_SOURCES } from "@/data/sources";
+import { sourcesForField } from "@/data/sources";
+import { auditObservations } from "@/lib/data/quality";
 import { DEMO_TODAY } from "@/lib/dates";
 import { generateAnomalies, generateSeries } from "@/lib/demo/series";
 import { detectDiscoveries } from "@/lib/science/detect";
@@ -8,7 +9,7 @@ import { mockField } from "./fieldSensorService";
 
 export function mockReport(fieldId: string, followUps: FollowUp[] = []): FieldReport {
   const field = mockField(fieldId);
-  const observations = generateSeries(field);
+  const { rows: observations, report: quality } = auditObservations(generateSeries(field));
   return {
     id: fieldId,
     generatedOn: DEMO_TODAY,
@@ -17,7 +18,8 @@ export function mockReport(fieldId: string, followUps: FollowUp[] = []): FieldRe
     observations,
     discoveries: detectDiscoveries(field, observations, followUps),
     anomalies: generateAnomalies(field),
-    sources: DATA_SOURCES,
+    sources: sourcesForField(fieldId),
+    quality,
   };
 }
 

@@ -19,8 +19,14 @@ export interface DataSource {
   spatialResolution: string;
   temporalResolution: string;
   kind: Provenance;
-  /** "demo" = values in this build are generated locally, not retrieved. */
-  integration: "demo" | "live";
+  /**
+   * "demo" = values are generated locally, not retrieved.
+   * "snapshot" = a real record retrieved by the TERRA data pipeline is bundled for this field.
+   * "live" = served by a connected backend.
+   */
+  integration: "demo" | "snapshot" | "live";
+  /** What the status means for the selected field, in plain words */
+  statusNote?: string;
   caveat: string;
 }
 
@@ -32,6 +38,8 @@ export interface MonthlyClimate {
   /** Mean daily maximum air temperature, °C */
   tmaxC: number[];
   source: string;
+  /** "retrieved" = taken from a NASA product; "illustrative" = written for the demo */
+  basis: "retrieved" | "illustrative";
 }
 
 export type CropId =
@@ -96,6 +104,12 @@ export interface Field {
   name: string;
   farm: string;
   location: string;
+  /** "primary" = the demonstration field shared with the data pipeline and hardware */
+  role: "primary" | "secondary";
+  /** IANA time zone of the field. Observation dates are local calendar days. */
+  timezone: string;
+  /** location_id of this field in the TERRA NASA data pipeline, when it has one */
+  pipelineLocationId?: string;
   center: LatLng;
   boundary: LatLng[];
   areaHa: number;
@@ -137,6 +151,55 @@ export interface DailyObservation {
   ecDsM: number;
   /** Modelled root-zone water storage, mm */
   storageMm: number;
+}
+
+/** A physically impossible value, an extreme but valid event, or a structural problem in a record. */
+export interface QualityIssue {
+  date: string;
+  variable: string;
+  value: number | null;
+  kind: "invalid" | "extreme" | "duplicate" | "gap";
+  note: string;
+}
+
+/** Result of auditing an observation record before it reaches any page. */
+export interface QualityReport {
+  rows: number;
+  start: string | null;
+  end: string | null;
+  duplicatesRemoved: number;
+  /** Rows dropped because a station value was physically impossible */
+  rowsRejected: number;
+  /** Calendar days with no row between start and end */
+  missingDays: number;
+  issues: QualityIssue[];
+}
+
+/** One day of the record retrieved by the TERRA NASA data pipeline. Missing values stay null. */
+export interface NasaDailyRecord {
+  date: string;
+  quality: "VALID" | "VALID_WITH_WARNINGS" | "INCOMPLETE" | "INVALID";
+  airTempC: number | null;
+  airTempMaxC: number | null;
+  airTempMinC: number | null;
+  /** NASA POWER corrected precipitation, mm/day */
+  rainPowerMm: number | null;
+  /** GPM IMERG Final daily precipitation, mm/day */
+  rainImergMm: number | null;
+  /** FAO-56 Penman-Monteith reference evapotranspiration from POWER inputs, mm/day */
+  et0Mm: number | null;
+  /** SMAP surface soil moisture, % volumetric. Null on days with no overpass. */
+  smapVwc: number | null;
+  smapFlag: string | null;
+}
+
+export interface NasaSnapshot {
+  fieldId: string;
+  locationId: string;
+  start: string;
+  end: string;
+  note: string;
+  records: NasaDailyRecord[];
 }
 
 export interface MonthlyAnomaly {
@@ -326,4 +389,5 @@ export interface FieldReport {
   discoveries: Discovery[];
   anomalies: MonthlyAnomaly[];
   sources: DataSource[];
+  quality: QualityReport;
 }

@@ -22,8 +22,8 @@ from typing import Dict, List
 class SensorTelemetry:
     station_id: str = "TS-01"
     node_id: str = "TERRA-POD-A1"
-    field_id: str = "north-terrace"
-    cluster: str = "CAGAYAN-ISABELA-NORTH-TERRACE"
+    field_id: str = "lipa-cropland"
+    cluster: str = "BATANGAS-LIPA-CROPLAND"
     timestamp_s: int = 1794637200
     sequence_id: int = 1001
     moisture_10cm_pct: float = 26.4
@@ -39,8 +39,8 @@ class SensorTelemetry:
     solar_wm2: float = 685.0
     ndvi: float = 0.74
     storage_mm: float = 107.6
-    latitude_deg: float = 16.8731
-    longitude_deg: float = 121.5846
+    latitude_deg: float = 13.9847
+    longitude_deg: float = 121.1858
     battery_v: float = 6.48
     battery_soc_pct: float = 94.0
     cached_offline: bool = False

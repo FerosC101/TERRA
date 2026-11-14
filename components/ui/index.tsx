@@ -1,82 +1,170 @@
 "use client";
 
 import clsx from "clsx";
-import { ChevronDown, Gauge, Cpu, FlaskConical, Satellite } from "lucide-react";
+import { ArrowDownRight, ArrowRight, ArrowUpRight, ChevronDown, CircleAlert, Info } from "lucide-react";
 import type { Provenance } from "@/types";
 
-export function Panel({ className, children, as: Tag = "section" }: { className?: string; children: React.ReactNode; as?: "section" | "div" | "article" }) {
-  return (
-    <Tag className={clsx("print-avoid rounded-lg border border-line bg-surface/80 backdrop-blur-sm", className)}>
-      {children}
-    </Tag>
-  );
+/* ───────────────────────── Layout ───────────────────────── */
+
+/** A white surface. Use it for a unit of content that stands alone, not for every block. */
+export function Card({ className, children, as: Tag = "section" }: { className?: string; children: React.ReactNode; as?: "section" | "div" | "article" }) {
+  return <Tag className={clsx("print-avoid rounded-xl border border-line bg-surface shadow-card", className)}>{children}</Tag>;
 }
 
-/** Small technical label in the display face — used for section eyebrows. */
-export function Eyebrow({ children, className }: { children: React.ReactNode; className?: string }) {
+export function PageHeader({ title, lead, actions, children }: { title: string; lead?: string; actions?: React.ReactNode; children?: React.ReactNode }) {
   return (
-    <div className={clsx("font-display text-[10px] font-semibold uppercase tracking-[0.2em] text-muted", className)}>
-      {children}
-    </div>
-  );
-}
-
-export function PageHeader({ eyebrow, title, lead, actions }: { eyebrow: string; title: string; lead?: string; actions?: React.ReactNode }) {
-  return (
-    <header className="mb-6 flex flex-wrap items-end justify-between gap-4">
-      <div className="min-w-0 max-w-3xl">
-        <Eyebrow className="!text-terra">{eyebrow}</Eyebrow>
-        <h1 className="mt-2 font-display text-2xl font-semibold tracking-wide text-silver sm:text-[28px]">{title}</h1>
-        {lead && <p className="mt-2 text-sm leading-relaxed text-muted">{lead}</p>}
+    <header className="mb-8 flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
+      <div className="min-w-0 max-w-2xl">
+        <h1 className="text-[26px] font-semibold leading-tight tracking-tight text-ink sm:text-[28px]">{title}</h1>
+        {lead && <p className="mt-2 text-[15px] leading-relaxed text-muted">{lead}</p>}
+        {children}
       </div>
       {actions && <div className="no-print flex flex-wrap items-center gap-2">{actions}</div>}
     </header>
   );
 }
 
-const PROVENANCE: Record<Provenance, { label: string; icon: typeof Gauge; tone: string; help: string }> = {
-  measurement: { label: "Field measurement", icon: Gauge, tone: "text-terra-soft border-terra/30", help: "Read by a sensor in the field." },
-  satellite: { label: "Satellite estimate", icon: Satellite, tone: "text-water border-water/30", help: "Estimated from orbit over an area larger than the field." },
-  model: { label: "Model output", icon: Cpu, tone: "text-violet border-violet/30", help: "Calculated from other data using stated assumptions." },
-  simulated: { label: "Simulation", icon: FlaskConical, tone: "text-amber border-amber/30", help: "A what-if result, not an observation or a forecast." },
+/** A titled region of a page. Separation comes from space and the heading, not a box. */
+export function Section({ title, description, actions, children, className }: { title: string; description?: React.ReactNode; actions?: React.ReactNode; children: React.ReactNode; className?: string }) {
+  return (
+    <section className={clsx("print-avoid", className)}>
+      <div className="mb-4 flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
+        <div className="min-w-0 max-w-2xl">
+          <h2 className="text-[17px] font-semibold tracking-tight text-ink">{title}</h2>
+          {description && <p className="mt-1 text-sm leading-relaxed text-muted">{description}</p>}
+        </div>
+        {actions && <div className="no-print flex flex-wrap items-center gap-2">{actions}</div>}
+      </div>
+      {children}
+    </section>
+  );
+}
+
+/** Heading row inside a Card. */
+export function CardHeader({ title, description, actions }: { title: string; description?: React.ReactNode; actions?: React.ReactNode }) {
+  return (
+    <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3 px-5 pt-5 sm:px-6">
+      <div className="min-w-0">
+        <h3 className="text-[15px] font-semibold text-ink">{title}</h3>
+        {description && <p className="mt-0.5 text-[13px] leading-relaxed text-muted">{description}</p>}
+      </div>
+      {actions && <div className="no-print flex flex-wrap items-center gap-2">{actions}</div>}
+    </div>
+  );
+}
+
+/* ───────────────────────── Data provenance ───────────────────────── */
+
+const PROVENANCE: Record<Provenance, { label: string; dot: string; help: string }> = {
+  measurement: { label: "Field measurement", dot: "bg-green", help: "Read by a sensor in the field." },
+  satellite: { label: "Satellite estimate", dot: "bg-blue", help: "Estimated from orbit over an area larger than the field." },
+  model: { label: "Model output", dot: "bg-violet", help: "Calculated from other data using stated assumptions." },
+  simulated: { label: "Simulation", dot: "bg-amber", help: "A what-if result, not an observation or a forecast." },
 };
 
-/** States how a value came to exist. `demo` adds the reminder that this build's data is generated. */
-export function ProvenanceTag({ kind, demo = true, className }: { kind: Provenance; demo?: boolean; className?: string }) {
+export function provenanceLabel(kind: Provenance): string {
+  return PROVENANCE[kind].label;
+}
+
+/**
+ * States how a value came to exist: a quiet dot and label. `retrieved` marks a
+ * real record; otherwise the tooltip reminds the reader the value is demo data.
+ */
+export function SourceTag({ kind, detail, retrieved = false, className }: { kind: Provenance; detail?: string; retrieved?: boolean; className?: string }) {
   const p = PROVENANCE[kind];
-  const Icon = p.icon;
   return (
-    <span title={`${p.help}${demo ? " Demo data in this build." : ""}`}
-      className={clsx("inline-flex items-center gap-1 whitespace-nowrap rounded border px-1.5 py-0.5 text-[10px] font-medium", p.tone, className)}>
-      <Icon size={11} aria-hidden />
-      {p.label}
-      {demo && <span className="text-muted">· demo</span>}
+    <span title={`${p.help}${retrieved ? " Retrieved record." : " Demo data in this build."}`} className={clsx("inline-flex items-center gap-1.5 whitespace-nowrap text-xs text-muted", className)}>
+      <span className={clsx("h-1.5 w-1.5 shrink-0 rounded-full", p.dot)} aria-hidden />
+      {p.label}{detail ? ` · ${detail}` : ""}
     </span>
   );
 }
+
+/* ───────────────────────── Metrics ───────────────────────── */
+
+export interface MetricProps {
+  label: string;
+  value: string;
+  unit?: string;
+  /** Signed change over the stated period, already formatted */
+  trend?: { direction: "up" | "down" | "flat"; text: string; tone?: "neutral" | "warning" };
+  source: Provenance;
+  /** Observation date or measurement period */
+  when: string;
+}
+
+/** One measurement: value, unit, what changed, where it came from and when. */
+export function Metric({ label, value, unit, trend, source, when }: MetricProps) {
+  const TrendIcon = trend?.direction === "up" ? ArrowUpRight : trend?.direction === "down" ? ArrowDownRight : ArrowRight;
+  return (
+    <div className="min-w-0">
+      <div className="text-[13px] text-muted">{label}</div>
+      <div className="mt-1.5 flex items-baseline gap-1">
+        <span className="tabular text-[26px] font-semibold leading-none tracking-tight text-ink">{value}</span>
+        {unit && <span className="text-sm text-muted">{unit}</span>}
+      </div>
+      {trend && (
+        <div className={clsx("mt-2 flex items-start gap-1 text-[13px] leading-snug", trend.tone === "warning" ? "text-amber" : "text-ink-soft")}>
+          <TrendIcon size={14} className="mt-0.5 shrink-0" aria-hidden />
+          <span>{trend.text}</span>
+        </div>
+      )}
+      <div className="mt-2 flex flex-col gap-0.5">
+        <SourceTag kind={source} />
+        <span className="text-xs text-faint">{when}</span>
+      </div>
+    </div>
+  );
+}
+
+/** A plain labelled fact, for supporting figures that do not need a trend. */
+export function Fact({ label, value, sub }: { label: string; value: string; sub?: string }) {
+  return (
+    <div className="min-w-0">
+      <div className="text-[13px] text-muted">{label}</div>
+      <div className="tabular mt-1 text-lg font-semibold text-ink">{value}</div>
+      {sub && <div className="mt-0.5 text-xs leading-snug text-muted">{sub}</div>}
+    </div>
+  );
+}
+
+/** Label / value row for detail panels. Wrap rows in a <dl>. */
+export function DetailRow({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex items-baseline justify-between gap-4 border-b border-line py-2 last:border-0">
+      <dt className="shrink-0 text-[13px] text-muted">{label}</dt>
+      <dd className="tabular text-right text-[13px] font-medium text-ink">{children}</dd>
+    </div>
+  );
+}
+
+/* ───────────────────────── Controls ───────────────────────── */
 
 export function Button({ variant = "secondary", className, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "primary" | "secondary" | "ghost" }) {
   return (
     <button
       {...props}
       className={clsx(
-        "inline-flex items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-[13px] font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40",
-        variant === "primary" && "bg-terra text-forest-deep hover:bg-terra-soft",
-        variant === "secondary" && "border border-line-strong text-silver hover:border-terra/60 hover:text-terra-soft",
-        variant === "ghost" && "text-muted hover:bg-white/5 hover:text-silver",
+        "inline-flex items-center justify-center gap-1.5 rounded-lg px-3.5 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40",
+        variant === "primary" && "bg-green text-white hover:bg-green-strong",
+        variant === "secondary" && "border border-line-strong bg-surface text-ink hover:bg-sunken",
+        variant === "ghost" && "text-ink-soft hover:bg-sunken hover:text-ink",
         className,
       )}
     />
   );
 }
 
+/** Shared look for a text link that leads somewhere. */
+export const LINK = "inline-flex items-center gap-1 text-sm font-medium text-green hover:text-green-strong";
+
 export function Segmented<T extends string | number>({ value, onChange, options, label }: { value: T; onChange: (v: T) => void; options: { value: T; label: string }[]; label: string }) {
   return (
-    <div role="group" aria-label={label} className="inline-flex flex-wrap rounded-md border border-line bg-forest-deep/60 p-0.5">
+    <div role="group" aria-label={label} className="inline-flex flex-wrap rounded-lg bg-sunken p-0.5">
       {options.map((o) => (
         <button key={String(o.value)} type="button" aria-pressed={o.value === value} onClick={() => onChange(o.value)}
-          className={clsx("rounded px-2.5 py-1 text-xs font-medium transition-colors",
-            o.value === value ? "bg-terra/15 text-terra-soft" : "text-muted hover:text-silver")}>
+          className={clsx("rounded-md px-3 py-1.5 text-[13px] font-medium transition-colors",
+            o.value === value ? "bg-surface text-ink shadow-card" : "text-muted hover:text-ink")}>
           {o.label}
         </button>
       ))}
@@ -84,37 +172,85 @@ export function Segmented<T extends string | number>({ value, onChange, options,
   );
 }
 
-/** Progressive disclosure: scientific detail stays one click away. */
+/** Progressive disclosure: methods and technical detail stay one click away. */
 export function Disclosure({ title, children, defaultOpen = false }: { title: string; children: React.ReactNode; defaultOpen?: boolean }) {
   return (
-    <details open={defaultOpen} className="group rounded-md border border-line bg-forest-deep/40">
-      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-3.5 py-2.5 text-[13px] font-medium text-silver marker:hidden">
+    <details open={defaultOpen} className="group border-b border-line first:border-t">
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 py-3.5 text-sm font-medium text-ink marker:hidden hover:text-green-strong">
         {title}
-        <ChevronDown size={15} className="text-muted transition-transform group-open:rotate-180" aria-hidden />
+        <ChevronDown size={16} className="shrink-0 text-muted transition-transform group-open:rotate-180" aria-hidden />
       </summary>
-      <div className="border-t border-line px-3.5 py-3 text-[13px] leading-relaxed text-muted">{children}</div>
+      <div className="pb-5 text-sm leading-relaxed text-ink-soft">{children}</div>
     </details>
   );
 }
 
-export function StatusDot({ tone = "good", pulse = false }: { tone?: "good" | "warning" | "critical" | "neutral"; pulse?: boolean }) {
-  const color = { good: "bg-terra", warning: "bg-amber", critical: "bg-alert", neutral: "bg-muted" }[tone];
+/* ───────────────────────── Status and feedback ───────────────────────── */
+
+type Tone = "good" | "warning" | "critical" | "neutral" | "info";
+
+export function StatusDot({ tone = "good", pulse = false }: { tone?: Tone; pulse?: boolean }) {
+  const color = { good: "bg-green", warning: "bg-amber", critical: "bg-red", neutral: "bg-faint", info: "bg-blue" }[tone];
   return <span className={clsx("inline-block h-2 w-2 shrink-0 rounded-full", color, pulse && "terra-pulse")} aria-hidden />;
+}
+
+export function Badge({ tone = "neutral", children }: { tone?: Tone; children: React.ReactNode }) {
+  const style = {
+    good: "bg-green-soft text-green-strong",
+    warning: "bg-amber-soft text-amber",
+    critical: "bg-red-soft text-red",
+    neutral: "bg-sunken text-ink-soft",
+    info: "bg-blue-soft text-blue",
+  }[tone];
+  return <span className={clsx("inline-flex items-center whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-medium", style)}>{children}</span>;
 }
 
 export function Loading({ label = "Loading field data" }: { label?: string }) {
   return (
-    <div className="flex h-40 items-center justify-center gap-2 text-sm text-muted" role="status">
+    <div className="flex h-48 items-center justify-center gap-2.5 text-sm text-muted" role="status" aria-live="polite">
       <StatusDot pulse /> {label}…
     </div>
   );
 }
 
-export function DemoNotice({ children }: { children: React.ReactNode }) {
+export function EmptyState({ title, children }: { title: string; children?: React.ReactNode }) {
   return (
-    <p className="flex items-start gap-2 rounded-md border border-amber/25 bg-amber/5 px-3 py-2 text-xs leading-relaxed text-silver/90">
-      <FlaskConical size={14} className="mt-0.5 shrink-0 text-amber" aria-hidden />
+    <div className="rounded-xl border border-dashed border-line-strong px-6 py-10 text-center">
+      <p className="text-sm font-medium text-ink">{title}</p>
+      {children && <div className="mx-auto mt-1.5 max-w-md text-sm leading-relaxed text-muted">{children}</div>}
+    </div>
+  );
+}
+
+export function ErrorState({ message }: { message: string }) {
+  return (
+    <div role="alert" className="flex items-start gap-3 rounded-xl border border-red/25 bg-red-soft px-5 py-4">
+      <CircleAlert size={18} className="mt-0.5 shrink-0 text-red" aria-hidden />
+      <div>
+        <p className="text-sm font-medium text-ink">This data could not be loaded.</p>
+        <p className="mt-0.5 text-sm text-ink-soft">{message} Check the connection to the TERRA data service and reload the page.</p>
+      </div>
+    </div>
+  );
+}
+
+/** A short note about how to read what follows: scope, caveats, simulated data. */
+export function Notice({ tone = "info", children }: { tone?: "info" | "caution"; children: React.ReactNode }) {
+  return (
+    <p className={clsx("flex items-start gap-2.5 rounded-lg px-4 py-3 text-[13px] leading-relaxed text-ink-soft", tone === "caution" ? "border border-amber-line bg-amber-soft" : "bg-sunken")}>
+      <Info size={15} className={clsx("mt-0.5 shrink-0", tone === "caution" ? "text-amber" : "text-muted")} aria-hidden />
       <span>{children}</span>
     </p>
   );
+}
+
+/* ───────────────────────── Tables ───────────────────────── */
+
+export const TABLE = "w-full border-collapse text-sm";
+export const TH = "border-b border-line px-3 py-2.5 text-left text-[13px] font-medium text-muted first:pl-0 last:pr-0";
+export const TD = "border-b border-line px-3 py-3 align-top text-ink-soft first:pl-0 last:pr-0";
+
+/** Coloured square that identifies a rotation plan next to its name. */
+export function Swatch({ color }: { color: string }) {
+  return <span className="inline-block h-2.5 w-2.5 shrink-0 rounded-[3px]" style={{ background: color }} aria-hidden />;
 }

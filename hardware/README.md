@@ -54,7 +54,7 @@ This directory contains the complete hardware engineering deliverables, 3D produ
 | **3. Rainfall** | Tipping-bucket reed switch ISR (`GPIO 27`, `0.2 mm/tip`) | `rain_mm`, `rain_mm_hr` | `rainMm` |
 | **4. Vegetation Index** | Multispectral Crop Health / Optical NDVI (`GPIO 25` / I2C) | `ndvi` (`0.00–1.00`) | `ndvi` |
 | **5. Solar Radiation & Micro-Climate** | `BH1750` Pyranometer + `SHT35` Air Temp/RH (`I2C 21/22`) | `solar_wm2`, `air_temp_c`, `et0_mm_day` | `tmaxC`, `et0Mm` |
-| **6. Location (GNSS Auto-Sync)** | Multi-constellation GNSS receiver + UTC sync | `gnss.lat`, `gnss.lng`, `gnss.fix` | `FieldStation.position` (`TS-01`: `16.8731, 121.5846`) |
+| **6. Location (GNSS Auto-Sync)** | Multi-constellation GNSS receiver + UTC sync | `gnss.lat`, `gnss.lng`, `gnss.fix` | `FieldStation.position` (`TS-01`: `13.9847, 121.1858`, inside the Lipa Cropland boundary) |
 
 ---
 

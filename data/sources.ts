@@ -1,8 +1,12 @@
+import { FIELDS } from "@/data/fields";
+import { NASA_SNAPSHOTS } from "@/data/nasa";
+import { longDate } from "@/lib/dates";
 import type { DataSource } from "@/types";
 
 /**
  * The data sources TERRA is designed around. `integration: "demo"` means this
- * build generates stand-in values locally; nothing is retrieved from NASA.
+ * build generates stand-in values locally. `sourcesForField` upgrades the
+ * products for which a real pipeline snapshot is bundled for that field.
  */
 export const DATA_SOURCES: DataSource[] = [
   {
@@ -55,3 +59,19 @@ export const DATA_SOURCES: DataSource[] = [
     caveat: "Projections of climate, not weather forecasts. Not yet connected — Future Earth uses fixed adjustments instead.",
   },
 ];
+
+const SNAPSHOT_PRODUCTS = ["power", "imerg", "smap"];
+
+/** Data sources with their status for one field. */
+export function sourcesForField(fieldId: string): DataSource[] {
+  const snap = NASA_SNAPSHOTS[fieldId];
+  return DATA_SOURCES.map((src) => {
+    if (snap && SNAPSHOT_PRODUCTS.includes(src.id)) {
+      return { ...src, integration: "snapshot", statusNote: `Retrieved record bundled for ${longDate(snap.start)} to ${longDate(snap.end)}. Values outside that period are demo data.` };
+    }
+    if (src.id === "power" && FIELDS.find((f) => f.id === fieldId)?.climate.basis === "retrieved") {
+      return { ...src, integration: "snapshot", statusNote: "Monthly climatology retrieved from NASA POWER." };
+    }
+    return { ...src, statusNote: src.id === "station" ? "No hardware connected. Demo values." : "Not connected. Demo values." };
+  });
+}

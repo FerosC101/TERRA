@@ -1,6 +1,7 @@
-import { DATA_SOURCES } from "@/data/sources";
+import { NASA_SNAPSHOTS } from "@/data/nasa";
+import { sourcesForField } from "@/data/sources";
 import { generateAnomalies } from "@/lib/demo/series";
-import type { DataSource, MonthlyAnomaly } from "@/types";
+import type { DataSource, MonthlyAnomaly, NasaSnapshot } from "@/types";
 import { IS_DEMO, request } from "./apiClient";
 import { mockField } from "./fieldSensorService";
 
@@ -9,8 +10,16 @@ import { mockField } from "./fieldSensorService";
  * `getConnectionStatus` reports that plainly so the UI can never show a
  * simulated series as a live observation.
  */
-export function getDataSources(): Promise<DataSource[]> {
-  return request("/api/sources", () => DATA_SOURCES);
+export function getDataSources(fieldId: string): Promise<DataSource[]> {
+  return request(`/api/fields/${fieldId}/sources`, () => sourcesForField(fieldId));
+}
+
+/**
+ * The real NASA record the data pipeline retrieved for this field, if one is
+ * bundled. Resolves to null for fields the pipeline has not been run for.
+ */
+export function getNasaSnapshot(fieldId: string): Promise<NasaSnapshot | null> {
+  return request(`/api/fields/${fieldId}/nasa-snapshot`, () => NASA_SNAPSHOTS[fieldId] ?? null);
 }
 
 export interface ConnectionStatus {
@@ -21,7 +30,7 @@ export interface ConnectionStatus {
 
 export function getConnectionStatus(): ConnectionStatus {
   return IS_DEMO
-    ? { mode: "demo", label: "Demo dataset", detail: "Not connected to NASA services or a field station. All values are generated locally for demonstration." }
+    ? { mode: "demo", label: "Demo data", detail: "No field station or live NASA service is connected. Time series are generated locally for demonstration. Where a real NASA record has been retrieved for a field, it is shown separately and labelled." }
     : { mode: "backend", label: "Backend connected", detail: "Data is served by the TERRA API. Check each value's source tag for its origin." };
 }
 

@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import { Badge } from "@/components/ui";
 import type { Discovery } from "@/types";
 
 export const STATUS_LABEL: Record<Discovery["status"], string> = {
@@ -8,29 +9,40 @@ export const STATUS_LABEL: Record<Discovery["status"], string> = {
 };
 
 export function StatusBadge({ status }: { status: Discovery["status"] }) {
-  return (
-    <span className={clsx("rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider",
-      status === "new" && "bg-amber/15 text-amber",
-      status === "investigating" && "bg-terra/15 text-terra-soft",
-      status === "resolved" && "bg-white/8 text-muted")}>
-      {STATUS_LABEL[status]}
-    </span>
-  );
+  return <Badge tone={status === "new" ? "warning" : status === "investigating" ? "good" : "neutral"}>{STATUS_LABEL[status]}</Badge>;
 }
 
-/** Confidence shown as a labelled meter with words — never a bare percentage. */
-export function Confidence({ value, note }: { value: number; note?: string }) {
-  const word = value >= 0.75 ? "Well supported" : value >= 0.5 ? "Moderately supported" : "Tentative";
+/**
+ * How much attention a discovery asks for. Derived, not measured: an open
+ * discovery that names a possible risk to the crop needs attention; other open
+ * ones are worth a look; resolved ones are kept for the record.
+ */
+export function severity(d: Discovery): { label: string; tone: "warning" | "info" | "neutral" } {
+  if (d.status === "resolved") return { label: "Resolved", tone: "neutral" };
+  return d.risk ? { label: "Needs attention", tone: "warning" } : { label: "Worth a look", tone: "info" };
+}
+
+/**
+ * The detectors produce a heuristic support score, not a probability. It is
+ * shown as one of three plain levels so it never reads as a measured certainty.
+ */
+export function evidenceLevel(value: number): { level: 1 | 2 | 3; label: string } {
+  if (value >= 0.75) return { level: 3, label: "Well supported" };
+  if (value >= 0.5) return { level: 2, label: "Moderately supported" };
+  return { level: 1, label: "Tentative" };
+}
+
+export function Evidence({ value, note, compact = false }: { value: number; note?: string; compact?: boolean }) {
+  const { level, label } = evidenceLevel(value);
   return (
     <div>
-      <div className="flex items-baseline justify-between gap-3 text-xs">
-        <span className="font-medium text-silver">{word}</span>
-        <span className="tabular text-muted">{Math.round(value * 100)}% confidence</span>
+      <div className="flex items-center gap-2.5" role="img" aria-label={`Evidence: ${label}, level ${level} of 3`}>
+        <span className="flex gap-0.5" aria-hidden>
+          {[1, 2, 3].map((i) => <span key={i} className={clsx("h-1.5 w-4 rounded-full", i <= level ? "bg-green" : "bg-line-strong")} />)}
+        </span>
+        <span className={clsx("text-ink", compact ? "text-[13px]" : "text-sm font-medium")}>{label}</span>
       </div>
-      <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-white/8" role="meter" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(value * 100)} aria-label="Confidence">
-        <div className="h-full rounded-full bg-terra" style={{ width: `${value * 100}%` }} />
-      </div>
-      {note && <p className="mt-2 text-xs leading-relaxed text-muted">{note}</p>}
+      {note && <p className="mt-2 text-[13px] leading-relaxed text-muted">{note}</p>}
     </div>
   );
 }

@@ -2,14 +2,14 @@
 
 import clsx from "clsx";
 import { Minus, Plus } from "lucide-react";
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { SeriesChart } from "@/components/charts/SeriesChart";
-import { Eyebrow, Panel, ProvenanceTag, Segmented } from "@/components/ui";
+import { Card, CardHeader, Segmented, SourceTag, Swatch, TABLE } from "@/components/ui";
 import { CROPS } from "@/data/crops";
 import { SERIES } from "@/lib/chartTheme";
 import { fmt, pct } from "@/lib/format";
 import type { Provenance, RotationEvaluation, RotationPlan } from "@/types";
-import { CRITERIA, planColor, tradeoffs } from "./shared";
+import { BETTER_HINT, CRITERIA, planColor, tradeoffs, type CriterionGroup } from "./shared";
 
 interface Props {
   plans: RotationPlan[];
@@ -18,57 +18,76 @@ interface Props {
   provenance?: Provenance;
 }
 
+const GROUPS: CriterionGroup[] = ["Water", "Crop diversity", "Soil cover", "Nutrient management", "Climate exposure"];
+
+/** What each plan gains and gives up against the others, in plain words. */
+export function Tradeoffs({ plans, evaluations }: Props) {
+  return (
+    <div className="grid gap-x-10 gap-y-7" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
+      {plans.map((p, i) => {
+        const t = tradeoffs(evaluations[i], evaluations);
+        return (
+          <div key={p.id}>
+            <p className="flex items-center gap-2 text-[15px] font-semibold text-ink"><Swatch color={planColor(p)} />{p.name}</p>
+            <p className="mt-0.5 text-[13px] text-muted">{p.crops.map((c) => CROPS[c].name).join(" → ")}</p>
+            <ul className="mt-3 space-y-1.5 text-sm leading-snug text-ink-soft">
+              {t.gains.map((g) => <li key={g} className="flex gap-2"><Plus size={15} className="mt-0.5 shrink-0 text-green" aria-label="Gain:" />{g}</li>)}
+              {t.costs.map((g) => <li key={g} className="flex gap-2"><Minus size={15} className="mt-0.5 shrink-0 text-amber" aria-label="Cost:" />{g}</li>)}
+              {t.gains.length + t.costs.length === 0 && <li className="text-muted">{plans.length < 2 ? "Include at least two rotations to see trade-offs." : "Sits between the others on every indicator."}</li>}
+            </ul>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+/** Every indicator, grouped by what it describes, with its meaning beside it. */
 export function CriteriaTable({ plans, evaluations }: Props) {
   return (
     <div className="overflow-x-auto">
-      <table className="w-full min-w-[560px] border-collapse text-[13px]">
+      <table className={`${TABLE} min-w-[600px]`}>
         <thead>
-          <tr className="border-b border-line text-left">
-            <th className="px-5 py-3 text-xs font-medium text-muted">Criterion</th>
-            {plans.map((p) => (
-              <th key={p.id} className="px-4 py-3 font-semibold text-silver">
-                <span className="inline-flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-sm" style={{ background: planColor(p) }} aria-hidden />{p.name}</span>
-              </th>
-            ))}
+          <tr className="border-b border-line-strong">
+            <th className="py-3 pr-4 text-left text-[13px] font-medium text-muted">Indicator</th>
+            {plans.map((p) => <th key={p.id} className="px-3 py-3 text-left font-semibold text-ink"><span className="inline-flex items-center gap-2"><Swatch color={planColor(p)} />{p.name}</span></th>)}
           </tr>
         </thead>
         <tbody>
-          {CRITERIA.map((c) => {
-            const values = evaluations.map((e) => c.value(e.indicators, e));
-            const max = c.max ?? Math.max(...values, 1);
-            return (
-              <tr key={c.key} className={clsx("border-b border-line last:border-0", c.key === "priority" && "bg-white/[0.02]")}>
-                <th scope="row" className="max-w-[260px] px-5 py-3 text-left align-top font-normal">
-                  <div className="font-medium text-silver">{c.label}</div>
-                  <div className="mt-0.5 text-[11px] leading-snug text-muted">{c.help}</div>
-                </th>
-                {plans.map((p, i) => (
-                  <td key={p.id} className="px-4 py-3 align-top">
-                    <div className="tabular font-medium text-silver">{c.format(values[i])}</div>
-                    <div className="mt-1.5 h-1.5 w-full max-w-[140px] rounded-full bg-white/8">
-                      <div className="h-full rounded-full" style={{ width: `${Math.max(2, (values[i] / max) * 100)}%`, background: planColor(p), opacity: values[i] === 0 ? 0.25 : 1 }} />
-                    </div>
-                  </td>
-                ))}
-              </tr>
-            );
-          })}
+          {GROUPS.map((group) => (
+            <Fragment key={group}>
+              <tr><th colSpan={plans.length + 1} scope="colgroup" className="pb-1 pt-5 text-left text-[13px] font-medium uppercase tracking-wide text-muted">{group}</th></tr>
+              {CRITERIA.filter((c) => c.group === group).map((c) => {
+                const values = evaluations.map((e) => c.value(e.indicators, e));
+                const max = c.max ?? Math.max(...values, 1);
+                return (
+                  <tr key={c.key} className="border-b border-line">
+                    <th scope="row" className="max-w-[300px] py-3 pr-4 text-left align-top font-normal">
+                      <span className="block font-medium text-ink">{c.label}</span>
+                      <span className="mt-0.5 block text-[13px] leading-snug text-muted">{c.help} <span className="text-faint">{BETTER_HINT[c.better ?? "none"]}.</span></span>
+                    </th>
+                    {plans.map((p, i) => (
+                      <td key={p.id} className="px-3 py-3 align-top">
+                        <span className="tabular block font-medium text-ink">{c.format(values[i])}</span>
+                        <span className="mt-1.5 block h-1.5 w-full max-w-[120px] rounded-full bg-sunken">
+                          <span className="block h-full rounded-full" style={{ width: `${values[i] === 0 ? 0 : Math.max(3, (values[i] / max) * 100)}%`, background: planColor(p) }} />
+                        </span>
+                      </td>
+                    ))}
+                  </tr>
+                );
+              })}
+            </Fragment>
+          ))}
         </tbody>
       </table>
     </div>
   );
 }
 
-export function Comparison({ plans, evaluations, provenance = "model" }: Props) {
-  const [pickedId, setPickedId] = useState(plans[0]?.id);
-  const picked = plans.find((p) => p.id === pickedId) ?? plans[0];
-  const pickedEval = evaluations.find((e) => e.planId === picked?.id);
-
+function WaterCharts({ plans, evaluations, provenance = "model" }: Props) {
   const waterRows = useMemo(() => plans.map((p, i) => ({
-    name: p.name,
-    demand: evaluations[i].indicators.demandMm,
-    met: evaluations[i].indicators.metMm,
-    rain: evaluations[i].indicators.rainMm,
+    name: p.name, demand: evaluations[i].indicators.demandMm, met: evaluations[i].indicators.metMm,
   })), [plans, evaluations]);
 
   const storageRows = useMemo(() => {
@@ -83,97 +102,68 @@ export function Comparison({ plans, evaluations, provenance = "model" }: Props) 
     });
   }, [evaluations]);
 
-  if (!picked || !pickedEval) return null;
-
   return (
-    <div className="space-y-5">
-      {/* Trade-offs first: the point of the lab */}
-      <Panel>
-        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line px-5 py-3.5">
-          <Eyebrow className="!text-terra">Overall trade-offs</Eyebrow>
-          <ProvenanceTag kind={provenance} />
+    <div className="grid gap-6 xl:grid-cols-2">
+      <Card className="pb-3">
+        <CardHeader title="Does the field supply what the crops need?" description="Water demand over the whole rotation against what rain and stored soil water could meet." actions={<SourceTag kind={provenance} />} />
+        <div className="px-3 pt-4 sm:px-5">
+          <SeriesChart data={waterRows} xKey="name" unit="mm over the whole rotation" digits={0} height={260} ariaLabel="Water demand and supply by rotation" series={[
+            { key: "demand", label: "Estimated water demand", color: SERIES.blue, type: "bar" },
+            { key: "met", label: "Met by rain and soil water", color: SERIES.green, type: "bar" },
+          ]} />
         </div>
-        <div className="grid gap-px bg-line" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))" }}>
-          {plans.map((p, i) => {
-            const t = tradeoffs(evaluations[i], evaluations);
-            return (
-              <div key={p.id} className="bg-surface p-5">
-                <div className="flex items-center gap-2 text-[15px] font-semibold text-silver"><span className="h-2.5 w-2.5 rounded-sm" style={{ background: planColor(p) }} aria-hidden />{p.name}</div>
-                <div className="mt-1 text-xs text-muted">{p.crops.map((c) => CROPS[c].name).join(" → ")}</div>
-                <ul className="mt-3 space-y-1.5 text-[13px] leading-snug">
-                  {t.gains.map((g) => <li key={g} className="flex gap-2 text-silver/90"><Plus size={13} className="mt-0.5 shrink-0 text-terra" aria-label="Gain:" />{g}</li>)}
-                  {t.costs.map((g) => <li key={g} className="flex gap-2 text-silver/90"><Minus size={13} className="mt-0.5 shrink-0 text-amber" aria-label="Cost:" />{g}</li>)}
-                  {t.gains.length + t.costs.length === 0 && <li className="text-muted">{plans.length < 2 ? "Select at least two rotations to see trade-offs." : "Sits between the others on every criterion."}</li>}
-                </ul>
-              </div>
-            );
-          })}
+        <p className="px-5 pt-2 text-[13px] leading-relaxed text-muted sm:px-6">The gap between each pair of bars is demand the field could not meet without irrigation.</p>
+      </Card>
+      <Card className="pb-3">
+        <CardHeader title="When would the soil run low on water?" description="Estimated water available to the crop in the root zone, through each rotation." actions={<SourceTag kind={provenance} />} />
+        <div className="px-3 pt-4 sm:px-5">
+          <SeriesChart data={storageRows} xKey="label" unit="mm available in the root zone" digits={0} height={260} domain={[0, "auto"]} ariaLabel="Root-zone water storage through each rotation" xInterval="preserveStartEnd"
+            series={plans.map((p) => ({ key: p.id, label: p.name, color: planColor(p) }))} />
         </div>
-        <p className="border-t border-line px-5 py-3 text-xs leading-relaxed text-muted">
-          No rotation is best on everything. Gains and costs are relative to the other rotations compared here, for this field&apos;s climate and soil.
-        </p>
-      </Panel>
-
-      <div className="grid gap-5 xl:grid-cols-2">
-        <Panel>
-          <div className="border-b border-line px-5 py-3.5"><Eyebrow>Water demand and availability</Eyebrow><div className="mt-1 text-[15px] font-medium text-silver">What the crops need against what rain and soil can supply</div></div>
-          <div className="px-3 pb-2 pt-4 sm:px-5">
-            <SeriesChart data={waterRows} xKey="name" unit="mm" digits={0} height={270} ariaLabel="Water demand and supply by rotation" series={[
-              { key: "demand", label: "Crop water demand (ETc)", color: SERIES.blue, type: "bar" },
-              { key: "met", label: "Met by rain and stored soil water", color: SERIES.green, type: "bar" },
-            ]} />
-          </div>
-          <p className="border-t border-line px-5 py-3 text-xs leading-relaxed text-muted">The gap between the two bars is demand the field could not meet without irrigation. Rain over the whole period: {waterRows.map((r) => `${r.name} ${fmt(r.rain)} mm`).join(" · ")}.</p>
-        </Panel>
-
-        <Panel>
-          <div className="border-b border-line px-5 py-3.5"><Eyebrow>Estimated water availability</Eyebrow><div className="mt-1 text-[15px] font-medium text-silver">Plant-available water stored in the root zone</div></div>
-          <div className="px-3 pb-2 pt-4 sm:px-5">
-            <SeriesChart data={storageRows} xKey="label" unit="mm" digits={0} height={270} ariaLabel="Root-zone water storage through each rotation" xInterval="preserveStartEnd"
-              series={plans.map((p) => ({ key: p.id, label: p.name, color: planColor(p) }))} />
-          </div>
-          <p className="border-t border-line px-5 py-3 text-xs leading-relaxed text-muted">Ten-day steps. S1, S2… are seasons. Low points are when a crop is most likely to run short of water.</p>
-        </Panel>
-      </div>
-
-      <Panel>
-        <div className="border-b border-line px-5 py-3.5"><Eyebrow>Criteria side by side</Eyebrow></div>
-        <CriteriaTable plans={plans} evaluations={evaluations} />
-      </Panel>
-
-      <Panel>
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-3.5">
-          <Eyebrow>Season by season</Eyebrow>
-          <Segmented label="Rotation" value={picked.id} onChange={setPickedId} options={plans.map((p) => ({ value: p.id, label: p.name }))} />
-        </div>
-        <div className="overflow-x-auto">
-          <table className="tabular w-full min-w-[640px] text-[13px]">
-            <thead>
-              <tr className="border-b border-line text-left text-xs text-muted">
-                {["Season", "Crop", "Window", "Rain", "Demand", "Met", "Unmet", "Runoff + drainage", "Heat exposure"].map((h) => <th key={h} className="px-4 py-2.5 font-medium first:pl-5">{h}</th>)}
-              </tr>
-            </thead>
-            <tbody>
-              {pickedEval.seasons.map((s) => (
-                <tr key={s.index} className="border-b border-line last:border-0 text-silver/90">
-                  <td className="py-2.5 pl-5 pr-4">{s.index + 1}</td>
-                  <td className="px-4 py-2.5 font-medium text-silver">{CROPS[s.cropId].name}</td>
-                  <td className="px-4 py-2.5">{s.windowLabel}</td>
-                  <td className="px-4 py-2.5">{s.rainMm} mm</td>
-                  <td className="px-4 py-2.5">{s.cropId === "fallow" ? "—" : `${s.demandMm} mm`}</td>
-                  <td className="px-4 py-2.5">{s.cropId === "fallow" ? "—" : `${s.metMm} mm`}</td>
-                  <td className={clsx("px-4 py-2.5", s.deficitMm > 30 && "text-amber")}>{s.cropId === "fallow" ? "—" : `${s.deficitMm} mm`}</td>
-                  <td className="px-4 py-2.5">{s.runoffMm + s.drainageMm} mm</td>
-                  <td className={clsx("px-4 py-2.5", s.heatShare > 0.3 && "text-amber")}>{CROPS[s.cropId].heatThresholdC === null ? "—" : pct(s.heatShare)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        {pickedEval.notes.length > 0 && (
-          <ul className="border-t border-line px-5 py-3 text-xs leading-relaxed text-amber">{pickedEval.notes.map((n) => <li key={n}>{n}</li>)}</ul>
-        )}
-      </Panel>
+        <p className="px-5 pt-2 text-[13px] leading-relaxed text-muted sm:px-6">Ten-day steps. S1, S2 and so on are seasons. Low points are when a crop is most likely to run short.</p>
+      </Card>
     </div>
   );
 }
+
+function SeasonTable({ plans, evaluations }: Props) {
+  const [pickedId, setPickedId] = useState(plans[0]?.id);
+  const picked = plans.find((p) => p.id === pickedId) ?? plans[0];
+  const evaluation = evaluations.find((e) => e.planId === picked?.id);
+  if (!picked || !evaluation) return null;
+  const cell = "border-b border-line px-3 py-2.5 first:pl-0";
+  return (
+    <div>
+      {plans.length > 1 && <div className="mb-3"><Segmented label="Rotation" value={picked.id} onChange={setPickedId} options={plans.map((p) => ({ value: p.id, label: p.name }))} /></div>}
+      <div className="overflow-x-auto">
+        <table className={`${TABLE} tabular min-w-[680px] text-[13px]`}>
+          <thead>
+            <tr>{["Season", "Crop", "Period", "Rain", "Demand", "Met", "Unmet", "Runoff and drainage", "Heat exposure"].map((h) => <th key={h} className={clsx(cell, "text-left font-medium text-muted")}>{h}</th>)}</tr>
+          </thead>
+          <tbody>
+            {evaluation.seasons.map((s) => {
+              const fallow = s.cropId === "fallow";
+              return (
+                <tr key={s.index} className="text-ink-soft">
+                  <td className={cell}>{s.index + 1}</td>
+                  <td className={clsx(cell, "font-medium text-ink")}>{CROPS[s.cropId].name}</td>
+                  <td className={cell}>{s.windowLabel}</td>
+                  <td className={cell}>{s.rainMm} mm</td>
+                  <td className={cell}>{fallow ? "Not applicable" : `${s.demandMm} mm`}</td>
+                  <td className={cell}>{fallow ? "Not applicable" : `${s.metMm} mm`}</td>
+                  <td className={clsx(cell, s.deficitMm > 30 && "font-medium text-amber")}>{fallow ? "Not applicable" : `${s.deficitMm} mm`}</td>
+                  <td className={cell}>{s.runoffMm + s.drainageMm} mm</td>
+                  <td className={clsx(cell, s.heatShare > 0.3 && "font-medium text-amber")}>{CROPS[s.cropId].heatThresholdC === null ? "Not applicable" : pct(s.heatShare)}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+      {evaluation.notes.length > 0 && <ul className="mt-3 space-y-1 text-[13px] leading-relaxed text-amber">{evaluation.notes.map((n) => <li key={n}>{n}</li>)}</ul>}
+      <p className="mt-3 text-[13px] text-muted">All figures are model estimates in millimetres over each season. Rain is the {fmt(evaluation.indicators.rainMm)} mm that falls over the whole rotation, split by season.</p>
+    </div>
+  );
+}
+
+export { SeasonTable, WaterCharts };
