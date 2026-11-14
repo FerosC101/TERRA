@@ -6,7 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "vitest run",
+    "experiment:discovery": "tsx scripts/evaluate-discovery.ts",
+    "experiment:e002": "tsx scripts/evaluate-discovery-e002.ts",
+    "experiment:e003": "tsx scripts/evaluate-discovery-e003.ts",
+    "experiment:e004": "tsx scripts/evaluate-discovery-e004.ts"
   },
   "dependencies": {
     "clsx": "^2.1.1",
@@ -27,6 +32,8 @@
     "eslint": "^9",
     "eslint-config-next": "16.4.6",
     "tailwindcss": "4.3.3",
-    "typescript": "^5"
+    "tsx": "4.23.15",
+    "typescript": "^5",
+    "vitest": "4.1.12"
   }
 }
