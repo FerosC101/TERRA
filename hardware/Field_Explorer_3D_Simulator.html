@@ -1,0 +1,1775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TERRA 2.0 — Field Explorer 3D Hardware Simulator &amp; Live Sensor Prototype</title>
+  <script src="three.min.js"></script>
+  <style>
+    :root {
+      --bg-deep: #050b14;
+      --bg-panel: #0b1626;
+      --bg-card: #112238;
+      --bg-card-hover: #172e4a;
+      --cyan: #38bdf8;
+      --emerald: #10b981;
+      --amber: #f59e0b;
+      --rose: #f43f5e;
+      --purple: #a855f7;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --border: rgba(148, 163, 184, 0.18);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Inter, Roboto, sans-serif;
+      background: radial-gradient(circle at 18% 0%, #0f2942 0%, var(--bg-deep) 72%);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Top Header */
+    .topbar {
+      height: 60px;
+      background: rgba(8, 17, 30, 0.94);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .brand-row {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+    .logo-badge {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #10b981 0%, #0b3d91 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 0.95rem;
+      color: #fff;
+      box-shadow: 0 0 14px rgba(16, 185, 129, 0.45);
+    }
+    .brand-title {
+      font-size: 0.98rem;
+      font-weight: 800;
+      letter-spacing: 0.2px;
+    }
+    .brand-title span {
+      color: #6ee7b7;
+      font-weight: 600;
+      font-size: 0.82rem;
+    }
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+    .btn-top {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+      padding: 0.38rem 0.78rem;
+      border-radius: 8px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      text-decoration: none;
+      transition: all 0.16s;
+    }
+    .btn-top:hover { background: var(--bg-card-hover); border-color: var(--cyan); }
+    .btn-top.primary {
+      background: linear-gradient(135deg, #7c3aed 0%, #2563eb 100%);
+      border-color: #a78bfa;
+      box-shadow: 0 0 14px rgba(124, 58, 237, 0.4);
+    }
+    .btn-top.emerald {
+      background: rgba(16, 185, 129, 0.16);
+      border-color: rgba(16, 185, 129, 0.55);
+      color: #6ee7b7;
+    }
+    .mcu-select {
+      background: var(--bg-card);
+      color: #fff;
+      border: 1px solid var(--cyan);
+      padding: 0.36rem 0.65rem;
+      border-radius: 8px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* Main Workspace Grid */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 350px 1fr 390px;
+      gap: 1rem;
+      padding: 1rem 1.2rem;
+      max-width: 1760px;
+      width: 100%;
+      margin: 0 auto;
+      flex: 1;
+      align-items: start;
+    }
+    @media (max-width: 1380px) {
+      .main-grid { grid-template-columns: 330px 1fr; }
+      .right-col { grid-column: span 2; }
+    }
+    @media (max-width: 920px) {
+      .main-grid { grid-template-columns: 1fr; }
+      .right-col { grid-column: span 1; }
+    }
+
+    .panel {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      padding: 0.95rem 1.05rem;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.38);
+    }
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.7rem;
+      padding-bottom: 0.45rem;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+    }
+    .panel-title {
+      font-size: 0.88rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #fff;
+    }
+    .panel-badge {
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 0.18rem 0.55rem;
+      border-radius: 99px;
+      background: rgba(56, 189, 248, 0.16);
+      color: var(--cyan);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+    }
+
+    /* Scenario Preset Chips */
+    .preset-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.45rem;
+      margin-bottom: 0.85rem;
+    }
+    .preset-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      padding: 0.48rem 0.55rem;
+      border-radius: 9px;
+      font-size: 0.71rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s;
+      line-height: 1.25;
+    }
+    .preset-btn:hover { background: var(--bg-card-hover); color: #fff; }
+    .preset-btn.active {
+      background: rgba(16, 185, 129, 0.18);
+      border-color: var(--emerald);
+      color: #6ee7b7;
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.2);
+    }
+    .preset-btn.warn.active {
+      background: rgba(245, 158, 11, 0.2);
+      border-color: var(--amber);
+      color: #fde68a;
+    }
+    .preset-btn.danger.active {
+      background: rgba(244, 63, 94, 0.2);
+      border-color: var(--rose);
+      color: #fecdd3;
+    }
+
+    /* Sensor Sliders */
+    .slider-group {
+      margin-bottom: 0.62rem;
+      background: rgba(17, 34, 56, 0.65);
+      border: 1px solid rgba(148, 163, 184, 0.12);
+      padding: 0.45rem 0.65rem;
+      border-radius: 9px;
+    }
+    .slider-head {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.73rem;
+      font-weight: 700;
+      margin-bottom: 3px;
+    }
+    .slider-val { color: var(--cyan); font-family: Consolas, monospace; }
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--cyan);
+      cursor: pointer;
+      height: 5px;
+    }
+
+    /* Center 3D Viewport */
+    .viewport-wrapper {
+      position: relative;
+      height: 560px;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid rgba(52, 211, 153, 0.38);
+      background: linear-gradient(180deg, #071426 0%, #163354 38%, #d99b52 68%, #182316 76%, #080f0a 100%);
+      box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.45);
+    }
+    #canvas3d {
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: grab;
+    }
+    #canvas3d:active { cursor: grabbing; }
+
+    /* Overlay HUD inside 3D Viewport */
+    .hud-top-left {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      z-index: 10;
+      pointer-events: none;
+    }
+    .hud-pill {
+      background: rgba(9, 18, 32, 0.84);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      padding: 0.42rem 0.75rem;
+      border-radius: 9px;
+      font-size: 0.73rem;
+      font-weight: 700;
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+    .hud-top-right {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      z-index: 10;
+    }
+    .cam-btn {
+      background: rgba(9, 18, 32, 0.86);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #e2e8f0;
+      padding: 0.4rem 0.7rem;
+      border-radius: 8px;
+      font-size: 0.71rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: right;
+      transition: all 0.15s;
+    }
+    .cam-btn:hover, .cam-btn.active {
+      background: linear-gradient(135deg, #10b981 0%, #0284c7 100%);
+      color: #fff;
+      border-color: #fff;
+    }
+    .cam-btn.cinema {
+      background: linear-gradient(135deg, #9333ea 0%, #4f46e5 100%);
+      border-color: #d8b4fe;
+      color: #fff;
+    }
+
+    /* Callout Subtitle Bar at Bottom of 3D Viewport */
+    .hud-bottom-bar {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      right: 12px;
+      background: rgba(9, 18, 32, 0.88);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      border-radius: 11px;
+      padding: 0.6rem 0.9rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.8rem;
+      z-index: 10;
+    }
+    .callout-title {
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: #38bdf8;
+    }
+    .callout-desc {
+      font-size: 0.73rem;
+      color: #e2e8f0;
+      margin-top: 2px;
+    }
+    .Inspector-tags {
+      display: flex;
+      gap: 0.4rem;
+      flex-shrink: 0;
+    }
+    .tag-chip {
+      font-size: 0.68rem;
+      font-weight: 800;
+      padding: 0.25rem 0.55rem;
+      border-radius: 6px;
+      background: rgba(16, 185, 129, 0.2);
+      border: 1px solid #10b981;
+      color: #6ee7b7;
+    }
+
+    /* Hardware Architecture Strip Below Viewport */
+    .hw-kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.65rem;
+      margin-top: 0.75rem;
+    }
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.55rem 0.7rem;
+    }
+    .kpi-lbl {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      font-weight: 800;
+      color: var(--text-secondary);
+    }
+    .kpi-val {
+      font-size: 0.98rem;
+      font-weight: 800;
+      color: #fff;
+      margin: 2px 0;
+    }
+    .kpi-sub {
+      font-size: 0.67rem;
+      color: var(--cyan);
+    }
+
+    /* Right Column: Live Oscilloscope & Serial Console */
+    .scope-canvas {
+      width: 100%;
+      height: 128px;
+      background: #060d18;
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-radius: 9px;
+      display: block;
+      margin-bottom: 0.65rem;
+    }
+    .serial-box {
+      background: #040811;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      border-radius: 9px;
+      padding: 0.55rem 0.7rem;
+      font-family: 'Cascadia Code', Consolas, monospace;
+      font-size: 0.68rem;
+      color: #34d399;
+      height: 155px;
+      overflow-y: auto;
+      line-height: 1.42;
+    }
+    .pinout-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.7rem;
+      margin-top: 0.35rem;
+    }
+    .pinout-table th, .pinout-table td {
+      padding: 0.32rem 0.4rem;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+      text-align: left;
+    }
+    .pinout-table th { color: var(--cyan); font-weight: 700; }
+    .pin-code {
+      font-family: Consolas, monospace;
+      color: #fde68a;
+      background: rgba(245, 158, 11, 0.14);
+      padding: 1px 5px;
+      border-radius: 4px;
+    }
+
+    /* Video Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 7, 18, 0.85);
+      backdrop-filter: blur(10px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 300;
+      padding: 1.5rem;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--cyan);
+      border-radius: 16px;
+      max-width: 920px;
+      width: 100%;
+      padding: 1.1rem;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.75);
+    }
+    .modal-card video {
+      width: 100%;
+      border-radius: 10px;
+      background: #000;
+      border: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="brand-row">
+      <div class="logo-badge">P1</div>
+      <div class="brand-title">
+        TERRA 2.0 Field Explorer <span>| Person 1: 3D Hardware Twin, Solar Pod &amp; Live Sensor Prototype</span>
+      </div>
+    </div>
+    <div class="top-actions">
+      <select id="mcuSelect" class="mcu-select" onchange="switchMcuArchitecture()">
+        <option value="esp32s3">MCU: ESP32-S3-WROOM-1 (Wi-Fi + LoRaWAN + Edge AI)</option>
+        <option value="stm32l4">MCU: STM32L476RG (Ultra-Low-Power Sub-GHz LoRa)</option>
+      </select>
+      <button class="btn-top primary" onclick="startStudioRevealChoreography()">
+        &#127916; Play 14s 3D Studio Reveal
+      </button>
+      <button class="btn-top" onclick="openVideoModal()">
+        &#128249; Watch Rendered MP4 Video
+      </button>
+      <button class="btn-top emerald" onclick="connectWebSerial()">
+        &#128268; USB WebSerial (ESP32)
+      </button>
+      <a href="../TERRA_App.html" class="btn-top">
+        &#127760; Open Mission Control &rarr;
+      </a>
+    </div>
+  </header>
+
+  <!-- MAIN 3-COLUMN WORKSPACE -->
+  <main class="main-grid">
+
+    <!-- LEFT COLUMN: HARDWARE CONTROLS, EXPLODED/X-RAY & LIVE SENSOR SLIDERS -->
+    <section class="panel">
+      <div class="panel-header">
+        <span class="panel-title">1. Field Scenario &amp; 3D Rig Controls</span>
+        <span class="panel-badge" id="syncStatusBadge">LIVE SYNC ON</span>
+      </div>
+
+      <!-- 4 Demo Scenario Presets -->
+      <div class="preset-grid">
+        <button class="preset-btn active" id="pre-normal" onclick="applyPreset('normal')">
+          &#9989; Normal Drained<br/><small style="color:var(--text-secondary)">θ: 28% | EC: 1.4 dS/m</small>
+        </button>
+        <button class="preset-btn warn" id="pre-saline" onclick="applyPreset('saline')">
+          &#9888;&#65039; Salinity Lock<br/><small style="color:var(--text-secondary)">θ: 44% | EC: 3.8 dS/m</small>
+        </button>
+        <button class="preset-btn" id="pre-monsoon" onclick="applyPreset('monsoon')">
+          &#127783;&#65039; Monsoon Surge<br/><small style="color:var(--text-secondary)">Rain: 34 mm/h | θ: 49%</small>
+        </button>
+        <button class="preset-btn danger" id="pre-offline" onclick="applyPreset('offline')">
+          &#128225; Link Blackout<br/><small style="color:var(--text-secondary)">Offline Ring-Buffer Cache</small>
+        </button>
+      </div>
+
+      <!-- 3D Mechanical Assembly Controls -->
+      <div class="slider-group" style="border-color: rgba(168, 85, 247, 0.4);">
+        <div class="slider-head">
+          <span>&#128297; Exploded Assembly Separation</span>
+          <span class="slider-val" id="val-explode">0%</span>
+        </div>
+        <input type="range" id="rng-explode" min="0" max="100" value="0" oninput="onRigControlChange()" />
+      </div>
+
+      <div class="slider-group" style="border-color: rgba(56, 189, 248, 0.4);">
+        <div class="slider-head">
+          <span>&#128065;&#65039; Enclosure Wireframe X-Ray Cutaway</span>
+          <span class="slider-val" id="val-xray">0%</span>
+        </div>
+        <input type="range" id="rng-xray" min="0" max="100" value="0" oninput="onRigControlChange()" />
+      </div>
+
+      <div class="panel-header" style="margin-top:0.75rem;">
+        <span class="panel-title">2. Live Physical Sensor Inputs</span>
+        <span class="panel-badge">10 / 30 / 60 cm</span>
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-head">
+          <span>Topsoil Moisture (10 cm FDR)</span>
+          <span class="slider-val" id="val-m10">26.0%</span>
+        </div>
+        <input type="range" id="rng-m10" min="8" max="52" step="0.5" value="26" oninput="onSensorChange()" />
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-head">
+          <span>Root-Zone Moisture (30 cm Cal/Val)</span>
+          <span class="slider-val" id="val-m30">28.0%</span>
+        </div>
+        <input type="range" id="rng-m30" min="8" max="52" step="0.5" value="28" oninput="onSensorChange()" />
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-head">
+          <span>Subsoil Moisture (60 cm Plow-Pan)</span>
+          <span class="slider-val" id="val-m60">34.0%</span>
+        </div>
+        <input type="range" id="rng-m60" min="10" max="52" step="0.5" value="34" oninput="onSensorChange()" />
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-head">
+          <span>Pore-Water Salinity (EC Probe)</span>
+          <span class="slider-val" id="val-ec">1.40 dS/m</span>
+        </div>
+        <input type="range" id="rng-ec" min="0.4" max="6.0" step="0.1" value="1.4" oninput="onSensorChange()" />
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-head">
+          <span>Soil &amp; Air Temp (DS18B20 / SHT35)</span>
+          <span class="slider-val" id="val-temp">27.5°C / 30.8°C</span>
+        </div>
+        <input type="range" id="rng-temp" min="18" max="40" step="0.5" value="27.5" oninput="onSensorChange()" />
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-head">
+          <span>Tipping-Bucket Rain &amp; Solar (W/m²)</span>
+          <span class="slider-val" id="val-rain">0.0 mm/h | 685 W/m²</span>
+        </div>
+        <input type="range" id="rng-rain" min="0" max="50" step="1" value="0" oninput="onSensorChange()" />
+      </div>
+    </section>
+
+    <!-- CENTER COLUMN: INTERACTIVE 3D WEBGL HARDWARE & FIELD STUDIO -->
+    <section class="panel" style="padding:0.85rem;">
+      <div class="viewport-wrapper" id="viewportWrapper">
+        <canvas id="canvas3d"></canvas>
+
+        <!-- Top-Left Live Status Overlay -->
+        <div class="hud-top-left">
+          <div class="hud-pill">
+            <span id="ledDot" style="width:9px;height:9px;border-radius:50%;background:#10b981;box-shadow:0 0 8px #10b981;"></span>
+            <span id="hudModeLabel">STUDIO CYCLORAMA + 3D HARDWARE TWIN</span>
+          </div>
+          <div class="hud-pill" style="color:#c4b5fd;">
+            <span>Edge AI Anomaly Score:</span>
+            <strong id="hudZScore" style="color:#34d399;">Z = +0.38 (NORMAL)</strong>
+          </div>
+          <div class="hud-pill" style="color:#bae6fd;">
+            <span>Space-Ground Divergence:</span>
+            <strong id="hudDsgScore" style="color:#38bdf8;">D_SG = 0.40 (COUPLED)</strong>
+          </div>
+        </div>
+
+        <!-- Top-Right Camera & Scene Switchers -->
+        <div class="hud-top-right">
+          <button class="cam-btn cinema" onclick="startStudioRevealChoreography()">&#127916; 14s 5-Act Reveal Choreography</button>
+          <button class="cam-btn active" id="btnSceneStudio" onclick="setSceneBackdrop('studio')">&#127749; Golden-Hour Field Horizon</button>
+          <button class="cam-btn" id="btnSceneField" onclick="setSceneBackdrop('field')">&#127806; Inside TERRA &amp; Soil Cutaway</button>
+          <button class="cam-btn" onclick="focusCameraPreset('hero')">&#128247; Hero TERRA Pod Lockup</button>
+          <button class="cam-btn" onclick="focusCameraPreset('under')">&#129517; Quad Legs &amp; Soil Probes</button>
+          <button class="cam-btn" onclick="focusCameraPreset('xray')">&#9889; Inside TERRA Wireframe X-Ray</button>
+          <button class="cam-btn" onclick="focusCameraPreset('pcb')">&#9728;&#65039; Conical Solar &amp; GNSS Crown</button>
+        </div>
+
+        <!-- Bottom Callout Bar -->
+        <div class="hud-bottom-bar">
+          <div>
+            <div class="callout-title" id="calloutTitle">TERRA Autonomous Field Explorer — Quad-Legged Solar &amp; Multispectral Pod</div>
+            <div class="callout-desc" id="calloutDesc">Conical 16-segment solar canopy • GNSS dome &amp; whip antenna • Dual-lens multispectral camera • 4-tier Inside TERRA stack • Quad outrigger legs.</div>
+          </div>
+          <div class="Inspector-tags">
+            <span class="tag-chip" id="tagMcu">ESP32-S3</span>
+            <span class="tag-chip" id="tagPower">Solar + Blue LiFePO4</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4 Hardware Telemetry KPI Cards -->
+      <div class="hw-kpi-strip">
+        <div class="kpi-card">
+          <div class="kpi-lbl">Multi-Depth Soil (10/30/60cm)</div>
+          <div class="kpi-val" id="kpiMoisture">26% / 28% / 34%</div>
+          <div class="kpi-sub">Calibrates NISAR + SMAP L4</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-lbl">Pore-Water Salinity &amp; Temp</div>
+          <div class="kpi-val" id="kpiSalinity">1.40 dS/m | 27.5°C</div>
+          <div class="kpi-sub" id="kpiSalinitySub">25°C Temp-Compensated EC</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-lbl">Local FAO-56 Water Balance</div>
+          <div class="kpi-val" id="kpiFao">ET₀: 4.18 mm/day</div>
+          <div class="kpi-sub" id="kpiFaoSub">ETc (Mungbean): 4.39 mm/d</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-lbl">Solar MPPT &amp; Ring Buffer</div>
+          <div class="kpi-val" id="kpiPower">6.48V (94% SoC)</div>
+          <div class="kpi-sub" id="kpiBufferSub">LoRaWAN Online (0 Queued)</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT COLUMN: LIVE OSCILLOSCOPE, PINOUT & UART SERIAL STREAM -->
+    <section class="panel right-col">
+      <div class="panel-header">
+        <span class="panel-title">3. Live Multi-Sensor Oscilloscope</span>
+        <span class="panel-badge">5 Hz Stream</span>
+      </div>
+      <canvas id="scopeMoisture" class="scope-canvas" width="360" height="128"></canvas>
+      <canvas id="scopeAnomaly" class="scope-canvas" width="360" height="128"></canvas>
+
+      <div class="panel-header" style="margin-top:0.4rem;">
+        <span class="panel-title">4. ESP32 / STM32 UART JSON Telemetry</span>
+        <span class="panel-badge" id="pktCounterBadge">SEQ #1001</span>
+      </div>
+      <div class="serial-box" id="serialConsole"></div>
+
+      <div class="panel-header" style="margin-top:0.75rem;">
+        <span class="panel-title">5. Active MCU Bus &amp; Sensor Pinout</span>
+        <span class="panel-badge" id="pinoutMcuBadge">ESP32-S3</span>
+      </div>
+      <table class="pinout-table">
+        <thead>
+          <tr><th>Sensor / Subsystem</th><th>Bus</th><th>Pin Mapping</th></tr>
+        </thead>
+        <tbody id="pinoutTableBody">
+          <tr><td>Soil Moisture (10/30/60cm)</td><td>12-bit ADC</td><td><span class="pin-code">GPIO 34 / 35 / 32</span></td></tr>
+          <tr><td>Pore-Water Salinity (EC)</td><td>ADC / Modbus</td><td><span class="pin-code">GPIO 33 / UART2</span></td></tr>
+          <tr><td>Soil Temp (DS18B20)</td><td>1-Wire</td><td><span class="pin-code">GPIO 4</span></td></tr>
+          <tr><td>Air T/RH (SHT35) + Solar</td><td>I2C (0x44/23)</td><td><span class="pin-code">SDA 21 / SCL 22</span></td></tr>
+          <tr><td>Tipping-Bucket Rain ISR</td><td>GPIO IRQ</td><td><span class="pin-code">GPIO 27 (FALLING)</span></td></tr>
+          <tr><td>SX1262 LoRaWAN Radio</td><td>SPI Bus</td><td><span class="pin-code">CS 18 / RST 14</span></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+  </main>
+
+  <!-- RENDERED 3D VIDEO SHOWCASE MODAL -->
+  <div class="modal-backdrop" id="videoModal">
+    <div class="modal-card">
+      <div class="panel-header">
+        <span class="panel-title">&#127916; TERRA 2.0 Field Explorer — 3D Hardware Reveal Video (MP4)</span>
+        <button class="btn-top" onclick="closeVideoModal()">&#10006; Close</button>
+      </div>
+      <video id="revealVideoPlayer" controls loop playsinline poster="Field_Explorer_Product_Poster.png">
+        <source src="Field_Explorer_3D_Reveal.mp4" type="video/mp4" />
+      </video>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:0.7rem; font-size:0.78rem; color:var(--text-secondary);">
+        <span>5-Act Studio Reveal: Floating Exploded View &rarr; Under-Chassis Sensing Rays &rarr; Front Pill &amp; Wireframe X-Ray &rarr; Top-Down ESP32 PCB &rarr; Hero Re-assembly</span>
+        <a href="Field_Explorer_3D_Reveal.mp4" download class="btn-top emerald">&#11015; Download MP4</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // 1. STATE & TELEMETRY PHYSICS ENGINE (Synced with TERRA_App.html)
+    // =========================================================================
+    const state = {
+      mcu: 'esp32s3',
+      sceneMode: 'studio', // 'studio' or 'field'
+      explode: 0.0,
+      xray: 0.0,
+      m10: 26.0,
+      m30: 28.0,
+      m60: 34.0,
+      ec: 1.40,
+      soilTemp: 27.5,
+      airTemp: 30.8,
+      airRh: 74.0,
+      rain: 0.0,
+      solarWm2: 685.0,
+      battV: 6.48,
+      battSoc: 94.2,
+      networkOnline: true,
+      ringBufferQueued: 0,
+      seqId: 1001,
+      zMoisture: 0.38,
+      zEc: 0.0,
+      dSg: 0.40,
+      et0: 4.18,
+      etc: 4.39,
+      choreoActive: false,
+      choreoStartTime: 0
+    };
+
+    const broadcastChannel = ('BroadcastChannel' in window) ? new BroadcastChannel('terra_hardware_live') : null;
+    const historyM10 = [], historyM30 = [], historyM60 = [], historyZ = [], historyEc = [];
+    for (let i = 0; i < 60; i++) {
+      historyM10.push(26.0);
+      historyM30.push(28.0);
+      historyM60.push(34.0);
+      historyZ.push(0.35);
+      historyEc.push(1.4);
+    }
+
+    function computeTelemetryPhysics() {
+      // Standardized Anomaly Score: Z = (x - mu) / sigma (NASA - Team 1.md Sec 5.A)
+      state.zMoisture = +((state.m30 - 28.0) / 5.5).toFixed(2);
+      state.zEc = +((state.ec - 1.40) / 0.65).toFixed(2);
+
+      // FAO-56 Reference & Crop Evapotranspiration: ET_c = K_c * ET_0 (Sec 5.B)
+      const rsMj = state.solarWm2 * 0.0864 * 0.35;
+      const vpdFactor = 1.0 + Math.max(0, 100.0 - state.airRh) * 0.0045;
+      state.et0 = +Math.max(0.6, Math.min(9.5, 0.0135 * (state.airTemp + 17.78) * (rsMj / 2.45) * vpdFactor)).toFixed(2);
+      state.etc = +(state.et0 * 1.05).toFixed(2);
+
+      // Space-vs-Ground Divergence Score D_SG
+      if (state.m30 >= 38.0 && state.ec >= 3.0) {
+        state.dSg = +(2.10 + (state.ec - 3.0) * 0.68).toFixed(2);
+      } else {
+        state.dSg = +(Math.max(0.15, Math.abs(state.zMoisture) * 0.45 + Math.max(0, state.zEc) * 0.55)).toFixed(2);
+      }
+
+      // Update DOM HUD & KPI Cards
+      const zMax = Math.max(Math.abs(state.zMoisture), Math.abs(state.zEc));
+      const zEl = document.getElementById('hudZScore');
+      const dsgEl = document.getElementById('hudDsgScore');
+      const ledDot = document.getElementById('ledDot');
+
+      if (zMax >= 2.0 || state.dSg >= 2.0) {
+        zEl.textContent = `Z = +${zMax.toFixed(2)} (ANOMALY ALERT!)`;
+        zEl.style.color = '#fbbf24';
+        dsgEl.textContent = `D_SG = ${state.dSg.toFixed(2)} (SALINITY LOCK!)`;
+        dsgEl.style.color = '#fb7185';
+        ledDot.style.background = '#f59e0b';
+        ledDot.style.boxShadow = '0 0 10px #f59e0b';
+      } else {
+        zEl.textContent = `Z = ${state.zMoisture >= 0 ? '+' : ''}${state.zMoisture.toFixed(2)} (NORMAL)`;
+        zEl.style.color = '#34d399';
+        dsgEl.textContent = `D_SG = ${state.dSg.toFixed(2)} (COUPLED)`;
+        dsgEl.style.color = '#38bdf8';
+        ledDot.style.background = '#10b981';
+        ledDot.style.boxShadow = '0 0 10px #10b981';
+      }
+
+      document.getElementById('kpiMoisture').textContent = `${state.m10.toFixed(0)}% / ${state.m30.toFixed(0)}% / ${state.m60.toFixed(0)}%`;
+      document.getElementById('kpiSalinity').textContent = `${state.ec.toFixed(2)} dS/m | ${state.soilTemp.toFixed(1)}°C`;
+      document.getElementById('kpiSalinitySub').textContent = state.ec >= 3.0 ? '⚠️ Osmotic Root Lock Threshold Exceeded' : '25°C Temp-Compensated Safe EC';
+      document.getElementById('kpiFao').textContent = `ET₀: ${state.et0.toFixed(2)} mm/day`;
+      document.getElementById('kpiFaoSub').textContent = `ETc (Kc=1.05): ${state.etc.toFixed(2)} mm/day`;
+      document.getElementById('kpiPower').textContent = `${state.battV.toFixed(2)}V (${state.battSoc.toFixed(0)}% SoC)`;
+      document.getElementById('kpiBufferSub').textContent = state.networkOnline
+        ? `LoRaWAN Online (${state.ringBufferQueued} Queued)`
+        : `OFFLINE CACHE (${state.ringBufferQueued}/256 Frames)`;
+
+      // Broadcast live reading to TERRA_App.html if open
+      const livePayload = {
+        source: 'Field_Explorer_3D_Simulator',
+        node_id: 'TERRA-POD-A1',
+        mcu: state.mcu,
+        moisture_10cm: state.m10,
+        moisture_30cm: state.m30,
+        moisture_60cm: state.m60,
+        ec_dsm: state.ec,
+        soil_temp_c: state.soilTemp,
+        air_temp_c: state.airTemp,
+        rain_mm_hr: state.rain,
+        et0_mm_day: state.et0,
+        z_score: zMax,
+        d_sg: state.dSg,
+        ts: Date.now()
+      };
+      if (broadcastChannel) broadcastChannel.postMessage(livePayload);
+      try { localStorage.setItem('terra_live_pod_telemetry', JSON.stringify(livePayload)); } catch (e) {}
+    }
+
+    // =========================================================================
+    // 2. THREE.JS OFFICIAL TERRA 3D HARDWARE MODEL (blender-skills + Atlas 3d-design)
+    // =========================================================================
+    let scene, camera, renderer;
+    let podRoot, crownGroup, armorGroup, internalStackGroup, baseAndLegsGroup, sensingRaysGroup;
+    let tier1SensorGroup, tier2EdgeAiGroup, tier3BusGroup, tier4BatteryGroup;
+    let armorPlateNorth, armorPlateSouth, armorPlateEast, armorPlateWest;
+    let matSilverArmor, matFrontLogoArmor, wireCageMat, haloRingMat;
+    let terrainMoundGroup, fieldSoilGroup;
+    let camOrbitAngle = 0.24, camPitchAngle = 0.06, camDistance = 8.25;
+    let camTargetY = 0.08;
+    let isDragging = false, prevMouseX = 0, prevMouseY = 0;
+
+    // 1. Conical 16-Segment Monocrystalline Solar Canopy Texture (2048x2048)
+    function createSolarCanopyTexture() {
+      const c = document.createElement('canvas');
+      c.width = 1024;
+      c.height = 1024;
+      const ctx = c.getContext('2d');
+      const cx = 512, cy = 512;
+
+      const rad = ctx.createRadialGradient(cx, cy, 60, cx, cy, 490);
+      rad.addColorStop(0.0, '#0c2d5e');
+      rad.addColorStop(0.55, '#0f3d7a');
+      rad.addColorStop(0.88, '#082042');
+      rad.addColorStop(1.0, '#cbd5e1');
+      ctx.fillStyle = rad;
+      ctx.fillRect(0, 0, 1024, 1024);
+
+      ctx.strokeStyle = 'rgba(147, 197, 253, 0.34)';
+      ctx.lineWidth = 2;
+      for (let r = 100; r <= 460; r += 26) {
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      ctx.strokeStyle = '#e2e8f0';
+      ctx.lineWidth = 7;
+      for (let i = 0; i < 16; i++) {
+        const a = (i / 16) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.moveTo(cx + Math.cos(a) * 82, cy + Math.sin(a) * 82);
+        ctx.lineTo(cx + Math.cos(a) * 480, cy + Math.sin(a) * 480);
+        ctx.stroke();
+      }
+      return new THREE.CanvasTexture(c);
+    }
+
+    // 2. Front Matte-Silver Armor Plate Texture with Glowing Emerald TERRA Leaf Logo & Wordmark
+    function createFrontArmorLogoTexture() {
+      const c = document.createElement('canvas');
+      c.width = 512;
+      c.height = 768;
+      const ctx = c.getContext('2d');
+
+      const grad = ctx.createLinearGradient(0, 0, 512, 768);
+      grad.addColorStop(0.0, '#e2e6ec');
+      grad.addColorStop(0.5, '#cfd5de');
+      grad.addColorStop(1.0, '#b8c0cc');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 512, 768);
+
+      ctx.strokeStyle = 'rgba(30, 41, 59, 0.35)';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(22, 22, 468, 724);
+
+      // Glowing Emerald TERRA Leaf Icon
+      ctx.save();
+      ctx.translate(256, 510);
+      ctx.shadowColor = '#10b981';
+      ctx.shadowBlur = 24;
+      ctx.strokeStyle = '#34d399';
+      ctx.fillStyle = 'rgba(16, 185, 129, 0.20)';
+      ctx.lineWidth = 10;
+
+      ctx.beginPath();
+      ctx.moveTo(-36, 42);
+      ctx.bezierCurveTo(-48, -10, -5, -58, 48, -64);
+      ctx.bezierCurveTo(48, -5, 18, 42, -36, 42);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(-34, 40);
+      ctx.quadraticCurveTo(5, 5, 32, -38);
+      ctx.stroke();
+      ctx.restore();
+
+      ctx.fillStyle = '#1e293b';
+      ctx.font = '900 54px "Segoe UI", Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('TERRA', 256, 628);
+
+      return new THREE.CanvasTexture(c);
+    }
+
+    // 3. Multi-Layer Green & Gold PCB Texture ("Inside TERRA" Stack)
+    function createPcbCircuitTexture() {
+      const c = document.createElement('canvas');
+      c.width = 512;
+      c.height = 512;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#064e3b';
+      ctx.fillRect(0, 0, 512, 512);
+
+      ctx.strokeStyle = '#10b981';
+      ctx.lineWidth = 3;
+      for (let i = 0; i < 36; i++) {
+        ctx.beginPath();
+        ctx.moveTo(256, 256);
+        const ang = (i / 36) * Math.PI * 2;
+        ctx.lineTo(256 + Math.cos(ang) * 220, 256 + Math.sin(ang) * 220);
+        ctx.stroke();
+      }
+      ctx.fillStyle = '#fbbf24';
+      for (let i = 0; i < 28; i++) {
+        const ang = (i / 28) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.arc(256 + Math.cos(ang) * 215, 256 + Math.sin(ang) * 215, 6, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      return new THREE.CanvasTexture(c);
+    }
+
+    function init3DScene() {
+      const canvas = document.getElementById('canvas3d');
+      const wrapper = document.getElementById('viewportWrapper');
+
+      scene = new THREE.Scene();
+      camera = new THREE.PerspectiveCamera(34, wrapper.clientWidth / wrapper.clientHeight, 0.1, 100);
+
+      renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer: true });
+      renderer.setSize(wrapper.clientWidth, wrapper.clientHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.shadowMap.enabled = true;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.15;
+
+      // Lighting Rig (`COL_Lights`: Daylight Key + Golden-Hour Horizon Rim + Emerald Fill)
+      const hemiLight = new THREE.HemisphereLight(0xdbeafe, 0x1e293b, 0.92);
+      scene.add(hemiLight);
+
+      const keyLight = new THREE.DirectionalLight(0xffffff, 1.32);
+      keyLight.position.set(5.5, 8.8, 6.8);
+      keyLight.castShadow = true;
+      scene.add(keyLight);
+
+      const goldenSunLight = new THREE.DirectionalLight(0xf59e0b, 1.25);
+      goldenSunLight.position.set(4.5, 2.5, -5.5);
+      scene.add(goldenSunLight);
+
+      const emeraldFillLight = new THREE.PointLight(0x10b981, 1.4, 12);
+      emeraldFillLight.position.set(0.0, -1.2, 3.2);
+      scene.add(emeraldFillLight);
+
+      // Shared Master PBR Materials (`MAT_*` + per-instance `MAT_LightInst_*`)
+      matSilverArmor = new THREE.MeshStandardMaterial({
+        color: 0xd4d9e2,
+        roughness: 0.32,
+        metalness: 0.28,
+        transparent: true,
+        opacity: 1.0
+      });
+      matFrontLogoArmor = new THREE.MeshStandardMaterial({
+        map: createFrontArmorLogoTexture(),
+        roughness: 0.30,
+        metalness: 0.24,
+        transparent: true,
+        opacity: 1.0
+      });
+      const matDarkGunmetal = new THREE.MeshStandardMaterial({ color: 0x1b222c, roughness: 0.42, metalness: 0.72 });
+      const matBrushedAlum = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.22, metalness: 0.82 });
+      haloRingMat = new THREE.MeshBasicMaterial({ color: 0x34d399 });
+      const matPcbBoard = new THREE.MeshStandardMaterial({ map: createPcbCircuitTexture(), roughness: 0.35, metalness: 0.30 });
+      const matGoldMetal = new THREE.MeshStandardMaterial({ color: 0xfbbf24, roughness: 0.16, metalness: 0.94 });
+      const matBlueBattery = new THREE.MeshStandardMaterial({ color: 0x1d4ed8, roughness: 0.25, metalness: 0.22 });
+
+      // Root Pod Group (`COL_TERRA_FieldExplorer`)
+      podRoot = new THREE.Group();
+      scene.add(podRoot);
+
+      // -----------------------------------------------------------------------
+      // 1. TOP CROWN (`COL_Crown_Solar`: Conical Solar Canopy + GNSS Dome + Antenna)
+      // -----------------------------------------------------------------------
+      crownGroup = new THREE.Group();
+      podRoot.add(crownGroup);
+
+      const solarUnderCollar = new THREE.Mesh(new THREE.CylinderGeometry(1.18, 0.98, 0.20, 32), matDarkGunmetal);
+      solarUnderCollar.position.y = 1.22;
+      crownGroup.add(solarUnderCollar);
+
+      const solarGoldTrim = new THREE.Mesh(new THREE.CylinderGeometry(1.06, 1.06, 0.04, 32), matGoldMetal);
+      solarGoldTrim.position.y = 1.13;
+      crownGroup.add(solarGoldTrim);
+
+      const solarCone = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.42, 1.54, 0.36, 32),
+        new THREE.MeshStandardMaterial({ map: createSolarCanopyTexture(), roughness: 0.18, metalness: 0.55 })
+      );
+      solarCone.position.y = 1.48;
+      solarCone.castShadow = true;
+      crownGroup.add(solarCone);
+
+      const solarRim = new THREE.Mesh(new THREE.TorusGeometry(1.53, 0.042, 16, 64), matBrushedAlum);
+      solarRim.rotation.x = Math.PI / 2;
+      solarRim.position.y = 1.31;
+      crownGroup.add(solarRim);
+
+      // 16 Raised Silver Divider Ribs (`COL_Greebles`)
+      for (let i = 0; i < 16; i++) {
+        const a = (i / 16) * Math.PI * 2;
+        const rib = new THREE.Mesh(new THREE.BoxGeometry(0.022, 0.025, 1.16), matBrushedAlum);
+        rib.position.set(Math.cos(a) * 0.98, 1.49, Math.sin(a) * 0.98);
+        rib.rotation.y = -a + Math.PI / 2;
+        rib.rotation.x = 0.30;
+        crownGroup.add(rib);
+      }
+
+      // Central Stepped Black Mast & White Mushroom GNSS Dome
+      const gnssMastBase = new THREE.Mesh(new THREE.CylinderGeometry(0.38, 0.44, 0.14, 32), matDarkGunmetal);
+      gnssMastBase.position.y = 1.70;
+      crownGroup.add(gnssMastBase);
+
+      const gnssMastNeck = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.25, 0.26, 32), matDarkGunmetal);
+      gnssMastNeck.position.y = 1.88;
+      crownGroup.add(gnssMastNeck);
+
+      const gnssNeckLed = new THREE.Mesh(new THREE.SphereGeometry(0.028, 12, 12), haloRingMat);
+      gnssNeckLed.position.set(0, 1.88, 0.24);
+      crownGroup.add(gnssNeckLed);
+
+      const gnssDome = new THREE.Mesh(
+        new THREE.SphereGeometry(0.36, 36, 24),
+        new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.22, metalness: 0.08 })
+      );
+      gnssDome.scale.set(1.0, 0.48, 1.0);
+      gnssDome.position.y = 2.06;
+      crownGroup.add(gnssDome);
+
+      // Right-Side Vertical Auto-Sync Whip Antenna with Glowing White Beacon Tip
+      const antGroup = new THREE.Group();
+      antGroup.position.set(0.56, 1.62, -0.15);
+      crownGroup.add(antGroup);
+
+      antGroup.add(new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.068, 0.18, 16), matBrushedAlum));
+      const antRod = new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.042, 0.72, 16), matDarkGunmetal);
+      antRod.position.y = 0.42;
+      antGroup.add(antRod);
+
+      const antBeaconTip = new THREE.Mesh(
+        new THREE.SphereGeometry(0.048, 16, 16),
+        new THREE.MeshBasicMaterial({ color: 0xffffff })
+      );
+      antBeaconTip.position.y = 0.80;
+      antGroup.add(antBeaconTip);
+
+      // -----------------------------------------------------------------------
+      // 2. "INSIDE TERRA" 4-TIER INTERNAL STACK (`COL_Inside_TERRA_Stack`)
+      // -----------------------------------------------------------------------
+      internalStackGroup = new THREE.Group();
+      podRoot.add(internalStackGroup);
+
+      for (let i = 0; i < 4; i++) {
+        const a = (i / 4) * Math.PI * 2 + Math.PI / 4;
+        const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.028, 1.95, 12), matBrushedAlum);
+        rod.position.set(Math.cos(a) * 0.68, 0.0, Math.sin(a) * 0.68);
+        internalStackGroup.add(rod);
+      }
+
+      // Tier 1: Sensor Module PCB
+      tier1SensorGroup = new THREE.Group();
+      tier1SensorGroup.position.y = 0.82;
+      internalStackGroup.add(tier1SensorGroup);
+      tier1SensorGroup.add(new THREE.Mesh(new THREE.CylinderGeometry(0.84, 0.84, 0.05, 32), matPcbBoard));
+      for (let i = 0; i < 6; i++) {
+        const a = (i / 6) * Math.PI * 2;
+        const ic = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.06, 0.14), matDarkGunmetal);
+        ic.position.set(Math.cos(a) * 0.48, 0.05, Math.sin(a) * 0.48);
+        tier1SensorGroup.add(ic);
+      }
+
+      // Tier 2: Edge AI Processor Deck (ESP32-S3 / STM32 + Daughterboards)
+      tier2EdgeAiGroup = new THREE.Group();
+      tier2EdgeAiGroup.position.y = 0.34;
+      internalStackGroup.add(tier2EdgeAiGroup);
+      tier2EdgeAiGroup.add(new THREE.Mesh(new THREE.CylinderGeometry(0.86, 0.86, 0.055, 32), matPcbBoard));
+      const edgeMcu = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.09, 0.46), matDarkGunmetal);
+      edgeMcu.position.set(0, 0.06, 0.12);
+      tier2EdgeAiGroup.add(edgeMcu);
+
+      for (let s = -1; s <= 1; s += 2) {
+        const card = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.36, 0.62), matPcbBoard);
+        card.position.set(s * 0.38, 0.18, 0.0);
+        tier2EdgeAiGroup.add(card);
+        const goldBar = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.06, 0.56), matGoldMetal);
+        goldBar.position.set(s * 0.38, 0.34, 0.0);
+        tier2EdgeAiGroup.add(goldBar);
+      }
+
+      // Tier 3: Sensor & LoRaWAN Telemetry Interface Ring
+      tier3BusGroup = new THREE.Group();
+      tier3BusGroup.position.y = -0.15;
+      internalStackGroup.add(tier3BusGroup);
+      tier3BusGroup.add(new THREE.Mesh(new THREE.CylinderGeometry(0.84, 0.84, 0.05, 32), matPcbBoard));
+      const loraShield = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.14, 0.28), matBrushedAlum);
+      loraShield.position.set(-0.25, 0.09, 0.25);
+      tier3BusGroup.add(loraShield);
+
+      // Tier 4: "Reliable Battery" — Bright-Blue LiFePO4 Prismatic & Cell Pack
+      tier4BatteryGroup = new THREE.Group();
+      tier4BatteryGroup.position.y = -0.68;
+      internalStackGroup.add(tier4BatteryGroup);
+
+      const battTray = new THREE.Mesh(new THREE.CylinderGeometry(0.88, 0.88, 0.06, 32), matDarkGunmetal);
+      battTray.position.y = -0.22;
+      tier4BatteryGroup.add(battTray);
+
+      const mainBluePack = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.44, 0.52), matBlueBattery);
+      mainBluePack.position.set(0, 0.03, 0.12);
+      tier4BatteryGroup.add(mainBluePack);
+
+      for (let c = 0; c < 6; c++) {
+        const a = (c / 6) * Math.PI * 2;
+        const cell = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, 0.42, 20), matBlueBattery);
+        cell.position.set(Math.cos(a) * 0.54, 0.02, Math.sin(a) * 0.54);
+        tier4BatteryGroup.add(cell);
+      }
+
+      // -----------------------------------------------------------------------
+      // 3. WEATHERPROOF OCTAGONAL CORE & 4 BEVELED SILVER ARMOR PLATES (`COL_Armor_Housing`)
+      // -----------------------------------------------------------------------
+      armorGroup = new THREE.Group();
+      podRoot.add(armorGroup);
+
+      const coreOctagon = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.95, 0.98, 2.02, 8, 1, true),
+        matDarkGunmetal
+      );
+      coreOctagon.rotation.y = Math.PI / 8;
+      coreOctagon.position.y = 0.06;
+      armorGroup.add(coreOctagon);
+
+      [-0.54, 0.54].forEach(xPos => {
+        const seamStrip = new THREE.Mesh(new THREE.BoxGeometry(0.032, 1.56, 0.032), haloRingMat);
+        seamStrip.position.set(xPos, 0.06, 0.78);
+        armorGroup.add(seamStrip);
+      });
+
+      wireCageMat = new THREE.MeshBasicMaterial({
+        color: 0x34d399,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.0
+      });
+      const wireCageMesh = new THREE.Mesh(new THREE.CylinderGeometry(1.06, 1.08, 2.02, 16, 6), wireCageMat);
+      wireCageMesh.position.y = 0.06;
+      armorGroup.add(wireCageMesh);
+
+      armorPlateNorth = new THREE.Group();
+      armorPlateSouth = new THREE.Group();
+      armorPlateEast = new THREE.Group();
+      armorPlateWest = new THREE.Group();
+      armorGroup.add(armorPlateNorth, armorPlateSouth, armorPlateEast, armorPlateWest);
+
+      // Front Plate (+Z) with TERRA Leaf Logo & Multispectral Camera
+      const frontPlateMesh = new THREE.Mesh(new THREE.BoxGeometry(0.94, 1.94, 0.10), matFrontLogoArmor);
+      frontPlateMesh.position.set(0, 0.06, 0.96);
+      armorPlateNorth.add(frontPlateMesh);
+
+      [[-0.38, 0.88], [0.38, 0.88], [-0.38, 0.05], [0.38, 0.05], [-0.38, -0.78], [0.38, -0.78]].forEach(([bx, by]) => {
+        const bolt = new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.028, 0.03, 6), matDarkGunmetal);
+        bolt.rotation.x = Math.PI / 2;
+        bolt.position.set(bx, by, 1.015);
+        armorPlateNorth.add(bolt);
+      });
+
+      const camHousing = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.64, 0.12), matDarkGunmetal);
+      camHousing.position.set(0, 0.46, 1.00);
+      armorPlateNorth.add(camHousing);
+
+      const lensGlassMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.06, metalness: 0.88 });
+      const mainLensRing = new THREE.Mesh(new THREE.CylinderGeometry(0.155, 0.165, 0.08, 32), matBrushedAlum);
+      mainLensRing.rotation.x = Math.PI / 2;
+      mainLensRing.position.set(0, 0.56, 1.04);
+      armorPlateNorth.add(mainLensRing);
+
+      const mainLensGlass = new THREE.Mesh(new THREE.SphereGeometry(0.135, 28, 20), lensGlassMat);
+      mainLensGlass.scale.set(1.0, 1.0, 0.38);
+      mainLensGlass.position.set(0, 0.56, 1.065);
+      armorPlateNorth.add(mainLensGlass);
+
+      const subLensRing = new THREE.Mesh(new THREE.CylinderGeometry(0.085, 0.095, 0.07, 24), matBrushedAlum);
+      subLensRing.rotation.x = Math.PI / 2;
+      subLensRing.position.set(0, 0.28, 1.035);
+      armorPlateNorth.add(subLensRing);
+
+      const subLensGlass = new THREE.Mesh(new THREE.SphereGeometry(0.072, 20, 16), lensGlassMat);
+      subLensGlass.scale.set(1.0, 1.0, 0.35);
+      subLensGlass.position.set(0, 0.28, 1.055);
+      armorPlateNorth.add(subLensGlass);
+
+      // Back Armor Plate (-Z)
+      const backPlateMesh = new THREE.Mesh(new THREE.BoxGeometry(0.94, 1.94, 0.10), matSilverArmor);
+      backPlateMesh.position.set(0, 0.06, -0.96);
+      armorPlateSouth.add(backPlateMesh);
+
+      // East & West Flank Armor Plates with Louvered Weather & Environment Sensor Chambers
+      [
+        { grp: armorPlateEast, sign: 1 },
+        { grp: armorPlateWest, sign: -1 }
+      ].forEach(({ grp, sign }) => {
+        const sidePlate = new THREE.Mesh(new THREE.BoxGeometry(0.10, 1.94, 0.94), matSilverArmor);
+        sidePlate.position.set(sign * 0.96, 0.06, 0);
+        grp.add(sidePlate);
+
+        const chamberBox = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.86, 0.28), matDarkGunmetal);
+        chamberBox.position.set(sign * 0.985, 0.04, 0);
+        grp.add(chamberBox);
+
+        for (let l = -4; l <= 4; l++) {
+          const gill = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.025, 0.22), matBrushedAlum);
+          gill.position.set(sign * 1.025, 0.04 + l * 0.08, 0);
+          grp.add(gill);
+        }
+      });
+
+      // -----------------------------------------------------------------------
+      // 4. HEAVY BASE COLLAR, DUAL GREEN BUMPER LEDS, 4 OUTRIGGER LEGS & PROBES
+      // -----------------------------------------------------------------------
+      baseAndLegsGroup = new THREE.Group();
+      podRoot.add(baseAndLegsGroup);
+
+      const baseCollar = new THREE.Mesh(new THREE.CylinderGeometry(1.06, 1.14, 0.46, 8), matDarkGunmetal);
+      baseCollar.rotation.y = Math.PI / 8;
+      baseCollar.position.y = -1.18;
+      baseAndLegsGroup.add(baseCollar);
+
+      for (let i = 0; i < 4; i++) {
+        const a = (i / 4) * Math.PI * 2;
+        const fender = new THREE.Mesh(new THREE.BoxGeometry(0.68, 0.28, 0.08), matSilverArmor);
+        fender.position.set(Math.cos(a) * 1.04, -1.14, Math.sin(a) * 1.04);
+        fender.rotation.y = -a + Math.PI / 2;
+        baseAndLegsGroup.add(fender);
+      }
+
+      const frontBumperPod = new THREE.Mesh(new THREE.BoxGeometry(0.54, 0.24, 0.12), matDarkGunmetal);
+      frontBumperPod.position.set(0, -1.28, 1.05);
+      baseAndLegsGroup.add(frontBumperPod);
+
+      [-1.24, -1.32].forEach(yBar => {
+        const bar = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.032, 0.04), haloRingMat);
+        bar.position.set(0, yBar, 1.10);
+        baseAndLegsGroup.add(bar);
+      });
+
+      // 4 Angled Mechanical Outrigger Landing Legs
+      for (let i = 0; i < 4; i++) {
+        const angle = (i / 4) * Math.PI * 2 + Math.PI / 4;
+        const legRoot = new THREE.Group();
+        legRoot.position.set(Math.cos(angle) * 0.94, -1.16, Math.sin(angle) * 0.94);
+        legRoot.rotation.y = -angle + Math.PI / 2;
+        baseAndLegsGroup.add(legRoot);
+
+        legRoot.add(new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.24, 0.26), matDarkGunmetal));
+
+        const strutPivot = new THREE.Group();
+        strutPivot.rotation.x = 0.68;
+        legRoot.add(strutPivot);
+
+        const innerBeam = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.88, 0.16), matDarkGunmetal);
+        innerBeam.position.set(0, -0.38, 0.22);
+        strutPivot.add(innerBeam);
+
+        const legArmor = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.76, 0.08), matSilverArmor);
+        legArmor.position.set(0, -0.36, 0.30);
+        strutPivot.add(legArmor);
+
+        const legSlot = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.42, 0.09), matDarkGunmetal);
+        legSlot.position.set(0, -0.36, 0.305);
+        strutPivot.add(legSlot);
+
+        const footpad = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.10, 0.38), matDarkGunmetal);
+        footpad.rotation.x = -0.68;
+        footpad.position.set(0, -0.78, 0.30);
+        strutPivot.add(footpad);
+      }
+
+      // Subsurface Soil Probes (10 / 30 / 60 cm)
+      [
+        { x: -0.36, z: 0.22, len: 0.72 },
+        { x: 0.0,   z: 0.32, len: 1.05 },
+        { x: 0.36,  z: 0.22, len: 1.35 }
+      ].forEach(p => {
+        const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.032, 0.024, p.len, 16), matBrushedAlum);
+        rod.position.set(p.x, -1.40 - p.len / 2, p.z);
+        baseAndLegsGroup.add(rod);
+      });
+
+      // Subsurface Dielectric Sensing Waves
+      sensingRaysGroup = new THREE.Group();
+      podRoot.add(sensingRaysGroup);
+      for (let w = 0; w < 4; w++) {
+        const waveRing = new THREE.Mesh(
+          new THREE.RingGeometry(0.35 + w * 0.28, 0.38 + w * 0.28, 48),
+          new THREE.MeshBasicMaterial({
+            color: w % 2 === 0 ? 0x34d399 : 0x38bdf8,
+            side: THREE.DoubleSide,
+            transparent: true,
+            opacity: 0.55 - w * 0.1
+          })
+        );
+        waveRing.rotation.x = -Math.PI / 2;
+        waveRing.position.y = -1.78 - w * 0.16;
+        sensingRaysGroup.add(waveRing);
+      }
+
+      // Field Soil Mound & Crop Sprouts
+      terrainMoundGroup = new THREE.Group();
+      scene.add(terrainMoundGroup);
+      const soilMound = new THREE.Mesh(
+        new THREE.CylinderGeometry(3.4, 4.8, 0.65, 64),
+        new THREE.MeshStandardMaterial({ color: 0x2b1d14, roughness: 0.92 })
+      );
+      soilMound.position.y = -2.18;
+      terrainMoundGroup.add(soilMound);
+
+      fieldSoilGroup = new THREE.Group();
+      fieldSoilGroup.visible = false;
+      scene.add(fieldSoilGroup);
+
+      // Mouse / Touch Orbit Controls
+      canvas.addEventListener('mousedown', e => {
+        isDragging = true;
+        state.choreoActive = false;
+        prevMouseX = e.clientX;
+        prevMouseY = e.clientY;
+      });
+      window.addEventListener('mouseup', () => { isDragging = false; });
+      window.addEventListener('mousemove', e => {
+        if (!isDragging) return;
+        const dx = e.clientX - prevMouseX;
+        const dy = e.clientY - prevMouseY;
+        prevMouseX = e.clientX;
+        prevMouseY = e.clientY;
+        camOrbitAngle -= dx * 0.008;
+        camPitchAngle = Math.max(-0.85, Math.min(1.15, camPitchAngle + dy * 0.007));
+      });
+      canvas.addEventListener('wheel', e => {
+        e.preventDefault();
+        state.choreoActive = false;
+        camDistance = Math.max(2.6, Math.min(13.0, camDistance + e.deltaY * 0.004));
+      }, { passive: false });
+
+      window.addEventListener('resize', () => {
+        camera.aspect = wrapper.clientWidth / wrapper.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(wrapper.clientWidth, wrapper.clientHeight);
+      });
+    }
+
+    function applyMechanicalRigState(explodeAmt, xrayAmt) {
+      crownGroup.position.y = explodeAmt * 1.18;
+      tier1SensorGroup.position.y = 0.82 + explodeAmt * 0.72;
+      tier2EdgeAiGroup.position.y = 0.34 + explodeAmt * 0.32;
+      tier3BusGroup.position.y = -0.15 - explodeAmt * 0.08;
+      tier4BatteryGroup.position.y = -0.68 - explodeAmt * 0.42;
+      baseAndLegsGroup.position.y = -explodeAmt * 0.75;
+
+      const spread = explodeAmt * 0.65;
+      armorPlateNorth.position.z = spread;
+      armorPlateSouth.position.z = -spread;
+      armorPlateEast.position.x = spread;
+      armorPlateWest.position.x = -spread;
+
+      sensingRaysGroup.visible = (explodeAmt > 0.25 || state.sceneMode === 'field');
+      sensingRaysGroup.position.y = -explodeAmt * 0.75;
+
+      const solidOp = Math.max(0.08, 1.0 - xrayAmt * 0.88);
+      matSilverArmor.opacity = solidOp;
+      matFrontLogoArmor.opacity = solidOp;
+      wireCageMat.opacity = xrayAmt * 0.85;
+    }
+
+    // =========================================================================
+    // 3. 14-SECOND 5-ACT STUDIO REVEAL CHOREOGRAPHY
+    // =========================================================================
+    function startStudioRevealChoreography() {
+      setSceneBackdrop('studio');
+      state.choreoActive = true;
+      state.choreoStartTime = performance.now();
+    }
+
+    function updateChoreographyAtTime(tSec) {
+      const calloutTitle = document.getElementById('calloutTitle');
+      const calloutDesc = document.getElementById('calloutDesc');
+
+      if (tSec < 2.6) {
+        const p = Math.min(1, Math.max(0, (tSec - 0.5) / 1.9));
+        const ease = p * p * (3 - 2 * p);
+        state.explode = ease * 0.78;
+        state.xray = 0.0;
+        camOrbitAngle = 0.24 - ease * 0.14;
+        camPitchAngle = 0.05;
+        camDistance = 6.25 + ease * 0.55;
+        camTargetY = 0.02;
+        calloutTitle.textContent = "Act 1 (0:00–0:02.6): Official TERRA Field Explorer & Modular Separation";
+        calloutDesc.textContent = "Conical 16-segment solar canopy, GNSS auto-sync dome, beveled silver armor & quad outrigger legs.";
+      } else if (tSec < 5.5) {
+        const p = (tSec - 2.6) / 2.9;
+        state.explode = 0.45;
+        state.xray = 0.0;
+        camOrbitAngle = -0.35 + p * 0.82;
+        camPitchAngle = -0.18 + p * 0.14;
+        camDistance = 4.35;
+        camTargetY = -1.35;
+        calloutTitle.textContent = "Act 2 (0:02.6–0:05.5): Quad Outrigger Landing Legs & Subsurface Soil Probes";
+        calloutDesc.textContent = "Articulated mechanical landing legs, dual emerald base LEDs & 10/30/60cm moisture/temp/EC probes.";
+      } else if (tSec < 8.5) {
+        const p = (tSec - 5.5) / 3.0;
+        const xrayCurve = Math.min(1, p / 0.4);
+        state.explode = 0.72;
+        state.xray = xrayCurve;
+        camOrbitAngle = -0.28 + p * 0.62;
+        camPitchAngle = 0.04;
+        camDistance = 5.25;
+        camTargetY = -0.05;
+        calloutTitle.textContent = "Act 3 (0:05.5–0:08.5): 'Inside TERRA' Wireframe X-Ray & 4-Tier Internal Stack";
+        calloutDesc.textContent = "Reveals Sensor Module PCB, Edge AI Processor (ESP32-S3/STM32), LoRa Bus & Blue LiFePO4 Battery Pack.";
+      } else if (tSec < 11.2) {
+        const p = (tSec - 8.5) / 2.7;
+        state.explode = 0.76;
+        state.xray = 0.25;
+        camOrbitAngle = 0.22 + p * 0.95;
+        camPitchAngle = 0.36;
+        camDistance = 4.55;
+        camTargetY = 1.25;
+        calloutTitle.textContent = "Act 4 (0:08.5–0:11.2): Conical Solar Canopy, GNSS Dome & Auto-Sync Antenna";
+        calloutDesc.textContent = "16-segment monocrystalline solar array, white mushroom GNSS dome & telescopic whip antenna.";
+      } else {
+        const p = Math.min(1, (tSec - 11.2) / 2.0);
+        const ease = p * p * (3 - 2 * p);
+        state.explode = 0.76 * (1 - ease);
+        state.xray = 0.25 * (1 - ease);
+        camOrbitAngle = 0.24;
+        camPitchAngle = 0.05;
+        camDistance = 6.85 - ease * 0.60;
+        camTargetY = 0.02;
+        calloutTitle.textContent = "Act 5 (0:11.2–0:14.0): TERRA Autonomous Intelligence System — Field Health 87/100";
+        calloutDesc.textContent = "Fusing local multi-depth soil & crop health telemetry with NASA Earth observations.";
+      }
+
+      document.getElementById('rng-explode').value = Math.round(state.explode * 100);
+      document.getElementById('val-explode').textContent = Math.round(state.explode * 100) + '%';
+      document.getElementById('rng-xray').value = Math.round(state.xray * 100);
+      document.getElementById('val-xray').textContent = Math.round(state.xray * 100) + '%';
+      applyMechanicalRigState(state.explode, state.xray);
+    }
+
+    window.renderChoreographyFrameAt = function(tSec) {
+      state.choreoActive = false;
+      updateChoreographyAtTime(tSec);
+      sensingRaysGroup.rotation.y = tSec * 1.2;
+      const camX = Math.sin(camOrbitAngle) * Math.cos(camPitchAngle) * camDistance;
+      const camY = camTargetY + Math.sin(camPitchAngle) * camDistance;
+      const camZ = Math.cos(camOrbitAngle) * Math.cos(camPitchAngle) * camDistance;
+      camera.position.set(camX, camY, camZ);
+      camera.lookAt(0, camTargetY, 0);
+      renderer.render(scene, camera);
+    };
+
+    function animate3D(nowMs) {
+      requestAnimationFrame(animate3D);
+
+      if (state.choreoActive) {
+        const elapsedSec = (nowMs - state.choreoStartTime) / 1000.0;
+        if (elapsedSec <= 14.2) {
+          updateChoreographyAtTime(elapsedSec);
+        } else {
+          state.choreoActive = false;
+        }
+      } else if (!isDragging) {
+        camOrbitAngle += 0.002;
+      }
+
+      if (sensingRaysGroup) sensingRaysGroup.rotation.y += 0.02;
+
+      const camX = Math.sin(camOrbitAngle) * Math.cos(camPitchAngle) * camDistance;
+      const camY = camTargetY + Math.sin(camPitchAngle) * camDistance;
+      const camZ = Math.cos(camOrbitAngle) * Math.cos(camPitchAngle) * camDistance;
+      camera.position.set(camX, camY, camZ);
+      camera.lookAt(0, camTargetY, 0);
+
+      renderer.render(scene, camera);
+    }
+
+    // =========================================================================
+    // 4. UI INTERACTION HANDLERS, OSCILLOSCOPE & SERIAL CONSOLE
+    // =========================================================================
+    function onRigControlChange() {
+      state.choreoActive = false;
+      state.explode = parseInt(document.getElementById('rng-explode').value, 10) / 100.0;
+      state.xray = parseInt(document.getElementById('rng-xray').value, 10) / 100.0;
+      document.getElementById('val-explode').textContent = Math.round(state.explode * 100) + '%';
+      document.getElementById('val-xray').textContent = Math.round(state.xray * 100) + '%';
+      applyMechanicalRigState(state.explode, state.xray);
+    }
+
+    function onSensorChange() {
+      state.m10 = parseFloat(document.getElementById('rng-m10').value);
+      state.m30 = parseFloat(document.getElementById('rng-m30').value);
+      state.m60 = parseFloat(document.getElementById('rng-m60').value);
+      state.ec = parseFloat(document.getElementById('rng-ec').value);
+      state.soilTemp = parseFloat(document.getElementById('rng-temp').value);
+      state.airTemp = +(state.soilTemp + 3.3).toFixed(1);
+      state.rain = parseFloat(document.getElementById('rng-rain').value);
+      state.solarWm2 = state.rain > 10 ? 210 : 685;
+
+      document.getElementById('val-m10').textContent = state.m10.toFixed(1) + '%';
+      document.getElementById('val-m30').textContent = state.m30.toFixed(1) + '%';
+      document.getElementById('val-m60').textContent = state.m60.toFixed(1) + '%';
+      document.getElementById('val-ec').textContent = state.ec.toFixed(2) + ' dS/m';
+      document.getElementById('val-temp').textContent = `${state.soilTemp.toFixed(1)}°C / ${state.airTemp.toFixed(1)}°C`;
+      document.getElementById('val-rain').textContent = `${state.rain.toFixed(1)} mm/h | ${state.solarWm2} W/m²`;
+
+      if (haloRingMat) {
+        haloRingMat.color.setHex(state.ec >= 3.0 ? 0xf59e0b : 0x34d399);
+      }
+      computeTelemetryPhysics();
+    }
+
+    function applyPreset(mode) {
+      document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('pre-' + mode).classList.add('active');
+
+      state.networkOnline = true;
+      if (mode === 'normal') {
+        document.getElementById('rng-m10').value = 26;
+        document.getElementById('rng-m30').value = 28;
+        document.getElementById('rng-m60').value = 34;
+        document.getElementById('rng-ec').value = 1.4;
+        document.getElementById('rng-temp').value = 27.5;
+        document.getElementById('rng-rain').value = 0;
+      } else if (mode === 'saline') {
+        document.getElementById('rng-m10').value = 41;
+        document.getElementById('rng-m30').value = 44;
+        document.getElementById('rng-m60').value = 47;
+        document.getElementById('rng-ec').value = 3.8;
+        document.getElementById('rng-temp').value = 30.5;
+        document.getElementById('rng-rain').value = 0;
+      } else if (mode === 'monsoon') {
+        document.getElementById('rng-m10').value = 49;
+        document.getElementById('rng-m30').value = 46;
+        document.getElementById('rng-m60').value = 48;
+        document.getElementById('rng-ec').value = 1.1;
+        document.getElementById('rng-temp').value = 25.0;
+        document.getElementById('rng-rain').value = 34;
+      } else if (mode === 'offline') {
+        state.networkOnline = false;
+        state.ringBufferQueued = Math.min(256, state.ringBufferQueued + 4);
+      }
+      onSensorChange();
+    }
+
+    function setSceneBackdrop(mode) {
+      state.sceneMode = mode;
+      const wrapper = document.getElementById('viewportWrapper');
+      document.getElementById('btnSceneStudio').classList.toggle('active', mode === 'studio');
+      document.getElementById('btnSceneField').classList.toggle('active', mode === 'field');
+
+      if (mode === 'studio') {
+        wrapper.style.background = 'linear-gradient(180deg, #071426 0%, #163354 38%, #d99b52 68%, #182316 76%, #080f0a 100%)';
+        if (terrainMoundGroup) terrainMoundGroup.visible = true;
+        document.getElementById('hudModeLabel').textContent = 'GOLDEN-HOUR FIELD + 3D TERRA POD';
+      } else {
+        wrapper.style.background = 'radial-gradient(circle at 50% 30%, #0d3b3e 0%, #071926 55%, #040b12 100%)';
+        if (terrainMoundGroup) terrainMoundGroup.visible = false;
+        sensingRaysGroup.visible = true;
+        state.explode = 0.72;
+        state.xray = 0.85;
+        applyMechanicalRigState(state.explode, state.xray);
+        document.getElementById('hudModeLabel').textContent = 'INSIDE TERRA 4-TIER CUTAWAY & SOIL PROBES';
+      }
+    }
+
+    function focusCameraPreset(preset) {
+      state.choreoActive = false;
+      if (preset === 'hero') {
+        state.explode = 0.0; state.xray = 0.0;
+        if (terrainMoundGroup) terrainMoundGroup.visible = true;
+        camOrbitAngle = 0.24; camPitchAngle = 0.06; camDistance = 8.25; camTargetY = 0.08;
+      } else if (preset === 'under') {
+        state.explode = 0.35; state.xray = 0.0;
+        if (terrainMoundGroup) terrainMoundGroup.visible = false;
+        camOrbitAngle = 0.32; camPitchAngle = -0.15; camDistance = 4.4; camTargetY = -1.35;
+      } else if (preset === 'xray') {
+        state.explode = 0.72; state.xray = 0.92;
+        if (terrainMoundGroup) terrainMoundGroup.visible = false;
+        camOrbitAngle = 0.18; camPitchAngle = 0.04; camDistance = 5.3; camTargetY = -0.05;
+      } else if (preset === 'pcb') {
+        state.explode = 0.76; state.xray = 0.25;
+        camOrbitAngle = 0.45; camPitchAngle = 0.38; camDistance = 4.5; camTargetY = 1.25;
+      }
+      document.getElementById('rng-explode').value = Math.round(state.explode * 100);
+      document.getElementById('val-explode').textContent = Math.round(state.explode * 100) + '%';
+      document.getElementById('rng-xray').value = Math.round(state.xray * 100);
+      document.getElementById('val-xray').textContent = Math.round(state.xray * 100) + '%';
+      applyMechanicalRigState(state.explode, state.xray);
+    }
+
+    function switchMcuArchitecture() {
+      state.mcu = document.getElementById('mcuSelect').value;
+      const isEsp = state.mcu === 'esp32s3';
+      document.getElementById('tagMcu').textContent = isEsp ? 'ESP32-S3' : 'STM32L476RG';
+      document.getElementById('pinoutMcuBadge').textContent = isEsp ? 'ESP32-S3' : 'STM32L4';
+      const tbody = document.getElementById('pinoutTableBody');
+      if (isEsp) {
+        tbody.innerHTML = `
+          <tr><td>Soil Moisture (10/30/60cm)</td><td>12-bit ADC</td><td><span class="pin-code">GPIO 34 / 35 / 32</span></td></tr>
+          <tr><td>Pore-Water Salinity (EC)</td><td>ADC / Modbus</td><td><span class="pin-code">GPIO 33 / UART2</span></td></tr>
+          <tr><td>Soil Temp (DS18B20)</td><td>1-Wire</td><td><span class="pin-code">GPIO 4</span></td></tr>
+          <tr><td>Air T/RH (SHT35) + Solar</td><td>I2C (0x44/23)</td><td><span class="pin-code">SDA 21 / SCL 22</span></td></tr>
+          <tr><td>Tipping-Bucket Rain ISR</td><td>GPIO IRQ</td><td><span class="pin-code">GPIO 27 (FALLING)</span></td></tr>
+          <tr><td>SX1262 LoRaWAN Radio</td><td>SPI Bus</td><td><span class="pin-code">CS 18 / RST 14</span></td></tr>
+        `;
+      } else {
+        tbody.innerHTML = `
+          <tr><td>Soil Moisture (10/30/60cm)</td><td>12-bit ADC1</td><td><span class="pin-code">PA0 / PA1 / PA4</span></td></tr>
+          <tr><td>Pore-Water Salinity (EC)</td><td>ADC1 / RS485</td><td><span class="pin-code">PC0 / USART2</span></td></tr>
+          <tr><td>Soil Temp (DS18B20)</td><td>1-Wire</td><td><span class="pin-code">PB0</span></td></tr>
+          <tr><td>Air T/RH (SHT35) + Solar</td><td>I2C1 (0x44/23)</td><td><span class="pin-code">PB9 / PB8</span></td></tr>
+          <tr><td>Tipping-Bucket Rain ISR</td><td>EXTI15_10</td><td><span class="pin-code">PC13 (FALLING)</span></td></tr>
+          <tr><td>SX1262 LoRaWAN Radio</td><td>SPI1 Bus</td><td><span class="pin-code">PB6 / PA5-PA7</span></td></tr>
+        `;
+      }
+    }
+
+    function drawOscilloscopes() {
+      // Push latest readings with micro sensor noise
+      const jitter = (Math.random() - 0.5) * 0.35;
+      historyM10.push(state.m10 + jitter); historyM10.shift();
+      historyM30.push(state.m30 + jitter * 0.8); historyM30.shift();
+      historyM60.push(state.m60 + jitter * 0.5); historyM60.shift();
+      historyZ.push(Math.max(Math.abs(state.zMoisture), Math.abs(state.zEc)) + jitter * 0.08); historyZ.shift();
+      historyEc.push(state.ec + jitter * 0.04); historyEc.shift();
+
+      // Scope 1: Multi-Depth Soil Moisture (10 / 30 / 60 cm)
+      const c1 = document.getElementById('scopeMoisture');
+      const ctx1 = c1.getContext('2d');
+      ctx1.clearRect(0, 0, c1.width, c1.height);
+      ctx1.strokeStyle = 'rgba(148,163,184,0.12)';
+      for (let y = 25; y < c1.height; y += 28) {
+        ctx1.beginPath(); ctx1.moveTo(0, y); ctx1.lineTo(c1.width, y); ctx1.stroke();
+      }
+      const plotTrace = (ctx, arr, minV, maxV, color) => {
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        arr.forEach((v, i) => {
+          const x = (i / (arr.length - 1)) * c1.width;
+          const y = c1.height - 14 - ((v - minV) / (maxV - minV)) * (c1.height - 28);
+          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+      };
+      plotTrace(ctx1, historyM10, 0, 60, '#38bdf8');
+      plotTrace(ctx1, historyM30, 0, 60, '#10b981');
+      plotTrace(ctx1, historyM60, 0, 60, '#a855f7');
+      ctx1.fillStyle = '#cbd5e1'; ctx1.font = 'bold 10px Segoe UI';
+      ctx1.fillText('SOIL MOISTURE: 10cm (Cyan) | 30cm (Emerald) | 60cm (Purple)', 8, 13);
+
+      // Scope 2: Edge AI Z-Score Anomaly & Salinity EC
+      const c2 = document.getElementById('scopeAnomaly');
+      const ctx2 = c2.getContext('2d');
+      ctx2.clearRect(0, 0, c2.width, c2.height);
+      // 2.0 Sigma Alert Threshold Line
+      const threshY = c2.height - 14 - (2.0 / 5.0) * (c2.height - 28);
+      ctx2.strokeStyle = 'rgba(244,63,94,0.5)';
+      ctx2.setLineDash([4, 4]);
+      ctx2.beginPath(); ctx2.moveTo(0, threshY); ctx2.lineTo(c2.width, threshY); ctx2.stroke();
+      ctx2.setLineDash([]);
+
+      plotTrace(ctx2, historyZ, 0, 5.0, '#f59e0b');
+      plotTrace(ctx2, historyEc, 0, 5.0, '#f43f5e');
+      ctx2.fillStyle = '#cbd5e1'; ctx2.font = 'bold 10px Segoe UI';
+      ctx2.fillText('EDGE AI Z-SCORE (Amber) & SALINITY EC dS/m (Rose) [2.0σ Gate]', 8, 13);
+    }
+
+    function appendSerialPacket() {
+      state.seqId++;
+      if (!state.networkOnline) {
+        state.ringBufferQueued = Math.min(256, state.ringBufferQueued + 1);
+      } else if (state.ringBufferQueued > 0) {
+        state.ringBufferQueued = Math.max(0, state.ringBufferQueued - 2);
+      }
+
+      document.getElementById('pktCounterBadge').textContent = `SEQ #${state.seqId}`;
+      const pkt = {
+        node: "TERRA-POD-A1",
+        mcu: state.mcu.toUpperCase(),
+        seq: state.seqId,
+        m10: +state.m10.toFixed(1),
+        m30: +state.m30.toFixed(1),
+        m60: +state.m60.toFixed(1),
+        ec: +state.ec.toFixed(2),
+        t_soil: +state.soilTemp.toFixed(1),
+        et0: state.et0,
+        z: Math.max(Math.abs(state.zMoisture), Math.abs(state.zEc)),
+        d_sg: state.dSg,
+        q: state.ringBufferQueued
+      };
+      const consoleEl = document.getElementById('serialConsole');
+      const line = document.createElement('div');
+      line.textContent = JSON.stringify(pkt);
+      if (pkt.z >= 2.0 || pkt.d_sg >= 2.0) line.style.color = '#fbbf24';
+      consoleEl.appendChild(line);
+      while (consoleEl.children.length > 18) consoleEl.removeChild(consoleEl.firstChild);
+      consoleEl.scrollTop = consoleEl.scrollHeight;
+    }
+
+    async function connectWebSerial() {
+      if (!('serial' in navigator)) {
+        alert('Web Serial API requires Chrome/Edge. Streaming simulated ESP32-S3 UART telemetry.');
+        return;
+      }
+      try {
+        const port = await navigator.serial.requestPort();
+        await port.open({ baudRate: 115200 });
+        document.getElementById('syncStatusBadge').textContent = 'USB ESP32 CONNECTED';
+      } catch (err) {
+        console.log('WebSerial cancelled or simulated mode active.');
+      }
+    }
+
+    function openVideoModal() {
+      const m = document.getElementById('videoModal');
+      m.classList.add('open');
+      const v = document.getElementById('revealVideoPlayer');
+      v.currentTime = 0;
+      v.play().catch(() => {});
+    }
+
+    function closeVideoModal() {
+      const m = document.getElementById('videoModal');
+      m.classList.remove('open');
+      document.getElementById('revealVideoPlayer').pause();
+    }
+
+    // Initialize 3D Studio & Telemetry Timers
+    window.addEventListener('DOMContentLoaded', () => {
+      init3DScene();
+      computeTelemetryPhysics();
+      appendSerialPacket();
+      requestAnimationFrame(animate3D);
+      setInterval(drawOscilloscopes, 220);
+      setInterval(appendSerialPacket, 1600);
+    });
+  </script>
+</body>
+</html>

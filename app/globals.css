@@ -1,55 +1,62 @@
 @import "tailwindcss";
 
-/* TERRA design tokens. Print overrides the surface tokens for a light report. */
+/*
+ * TERRA design tokens. Light-first: a warm off-white canvas, white surfaces,
+ * deep-forest text and one botanical green accent. Colour carries meaning
+ * (state, source, selection) and is never decoration.
+ */
 :root {
-  --forest: #0b1f14;
-  --forest-deep: #07150d;
-  --surface: #121c17;
-  --raised: #1e1e1e;
-  --line: rgba(217, 217, 217, 0.09);
-  --line-strong: rgba(217, 217, 217, 0.18);
-  --silver: #d9d9d9;
-  --muted: #8b9490;
+  --canvas: #f7f8f4;
+  --surface: #ffffff;
+  --sunken: #f1f3ee;
+  --ink: #183b2a;
+  --ink-soft: #3d5547;
+  --muted: #68766d;
+  --faint: #93a097;
+  --line: #e5e9e3;
+  --line-strong: #d0d7ce;
+  --green: #37864a;
+  --green-strong: #2c6f3c;
+  --green-soft: #e8f1e7;
 }
 
 @theme inline {
-  --color-forest: var(--forest);
-  --color-forest-deep: var(--forest-deep);
+  --color-canvas: var(--canvas);
   --color-surface: var(--surface);
-  --color-raised: var(--raised);
+  --color-sunken: var(--sunken);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
   --color-line: var(--line);
   --color-line-strong: var(--line-strong);
-  --color-silver: var(--silver);
-  --color-muted: var(--muted);
-  --color-terra: #39d353;
-  --color-terra-soft: #7ee787;
-  --color-terra-deep: #2ea043;
-  --color-terra-dim: #196c2e;
-  --color-water: #4493f8;
-  --color-amber: #e3b341;
-  --color-alert: #f47067;
-  --color-violet: #a371f7;
+  --color-green: var(--green);
+  --color-green-strong: var(--green-strong);
+  --color-green-soft: var(--green-soft);
+  /* Status and source colours: muted, readable on white */
+  --color-amber: #9a6410;
+  --color-amber-soft: #fbf3e2;
+  --color-amber-line: #ecd9ae;
+  --color-red: #b0463a;
+  --color-red-soft: #fbeeec;
+  --color-blue: #2f6fb2;
+  --color-blue-soft: #eaf1f9;
+  --color-violet: #6b4fb3;
+  --color-violet-soft: #f0ecf8;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-orbitron), var(--font-inter), sans-serif;
+  --shadow-card: 0 1px 2px rgba(24, 59, 42, 0.04);
+  --shadow-pop: 0 8px 28px rgba(24, 59, 42, 0.12), 0 1px 3px rgba(24, 59, 42, 0.08);
 }
 
 html {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 body {
-  background: var(--forest);
-  color: var(--silver);
+  background: var(--canvas);
+  color: var(--ink);
   font-family: var(--font-sans);
   font-feature-settings: "cv11", "ss01";
-}
-
-/* Atmospheric lighting behind the app shell: one restrained glow, no more. */
-.terra-atmosphere {
-  background:
-    radial-gradient(900px 480px at 78% -8%, rgba(57, 211, 83, 0.1), transparent 70%),
-    radial-gradient(700px 500px at -10% 110%, rgba(57, 211, 83, 0.05), transparent 70%),
-    var(--forest);
 }
 
 .tabular {
@@ -57,44 +64,62 @@ body {
 }
 
 *:focus-visible {
-  outline: 2px solid #39d353;
+  outline: 2px solid var(--green);
   outline-offset: 2px;
   border-radius: 4px;
 }
 
-input[type="range"] {
-  accent-color: #39d353;
+input[type="range"],
+input[type="checkbox"] {
+  accent-color: var(--green);
 }
 
-select {
-  color-scheme: dark;
+/* Form controls share one look */
+.field-input {
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  border-radius: 8px;
+  padding: 7px 10px;
+  font-size: 14px;
+  color: var(--ink);
+}
+.field-input:hover {
+  border-color: var(--faint);
+}
+.field-input::placeholder {
+  color: var(--faint);
 }
 
-/* Leaflet, tuned to the dark interface */
+/* Leaflet controls, matched to the light interface */
 .leaflet-container {
-  background: #0a1510;
+  background: #eef1ea;
   font-family: var(--font-sans);
   border-radius: inherit;
 }
 .leaflet-control-attribution {
-  background: rgba(11, 31, 20, 0.78) !important;
-  color: #8b9490 !important;
+  background: rgba(255, 255, 255, 0.85) !important;
+  color: var(--muted) !important;
   font-size: 10px;
 }
 .leaflet-control-attribution a {
-  color: #d9d9d9 !important;
+  color: var(--ink-soft) !important;
+}
+.leaflet-bar {
+  border: 1px solid var(--line-strong) !important;
+  box-shadow: var(--shadow-card) !important;
 }
 .leaflet-bar a {
-  background: #121c17 !important;
-  color: #d9d9d9 !important;
-  border-color: rgba(217, 217, 217, 0.18) !important;
+  background: var(--surface) !important;
+  color: var(--ink) !important;
+  border-color: var(--line) !important;
 }
 .leaflet-tooltip.terra-tip {
-  background: #121c17;
-  border: 1px solid rgba(217, 217, 217, 0.18);
-  color: #d9d9d9;
-  font-size: 11px;
-  box-shadow: none;
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  color: var(--ink);
+  font-size: 12px;
+  border-radius: 6px;
+  box-shadow: var(--shadow-pop);
 }
 .leaflet-tooltip.terra-tip::before {
   display: none;
@@ -102,34 +127,23 @@ select {
 
 @keyframes terra-pulse {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.35; }
+  50% { opacity: 0.4; }
 }
 .terra-pulse {
   animation: terra-pulse 2.4s ease-in-out infinite;
 }
-@keyframes terra-orbit {
-  to { transform: rotate(360deg); }
-}
 @media (prefers-reduced-motion: reduce) {
-  .terra-pulse, .terra-orbit { animation: none !important; }
+  .terra-pulse { animation: none !important; }
 }
 
 @media print {
   :root {
-    --forest: #ffffff;
-    --forest-deep: #ffffff;
-    --surface: #ffffff;
-    --raised: #f4f6f5;
-    --line: rgba(0, 0, 0, 0.14);
-    --line-strong: rgba(0, 0, 0, 0.3);
-    --silver: #111a15;
-    --muted: #4c5752;
+    --canvas: #ffffff;
+    --sunken: #f6f7f4;
   }
-  html { color-scheme: light; }
-  .terra-atmosphere { background: #ffffff; }
   .no-print { display: none !important; }
   .print-break { break-before: page; }
   .print-avoid { break-inside: avoid; }
-  main { padding: 0 !important; }
+  main { padding: 0 !important; max-width: none !important; }
   @page { margin: 14mm; }
 }

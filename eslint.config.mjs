@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Not part of the web app: the data pipeline and the hardware module
+    "docs/**",
+    "hardware/**",
   ]),
 ]);
 

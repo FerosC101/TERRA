@@ -8,7 +8,7 @@ export function offset(origin: LatLng, eastM: number, northM: number): LatLng {
 }
 
 /**
- * Illustrative monthly climatologies. They follow the structure of a NASA POWER
+ * Illustrative monthly climatologies for the two secondary demo fields. They follow the structure of a NASA POWER
  * agroclimatology request (monthly precipitation, ET0, T2M_MAX) and the general
  * seasonality of each region, but the numbers were written for this demo and
  * were NOT retrieved from NASA POWER.
@@ -18,6 +18,7 @@ const CAGAYAN_VALLEY: MonthlyClimate = {
   et0MmDay: [3.0, 3.6, 4.4, 5.1, 5.0, 4.6, 4.3, 4.1, 4.0, 3.6, 3.1, 2.8],
   tmaxC: [28, 29.5, 32, 34.5, 35, 34.5, 33.5, 33, 32.5, 31, 29.5, 28],
   source: "Illustrative demo climatology (NASA POWER-style variables)",
+  basis: "illustrative",
 };
 
 const BUKIDNON_UPLAND: MonthlyClimate = {
@@ -25,6 +26,7 @@ const BUKIDNON_UPLAND: MonthlyClimate = {
   et0MmDay: [3.3, 3.7, 4.2, 4.4, 4.0, 3.6, 3.5, 3.6, 3.6, 3.5, 3.3, 3.1],
   tmaxC: [28.5, 29, 30, 31, 30.5, 29.5, 29, 29, 29.5, 29.5, 29, 28.5],
   source: "Illustrative demo climatology (NASA POWER-style variables)",
+  basis: "illustrative",
 };
 
 function rectangle(center: LatLng, widthM: number, heightM: number, skewM = 0): LatLng[] {
@@ -41,42 +43,76 @@ function rectangle(center: LatLng, widthM: number, heightM: number, skewM = 0): 
   ];
 }
 
-const northTerrace: LatLng = { lat: 16.8731, lng: 121.5846 };
+/**
+ * NASA POWER climatology for the Lipa Cropland area (13.983° N, 121.185° E, 162 m).
+ * Retrieved 14 Nov 2026 from the POWER Climatology API v2.10.1, 2001–2025 means.
+ * Rainfall is PRECTOTCORR × days in month. Maximum temperature is T2M + T2M_RANGE / 2.
+ * ET0 is FAO-56 Penman-Monteith computed from the monthly POWER means
+ * (T2M, T2M_RANGE, RH2M, WS2M, ALLSKY_SFC_SW_DWN). POWER is a ~50 km regional
+ * product: it describes the area's climate, not conditions inside the field.
+ */
+const LIPA_POWER: MonthlyClimate = {
+  rainMm: [144, 134, 105, 91, 163, 245, 283, 238, 272, 335, 351, 388],
+  et0MmDay: [2.72, 3.35, 4.13, 4.92, 4.62, 4.09, 3.71, 3.6, 3.62, 3.3, 2.91, 2.51],
+  tmaxC: [26.7, 27.6, 29.6, 32.1, 32.0, 30.2, 29.0, 28.8, 29.0, 28.7, 28.0, 27.1],
+  source: "NASA POWER climatology, 2001–2025 (~50 km regional means)",
+  basis: "retrieved",
+};
+
+/**
+ * The primary demonstration field. Its boundary is the Lipa_Cropland_AOI polygon
+ * used by the TERRA NASA data pipeline (docs/Data Pipeline/Lipa Cropland.geojson),
+ * and its centre is that polygon's centroid, so the web app, the pipeline and the
+ * hardware station all refer to the same ground.
+ */
+const lipa: LatLng = { lat: 13.983042, lng: 121.184648 };
+const LIPA_BOUNDARY: LatLng[] = [
+  [121.180302, 13.987887], [121.181271, 13.984303], [121.17961, 13.983545], [121.179512, 13.982984],
+  [121.176299, 13.981375], [121.178408, 13.976575], [121.183187, 13.978996], [121.182508, 13.98123],
+  [121.184092, 13.98201], [121.185371, 13.979918], [121.193002, 13.982692], [121.188807, 13.990451],
+  [121.186069, 13.98934], [121.184397, 13.988404], [121.183664, 13.98934],
+].map(([lng, lat]) => ({ lat, lng }));
+
 const riverside: LatLng = { lat: 17.1296, lng: 121.8831 };
 const uplandC: LatLng = { lat: 8.1250, lng: 125.0850 };
 
+const STATION_SENSORS = ["Soil moisture 10 cm", "Soil moisture 40 cm", "Soil temperature 10 cm", "Bulk EC", "Rain gauge"];
+
 export const FIELDS: Field[] = [
   {
-    id: "north-terrace",
-    name: "North Terrace Field",
-    farm: "Demo Farm · Cagayan Valley",
-    location: "San Mateo, Isabela, Philippines",
-    center: northTerrace,
-    boundary: rectangle(northTerrace, 410, 290, 26),
-    areaHa: 11.8,
+    id: "lipa-cropland",
+    name: "Lipa Cropland",
+    farm: "TERRA demonstration site",
+    location: "Lipa City, Batangas, Philippines",
+    role: "primary",
+    timezone: "Asia/Manila",
+    pipelineLocationId: "lipa_cropland_001",
+    center: lipa,
+    boundary: LIPA_BOUNDARY,
+    areaHa: 133.7,
     currentCrop: "corn",
     plantedOn: "2026-08-30",
     soil: {
-      texture: "Clay loam",
+      texture: "Loam",
       awcMmPerM: 150,
       profileDepthM: 1,
-      note: "Texture from a farmer-entered field record. Available water capacity is a typical value for the texture class, not a laboratory result.",
+      note: "Texture from a field record entered for the demonstration. Available water capacity is a typical value for the texture class, not a laboratory result.",
     },
     station: {
       id: "TS-01",
       name: "TERRA Station 01",
-      position: offset(northTerrace, -60, 40),
+      position: offset(lipa, 120, 180),
       status: "simulated",
-      sensors: ["Soil moisture 10 cm", "Soil moisture 40 cm", "Soil temperature 10 cm", "Bulk EC", "Rain gauge"],
+      sensors: STATION_SENSORS,
     },
     points: [
-      { id: "m1", kind: "moisture", label: "Probe point NW", position: offset(northTerrace, -150, 95), moistureOffset: 1.2 },
-      { id: "m2", kind: "moisture", label: "Probe point NE", position: offset(northTerrace, 140, 88), moistureOffset: -2.6 },
-      { id: "m3", kind: "moisture", label: "Probe point centre", position: offset(northTerrace, 20, -10), moistureOffset: -0.8 },
-      { id: "m4", kind: "moisture", label: "Probe point SW", position: offset(northTerrace, -130, -100), moistureOffset: 2.1 },
-      { id: "m5", kind: "moisture", label: "Probe point SE", position: offset(northTerrace, 150, -95), moistureOffset: -3.4 },
-      { id: "a1", kind: "anomaly", label: "Moisture divergence", position: offset(northTerrace, -60, 40), discoveryKind: "moisture-divergence" },
-      { id: "a2", kind: "anomaly", label: "Vegetation index dip", position: offset(northTerrace, 120, -40), discoveryKind: "ndvi-change" },
+      { id: "m1", kind: "moisture", label: "Probe point north-west", position: offset(lipa, -330, 380), moistureOffset: 1.2 },
+      { id: "m2", kind: "moisture", label: "Probe point north-east", position: offset(lipa, 330, 560), moistureOffset: -2.6 },
+      { id: "m3", kind: "moisture", label: "Probe point centre", position: offset(lipa, 150, -60), moistureOffset: -0.8 },
+      { id: "m4", kind: "moisture", label: "Probe point south-west", position: offset(lipa, -560, -420), moistureOffset: 2.1 },
+      { id: "m5", kind: "moisture", label: "Probe point east", position: offset(lipa, 620, 60), moistureOffset: -3.4 },
+      { id: "a1", kind: "anomaly", label: "Moisture divergence", position: offset(lipa, 120, 180), discoveryKind: "moisture-divergence" },
+      { id: "a2", kind: "anomaly", label: "Vegetation index dip", position: offset(lipa, 420, 330), discoveryKind: "ndvi-change" },
     ],
     rotationHistory: [
       { season: "Wet 2024", crop: "corn" },
@@ -85,7 +121,7 @@ export const FIELDS: Field[] = [
       { season: "Dry 2025–26", crop: "mungbean", note: "First legume break in three seasons" },
       { season: "Wet 2026", crop: "corn", note: "Current crop" },
     ],
-    climate: CAGAYAN_VALLEY,
+    climate: LIPA_POWER,
     demoPattern: "dry-spell",
     seed: 4107,
   },
@@ -94,6 +130,8 @@ export const FIELDS: Field[] = [
     name: "Riverside Plot",
     farm: "Demo Farm · Cagayan Valley",
     location: "Ilagan, Isabela, Philippines",
+    role: "secondary",
+    timezone: "Asia/Manila",
     center: riverside,
     boundary: rectangle(riverside, 300, 220, -18),
     areaHa: 6.4,
@@ -111,7 +149,7 @@ export const FIELDS: Field[] = [
       name: "TERRA Station 02",
       position: offset(riverside, 40, -30),
       status: "simulated",
-      sensors: ["Soil moisture 10 cm", "Soil moisture 40 cm", "Soil temperature 10 cm", "Bulk EC", "Rain gauge"],
+      sensors: STATION_SENSORS,
     },
     points: [
       { id: "m1", kind: "moisture", label: "Probe point north", position: offset(riverside, -20, 80), moistureOffset: 0.9 },
@@ -137,6 +175,8 @@ export const FIELDS: Field[] = [
     name: "Upland Block C",
     farm: "Demo Farm · Bukidnon",
     location: "Malaybalay, Bukidnon, Philippines",
+    role: "secondary",
+    timezone: "Asia/Manila",
     center: uplandC,
     boundary: rectangle(uplandC, 520, 350, 34),
     areaHa: 18.2,
@@ -154,7 +194,7 @@ export const FIELDS: Field[] = [
       name: "TERRA Station 03",
       position: offset(uplandC, 80, 60),
       status: "simulated",
-      sensors: ["Soil moisture 10 cm", "Soil moisture 40 cm", "Soil temperature 10 cm", "Bulk EC", "Rain gauge"],
+      sensors: STATION_SENSORS,
     },
     points: [
       { id: "m1", kind: "moisture", label: "Probe point upslope", position: offset(uplandC, -180, 120), moistureOffset: -2.8 },

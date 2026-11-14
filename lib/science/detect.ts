@@ -102,7 +102,7 @@ export function detectDiscoveries(field: Field, obs: DailyObservation[], followU
           `Surface moisture fell ${fmt(Math.abs(surfChange), 1)} pts in 14 days while the 40 cm reading moved ${fmt(Math.abs(deepChange), 1)} pts. The surface–deep gap is now ${fmt(gap, 1)} pts against a usual ${fmt(mean(gapSeries), 1)} pts.`,
           "TERRA selected a repeat surface and subsurface measurement as the observation most likely to separate the possible explanations.",
           follow ? `You logged ${fmt(follow.surfaceVwc, 1)}% at the surface and ${fmt(follow.deepVwc, 1)}% at depth.` : "Waiting for a follow-up measurement. Log one below.",
-          follow ? (persists ? "Water Memory now records a persisting surface drying pattern." : "Water Memory now records the pattern as a short dry spell that eased.") : "The field model will be updated once new data arrives.",
+          follow ? (persists ? "The water record in the field model now notes a persisting surface drying pattern." : "The water record in the field model now notes the pattern as a short dry spell that eased.") : "The field model will be updated once new data arrives.",
         ],
       ),
       location: anomalyPoint("moisture-divergence"),
@@ -238,7 +238,7 @@ export function detectDiscoveries(field: Field, obs: DailyObservation[], followU
           "After 30 days the two sources showed a persistent gap.",
           "TERRA chose to keep collecting paired readings to test whether the gap is steady or drifting.",
           "A further 30 days of paired readings were collected.",
-          "Water Memory now stores a fixed station–satellite offset and treats SMAP as a regional signal.",
+          "The water record in the field model now stores a fixed station–satellite offset and treats SMAP as a regional signal.",
         ]),
       location: stationPos,
     });

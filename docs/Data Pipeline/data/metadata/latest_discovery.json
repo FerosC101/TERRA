@@ -1,0 +1,215 @@
+{
+  "aoi": {
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "crs": "EPSG:4326",
+    "geojson_path": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\Lipa Cropland.geojson",
+    "geometry_type": "Polygon",
+    "centroid": {
+      "lat": 13.983842,
+      "lon": 121.184648
+    },
+    "bbox": [
+      121.176299,
+      13.976575,
+      121.193002,
+      13.990451
+    ],
+    "area_km2": 1.3372,
+    "area_ha": 133.72,
+    "buffer_m": 0.0,
+    "is_valid": true,
+    "resolution_notes": [
+      "AOI area is 1.337 km2 (133.7 ha), smaller than coarse satellite/reanalysis grid cells.",
+      "NASA POWER (~55 km grid) represents regional agroclimatology enclosing the AOI, not field-level microclimate.",
+      "GPM IMERG (0.1 deg ~11 km) and SMAP (9 km EASE-Grid 2.0) extract the enclosing/nearest grid cell without artificial downscaling."
+    ],
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            121.180302,
+            13.987887
+          ],
+          [
+            121.181271,
+            13.984303
+          ],
+          [
+            121.17961,
+            13.983545
+          ],
+          [
+            121.179512,
+            13.982984
+          ],
+          [
+            121.176299,
+            13.981375
+          ],
+          [
+            121.178408,
+            13.976575
+          ],
+          [
+            121.183187,
+            13.978996
+          ],
+          [
+            121.182508,
+            13.98123
+          ],
+          [
+            121.184092,
+            13.98201
+          ],
+          [
+            121.185371,
+            13.979918
+          ],
+          [
+            121.193002,
+            13.982692
+          ],
+          [
+            121.188807,
+            13.990451
+          ],
+          [
+            121.186069,
+            13.98934
+          ],
+          [
+            121.184397,
+            13.988404
+          ],
+          [
+            121.183664,
+            13.98934
+          ],
+          [
+            121.180302,
+            13.987887
+          ]
+        ]
+      ]
+    }
+  },
+  "date_range": {
+    "start_date": "2024-01-01",
+    "end_date": "2024-01-15"
+  },
+  "earthdata_credentials_configured": true,
+  "datasets": {
+    "NASA_POWER": {
+      "name": "NASA POWER Agroclimatology",
+      "priority": 1,
+      "status": "active",
+      "auth_required": false,
+      "spatial_resolution": "0.5 deg x 0.625 deg (~55 km)",
+      "spatial_coverage": true,
+      "temporal_coverage": true,
+      "covered": true
+    },
+    "GPM_IMERG": {
+      "name": "GPM IMERG Precipitation",
+      "priority": 2,
+      "status": "active",
+      "auth_required": true,
+      "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+      "spatial_coverage": true,
+      "temporal_coverage": true,
+      "covered": true,
+      "cmr_collections": {
+        "GPM_3IMERGDF": {
+          "granules_found": 15,
+          "sample_titles": [
+            "GPM_3IMERGDF.07:3B-DAY.MS.MRG.3IMERG.20240101-S000000-E235959.V07B.nc4",
+            "GPM_3IMERGDF.07:3B-DAY.MS.MRG.3IMERG.20240102-S000000-E235959.V07B.nc4",
+            "GPM_3IMERGDF.07:3B-DAY.MS.MRG.3IMERG.20240103-S000000-E235959.V07B.nc4"
+          ],
+          "status": "AVAILABLE"
+        },
+        "GPM_3IMERGDL": {
+          "granules_found": 15,
+          "sample_titles": [
+            "GPM_3IMERGDL.07:3B-DAY-L.MS.MRG.3IMERG.20240101-S000000-E235959.V07B.nc4",
+            "GPM_3IMERGDL.07:3B-DAY-L.MS.MRG.3IMERG.20240102-S000000-E235959.V07B.nc4",
+            "GPM_3IMERGDL.07:3B-DAY-L.MS.MRG.3IMERG.20240103-S000000-E235959.V07B.nc4"
+          ],
+          "status": "AVAILABLE"
+        },
+        "GPM_3IMERGHHE": {
+          "granules_found": 100,
+          "sample_titles": [
+            "GPM_3IMERGHHE.07:3B-HHR-E.MS.MRG.3IMERG.20240101-S000000-E002959.0000.V07B.HDF5",
+            "GPM_3IMERGHHE.07:3B-HHR-E.MS.MRG.3IMERG.20240101-S003000-E005959.0030.V07B.HDF5",
+            "GPM_3IMERGHHE.07:3B-HHR-E.MS.MRG.3IMERG.20240101-S010000-E012959.0060.V07B.HDF5"
+          ],
+          "status": "AVAILABLE"
+        }
+      }
+    },
+    "SMAP": {
+      "name": "NASA SMAP Soil Moisture",
+      "priority": 3,
+      "status": "active",
+      "auth_required": true,
+      "spatial_resolution": "9 km EASE-Grid 2.0",
+      "spatial_coverage": true,
+      "temporal_coverage": true,
+      "covered": true,
+      "cmr_collections": {
+        "SPL3SMP_E": {
+          "granules_found": 15,
+          "sample_titles": [
+            "SMAP_L3_SM_P_E_20240101_R19240_001.h5",
+            "SMAP_L3_SM_P_E_20240102_R19240_001.h5",
+            "SMAP_L3_SM_P_E_20240103_R19240_001.h5"
+          ],
+          "status": "AVAILABLE"
+        },
+        "SPL4SMGP": {
+          "granules_found": 100,
+          "sample_titles": [
+            "SMAP_L4_SM_gph_20231231T223000_Vv8012_001.h5_u9loH5HD",
+            "SMAP_L4_SM_gph_20240101T013000_Vv8012_001.h5_u9loH5HD",
+            "SMAP_L4_SM_gph_20240101T043000_Vv8012_001.h5_u9loH5HD"
+          ],
+          "status": "AVAILABLE"
+        }
+      }
+    },
+    "MODIS": {
+      "name": "MODIS Vegetation Indices (MOD13Q1)",
+      "priority": 4,
+      "status": "planned_phase_6",
+      "auth_required": true,
+      "spatial_resolution": "250 m",
+      "spatial_coverage": true,
+      "temporal_coverage": true,
+      "covered": true
+    },
+    "ECOSTRESS": {
+      "name": "ECOSTRESS Land Surface Temperature & ET",
+      "priority": 5,
+      "status": "planned_phase_6",
+      "auth_required": true,
+      "spatial_resolution": "70 m",
+      "spatial_coverage": true,
+      "temporal_coverage": true,
+      "covered": true
+    },
+    "NEX_GDDP_CMIP6": {
+      "name": "NASA NEX-GDDP-CMIP6 Climate Projections",
+      "priority": 6,
+      "status": "planned_phase_6",
+      "auth_required": false,
+      "spatial_resolution": "0.25 deg (~25 km)",
+      "spatial_coverage": true,
+      "temporal_coverage": true,
+      "covered": true
+    }
+  }
+}
