@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 import os
 import time
 from pathlib import Path
@@ -175,4 +176,81 @@ class EarthdataClient:
                     if chunk:
                         fh.write(chunk)
         return destination
+
+
+def _clean_opendap_base_url(opendap_url: str) -> str:
+    """Normalize a NASA CMR OPeNDAP service URL to its dataset base path."""
+    base = opendap_url.strip().rstrip("/")
+    for suffix in (".dmr.html", ".dap.nc4", ".dap", ".html", ".dmr"):
+        if base.endswith(suffix):
+            base = base[: -len(suffix)]
+            break
+    return base
+
+
+def build_gpm_opendap_subset_url(
+    opendap_url: str,
+    bbox: list[float],
+    variables: list[str] | tuple[str, ...] = ("precipitation", "randomError", "precipitation_cnt"),
+    margin_cells: int = 2,
+) -> str:
+    """Build a server-side DAP4 NetCDF-4 constraint URL for GPM IMERG 0.1-deg daily grids."""
+    min_lon, min_lat, max_lon, max_lat = bbox
+    lat0 = max(0, min(1799, round((min_lat + 89.95) / 0.1) - margin_cells))
+    lat1 = max(0, min(1799, round((max_lat + 89.95) / 0.1) + margin_cells))
+    lon0 = max(0, min(3599, round((min_lon + 179.95) / 0.1) - margin_cells))
+    lon1 = max(0, min(3599, round((max_lon + 179.95) / 0.1) + margin_cells))
+    if lat0 > lat1:
+        lat0, lat1 = lat1, lat0
+    if lon0 > lon1:
+        lon0, lon1 = lon1, lon0
+
+    constraints = [f"/lat[{lat0}:{lat1}]", f"/lon[{lon0}:{lon1}]"]
+    for var in variables:
+        if var in {"lat", "lon"}:
+            continue
+        constraints.append(f"/{var}[0:0][{lon0}:{lon1}][{lat0}:{lat1}]")
+
+    base = _clean_opendap_base_url(opendap_url)
+    return f"{base}.dap.nc4?dap4.ce={';'.join(constraints)}"
+
+
+def build_smap_l3_opendap_subset_url(
+    opendap_url: str,
+    bbox: list[float],
+    margin_cells: int = 2,
+) -> str:
+    """Build a server-side DAP4 NetCDF-4 constraint URL for SMAP SPL3SMP_E 9 km EASE-Grid 2.0."""
+    cols = 3856
+    rows = 1624
+    half_rows = 812
+    max_lat_sin = math.sin(math.radians(85.0445664))
+
+    def _lat_to_row(lat: float) -> int:
+        sin_ratio = max(-1.0, min(1.0, math.sin(math.radians(lat)) / max_lat_sin))
+        return max(0, min(rows - 1, round((1.0 - sin_ratio) * half_rows - 0.5)))
+
+    def _lon_to_col(lon: float) -> int:
+        return max(0, min(cols - 1, round((lon + 180.0) / 360.0 * cols - 0.5)))
+
+    min_lon, min_lat, max_lon, max_lat = bbox
+    r0 = max(0, min(_lat_to_row(max_lat), _lat_to_row(min_lat)) - margin_cells)
+    r1 = min(rows - 1, max(_lat_to_row(max_lat), _lat_to_row(min_lat)) + margin_cells)
+    c0 = max(0, min(_lon_to_col(min_lon), _lon_to_col(max_lon)) - margin_cells)
+    c1 = min(cols - 1, max(_lon_to_col(min_lon), _lon_to_col(max_lon)) + margin_cells)
+
+    fields = (
+        "/Soil_Moisture_Retrieval_Data_AM/latitude",
+        "/Soil_Moisture_Retrieval_Data_AM/longitude",
+        "/Soil_Moisture_Retrieval_Data_AM/soil_moisture",
+        "/Soil_Moisture_Retrieval_Data_AM/retrieval_qual_flag",
+        "/Soil_Moisture_Retrieval_Data_PM/latitude_pm",
+        "/Soil_Moisture_Retrieval_Data_PM/longitude_pm",
+        "/Soil_Moisture_Retrieval_Data_PM/soil_moisture_pm",
+        "/Soil_Moisture_Retrieval_Data_PM/retrieval_qual_flag_pm",
+    )
+    constraints = [f"{field}[{r0}:{r1}][{c0}:{c1}]" for field in fields]
+    base = _clean_opendap_base_url(opendap_url)
+    return f"{base}.dap.nc4?dap4.ce={';'.join(constraints)}"
+
 

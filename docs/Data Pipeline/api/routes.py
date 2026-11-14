@@ -15,6 +15,7 @@ from storage.repository import TerraRepository
 CATEGORY_VARIABLES: dict[str, set[str]] = {
     "precipitation": {
         "precipitation_mm",
+        "precipitation_imerg_mm",
         "precipitation_rate_mm_hr",
         "precipitation_random_error_mm",
         "precipitation_valid_sample_count",
@@ -30,6 +31,9 @@ CATEGORY_VARIABLES: dict[str, set[str]] = {
         "air_temperature_c",
         "air_temperature_max_c",
         "air_temperature_min_c",
+    },
+    "evapotranspiration": {
+        "et0_mm_day",
     },
     "vegetation": {
         "ndvi",
@@ -146,6 +150,51 @@ def create_app(
                 "quality_status": quality_status,
             },
             "observations": records,
+        }
+
+    @api.get("/observations/daily-merged")
+    def get_daily_merged(
+        start_date: str | None = Query(default=None, description="YYYY-MM-DD"),
+        end_date: str | None = Query(default=None, description="YYYY-MM-DD"),
+        aoi_id: str | None = Query(default=None, description="Location ID filter"),
+    ) -> dict[str, Any]:
+        repo = _get_repo()
+        merged = repo.query_daily_merged(
+            start_date=start_date,
+            end_date=end_date,
+            aoi_id=aoi_id,
+        )
+        return {
+            "count": len(merged),
+            "filters": {
+                "start_date": start_date,
+                "end_date": end_date,
+                "aoi_id": aoi_id,
+            },
+            "note": (
+                "Harmonized daily records merging NASA POWER (precipitation_mm, temperature, radiation, et0_mm_day), "
+                "GPM IMERG (precipitation_imerg_mm via 2x2 IDW), and SMAP (soil_moisture_surface_m3_m3)."
+            ),
+            "daily_observations": merged,
+        }
+
+    @api.get("/observations/evapotranspiration")
+    def get_evapotranspiration(
+        start_date: str | None = Query(default=None),
+        end_date: str | None = Query(default=None),
+        dataset: str | None = Query(default=None),
+        aoi_id: str | None = Query(default=None),
+    ) -> dict[str, Any]:
+        repo = _get_repo()
+        records = repo.query_observations(
+            start_date=start_date, end_date=end_date, dataset=dataset, aoi_id=aoi_id
+        )
+        filtered = _filter_records_by_category(records, "evapotranspiration")
+        return {
+            "category": "evapotranspiration",
+            "count": len(filtered),
+            "note": "Daily FAO-56 Penman-Monteith reference evapotranspiration (et0_mm_day) derived from NASA POWER.",
+            "observations": filtered,
         }
 
     @api.get("/observations/precipitation")

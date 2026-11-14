@@ -10,11 +10,11 @@ Automated, AOI-scoped geospatial data pipeline that retrieves, cleans, validates
 
 The **TERRA NASA Data Pipeline** converts heterogeneous NASA meteorological and satellite products into a single standardized, quality-checked schema consumed by TERRA's downstream modules — without requiring teammates to parse raw NetCDF4, HDF5, EASE-Grid 2.0, or NASA CMR APIs.
 
-**Verified live over `Lipa_Cropland_AOI` (`2024-01-01` .. `2024-01-03` + `2024-01-01` .. `2024-01-15`):**
-- **NASA POWER (`NASA_POWER_AG_DAILY`, `v2.10.3`)**: Retrieved live and cached cleanly (`VALID`, 15 daily records for `2024-01-01..15`).
-- **GPM IMERG (`GPM_3IMERGDF` V07B Final)**: Discovered via NASA CMR, downloaded as NetCDF4 granules, and subsetted over Lipa (`VALID`, 3 daily records for `2024-01-01..03`).
-- **SMAP (`SPL3SMP_E` v006 Daily 9 km)**: Discovered via NASA CMR, downloaded as HDF5 granules, and subsetted over Lipa (`2024-01-01`: `INCOMPLETE` due to genuine orbital swath gap `no_overpass_covering_aoi`; `2024-01-02`: `0.408539 m3/m3`; `2024-01-03`: `0.47474 m3/m3`, both `VALID_WITH_WARNINGS` preserving `retrieval_qual_flag=9`).
-- **TERRA FastAPI Service**: All 10 REST routes verified HTTP `200` against the live SQLite store.
+**Verified live over `Lipa_Cropland_AOI` (`2024-01-01` .. `2024-01-15`, 15 days across all 3 datasets = 45 source records + 15 merged daily records):**
+- **NASA POWER (`NASA_POWER_AG_DAILY`, `v2.10.3`)**: Retrieved live and cached cleanly (`VALID`, 15 daily records for `2024-01-01..15`), plus derived daily **FAO-56 Penman-Monteith reference evapotranspiration (`et0_mm_day`, `2.14..3.56 mm/day`)**.
+- **GPM IMERG (`GPM_3IMERGDF` V07B Final)**: Discovered via NASA CMR, retrieved via server-side **OPeNDAP DAP4 spatial subsetting** (`~34.3 KB/day` `.subset.dap.nc4` instead of `~26.7 MB/day` global files), and processed via **2×2 Inverse-Distance-Weighted (IDW)** interpolation (`idw_2x2_coarse_grid`, preserving `nearest_pixel` & `neighborhood_max` metadata and distinct `precipitation_imerg_mm`) — `VALID`, all 15 days (`2024-01-01..15`).
+- **SMAP (`SPL3SMP_E` v006 Daily 9 km)**: Discovered via NASA CMR, retrieved via server-side **OPeNDAP DAP4 spatial subsetting** (`~38.9 KB/day` `.subset.dap.nc4` instead of `~637 MB/day` global HDF5 files — ~16,400× smaller), with human-readable bitmask decoding (`retrieval_qual_decoded`) — 15 daily records (`2024-01-01..15`: 7 genuine orbital overpasses `0.4085..0.5041 m3/m3` flagged `VALID_WITH_WARNINGS`, and 8 orbital swath gaps preserved as `null` via `no_overpass_covering_aoi`).
+- **TERRA FastAPI Service**: All 12 REST routes (including `GET /observations/daily-merged` and `GET /observations/evapotranspiration`) verified HTTP `200` against the live SQLite store.
 
 ---
 
@@ -52,7 +52,7 @@ Lipa Cropland.geojson + config/farm_config.yaml + config/datasets.yaml
         │
         ▼
 [5] 3-Tier Storage Repository
-    data/raw/ -> data/processed/{terra.db, *.json, *.parquet} -> data/metadata/
+    data/raw/ -> data/processed/{terra.db, *.json, terra_daily_merged.json, *.parquet} -> data/metadata/
         │
         ▼
 [6] TERRA FastAPI Service (api/routes.py)
@@ -64,13 +64,13 @@ Lipa Cropland.geojson + config/farm_config.yaml + config/datasets.yaml
 Space APP Challenge Data Pipeline/
 ├── api/
 │   ├── __init__.py
-│   └── routes.py                 # FastAPI service (10 REST endpoints)
+│   └── routes.py                 # FastAPI service (12 REST endpoints incl. /observations/daily-merged)
 ├── collectors/
 │   ├── __init__.py
-│   ├── earthdata_client.py       # Retry/backoff HTTP, CMR pagination, URS auth redirects
-│   ├── nasa_power.py             # Priority 1: NASA POWER Agroclimatology collector
-│   ├── gpm.py                    # Priority 2: GPM IMERG Final/Late/Early collector
-│   └── smap.py                   # Priority 3: SMAP L3 (SPL3SMP_E) & L4 (SPL4SMGP) collector
+│   ├── earthdata_client.py       # Retry/backoff HTTP, CMR pagination, OPeNDAP DAP4 subset URLs, URS auth
+│   ├── nasa_power.py             # Priority 1: NASA POWER Agroclimatology collector + FAO-56 ET0
+│   ├── gpm.py                    # Priority 2: GPM IMERG Final/Late/Early (OPeNDAP subset + fallback)
+│   └── smap.py                   # Priority 3: SMAP L3/L4 (OPeNDAP subset + bitmask decoder)
 ├── config/
 │   ├── farm_config.yaml          # Authoritative Lipa Cropland AOI & pipeline settings
 │   └── datasets.yaml             # Dataset metadata, units, bounds, & Phase 6 catalog
@@ -87,18 +87,18 @@ Space APP Challenge Data Pipeline/
 │   ├── __init__.py
 │   ├── spatial_processor.py      # GeoJSON Polygon validation, centroid, bbox, metric area
 │   ├── temporal_processor.py     # UTC ISO-8601 normalization & date-range validation
-│   ├── unit_converter.py         # Physical conversions; keeps mm/day != mm/hr
-│   └── raster_processor.py       # NetCDF4/HDF5 1D & 2D EASE-Grid subsetting + 0.25 deg overpass guard
+│   ├── unit_converter.py         # Physical conversions + FAO-56 Penman-Monteith ET0; mm/day != mm/hr
+│   └── raster_processor.py       # NetCDF4/HDF5 2x2 IDW + 2D EASE-Grid subsetting + 0.25 deg overpass guard
 ├── storage/
 │   ├── __init__.py
 │   ├── cache.py                  # SHA-256 request index & raw file cache
-│   └── repository.py             # SQLite + Parquet + JSON unified repository
+│   └── repository.py             # SQLite + Parquet + JSON + daily merged repository
 ├── validators/
 │   ├── __init__.py
 │   ├── schema_validation.py      # Pydantic v2 standardized schemas
 │   └── quality_checks.py         # Physical bounds, extreme weather retention, bitmasks, deduplication
 ├── tests/
-│   └── test_pipeline.py          # 8 automated tests (unit + FastAPI integration)
+│   └── test_pipeline.py          # 10 automated tests (unit + OPeNDAP/ET0 + FastAPI integration)
 ├── data/                         # Runtime data layers (gitignored)
 ├── Lipa Cropland.geojson         # Authoritative 16-vertex cropland polygon
 ├── main.py                       # CLI entrypoint (`run`, `discover`, `download`, `process`, `validate`, `serve`)
@@ -134,8 +134,9 @@ Configured in [`config/farm_config.yaml`](config/farm_config.yaml) referencing [
 - **Area**: `1.3372 km²` (`133.72 ha`)
 
 **Spatial Scale Safeguards (`processors/raster_processor.py`):**
-- Coarse pixels (`~55 km` POWER, `~11 km` GPM, `9 km` SMAP) exceed the `1.34 km²` farm boundary, so the pipeline uses `nearest_grid_cell_containing_aoi` without fake sub-field downscaling.
-- SMAP L3 HDF5 extraction supports both `Soil_Moisture_Retrieval_Data_AM` and `Soil_Moisture_Retrieval_Data_PM` (`_pm` suffixes) and enforces a **`0.25°` (~27 km) maximum distance check** — if an orbital swath misses Lipa on a given day, it records `no_overpass_covering_aoi` (`null`) rather than returning a distant pixel.
+- Coarse pixels (`~55 km` POWER, `~11 km` GPM, `9 km` SMAP) exceed the `1.34 km²` farm boundary without fake sub-field downscaling:
+  - **GPM IMERG 1D grids** use **2×2 Inverse-Distance-Weighted interpolation** (`idw_2x2_coarse_grid`) across the 4 enclosing `0.1°` cells centered on `Lipa_Cropland_AOI`, while preserving `nearest_pixel` and `neighborhood_max` in variable notes.
+  - **SMAP L3 EASE-Grid 2.0** supports both `Soil_Moisture_Retrieval_Data_AM` and `Soil_Moisture_Retrieval_Data_PM` (`_pm` suffixes) and enforces a **`0.25°` (~27 km) maximum distance check** — if an orbital swath misses Lipa on a given day (including all-fill 6×6 OPeNDAP subsets), it records `no_overpass_covering_aoi` (`null`) rather than returning a distant pixel.
 
 To reuse the pipeline for another farm, replace `geojson_path`, `location_id`, `aoi_name`, `start_date`, and `end_date` in `config/farm_config.yaml`.
 
@@ -177,8 +178,8 @@ Environment variables in `.env`:
 # 1. Run full pipeline using config/farm_config.yaml dates
 python main.py
 
-# 2. Recommended quick test (downloads ~664 MB/day raw GPM + SMAP for 2 days)
-python main.py --start-date 2024-01-01 --end-date 2024-01-03
+# 2. Full 15-day OPeNDAP subset run (downloads ~1.07 MB total GPM + SMAP subsets)
+python main.py --start-date 2024-01-01 --end-date 2024-01-15
 
 # 3. Discover coverage & CMR granules without downloading files
 python main.py --action discover
@@ -203,17 +204,18 @@ python main.py --action serve --port 8000
 
 ## 9. Data Size & Storage Layer Breakdown
 
-Once processed for the `1.3372 km²` Lipa AOI, the outputs consumed by TERRA are under **0.5 MB**. Raw satellite granules are global files prior to local clipping:
+Using **server-side OPeNDAP DAP4 spatial subsetting**, downloading 15 full days (`2024-01-01` .. `2024-01-15`) across NASA POWER, GPM IMERG, and SMAP requires only **`~1.1 MB`** of raw downloads instead of **`~9.95 GB`** of full-globe granules:
 
-| Layer / File | Observed Size (Current Disk) | Daily Growth Rate | Notes |
+| Layer / File | Observed Size (15-Day Live Run) | Daily Growth Rate | Notes |
 |---|---|---|---|
-| `data/processed/terra.db` (SQLite) | `136.0 KB` (`0.13 MB`) | `~8 KB / day` | Indexed repository queried by FastAPI |
-| `data/processed/terra_observations.json` | `116.6 KB` (`0.11 MB`) | `~7 KB / day` | Full standardized JSON records |
-| `data/processed/terra_observations.parquet` | `14.3 KB` (`0.01 MB`) | `~1 KB / day` | Flattened analytics table |
-| `data/metadata/*.json` | `~111 KB` (`0.11 MB`) | negligible | CMR manifests, cache index, `pipeline_report.json` |
-| `data/raw/nasa_power/*.json` | `9.9 KB` (15d + 3d + 1d) | `~0.4 KB / day` | Point JSON (already tiny) |
-| `data/raw/gpm_imerg/*.nc4` | `80.1 MB` (3 files) | `~26.7 MB / day` | Global `GPM_3IMERGDF` NetCDF4 granules |
-| `data/raw/smap/*.h5` | `1,911.4 MB` (3 files) | `~637 MB / day` | Global `SPL3SMP_E` v006 HDF5 granules |
+| `data/processed/terra.db` (SQLite) | `240.0 KB` (`0.23 MB`) | `~16 KB / day` | Indexed repository queried by FastAPI |
+| `data/processed/terra_observations.json` | `213.5 KB` (`0.21 MB`) | `~14 KB / day` | Full standardized per-source records |
+| `data/processed/terra_daily_merged.json` | `162.6 KB` (`0.16 MB`) | `~11 KB / day` | Harmonized daily view (`precipitation_mm` + `precipitation_imerg_mm` + `et0_mm_day` + SMAP) |
+| `data/processed/terra_observations.parquet` | `16.1 KB` (`0.02 MB`) | `~1 KB / day` | Flattened analytics table |
+| `data/metadata/*.json` | `145.0 KB` (`0.14 MB`) | negligible | CMR manifests, cache index, `pipeline_report.json` |
+| `data/raw/nasa_power/*.json` | `9.9 KB` | `~0.4 KB / day` | Point JSON (already tiny) |
+| `data/raw/gpm_imerg/*.subset.dap.nc4` | `514.9 KB` (15 files) | **`~34.3 KB / day`** | Server-side OPeNDAP 5×5 slice (vs `~26.7 MB/day` global) |
+| `data/raw/smap/*.subset.dap.nc4` | `583.9 KB` (15 files) | **`~38.9 KB / day`** | Server-side OPeNDAP 6×6 AM+PM slice (vs `~637 MB/day` global) |
 
 > **Tip:** To use near-real-time rainfall for current dates (since `GPM_3IMERGDF` lags ~3.5 months), set `preferred_product: "GPM_3IMERGDL"` (~14 hr lag) in [`config/farm_config.yaml`](config/farm_config.yaml).
 
@@ -223,17 +225,16 @@ Once processed for the `1.3372 km²` Lipa AOI, the outputs consumed by TERRA are
 
 Every record preserves native observation timestamps (`YYYY-MM-DDTHH:MM:SSZ`), provenance, and quality status (`VALID`, `VALID_WITH_WARNINGS`, `INCOMPLETE`, `INVALID`).
 
-**Live observed values for `Lipa_Cropland_AOI` (`2024-01-01` .. `2024-01-03`):**
-- **NASA POWER (`VALID`)**:
-  - `2024-01-01`: `air_temperature_c = 25.96 °C` (`24.27..28.65`), `precipitation_mm = 3.42 mm/day`, `relative_humidity_pct = 92.39%`, `solar_radiation_mj_m2_day = 16.68`, `wind_speed_m_s = 1.21`, `surface_soil_wetness_index = 0.92`, `rootzone_soil_wetness_index = 0.95`
-  - `2024-01-02`: `25.87 °C`, `2.34 mm/day`, `90.39%`, `14.89 MJ/m2/day`
-  - `2024-01-03`: `25.94 °C`, `1.32 mm/day`, `89.15%`, `14.28 MJ/m2/day`
-- **GPM IMERG (`GPM_3IMERGDF`, `VALID`)**:
-  - `2024-01-01 .. 03`: `precipitation_mm = 0.0 mm/day`, `precipitation_random_error_mm = 2.764801 mm/day`, `precipitation_valid_sample_count = 48.0` (`grid_center = {lat: 13.95, lon: 121.150002}`)
-- **SMAP (`SPL3SMP_E`, `INCOMPLETE` / `VALID_WITH_WARNINGS`)**:
-  - `2024-01-01`: `soil_moisture_surface_m3_m3 = null` (`no_overpass_covering_aoi`)
-  - `2024-01-02`: `0.408539 m3/m3`, `smap_retrieval_quality_flag = 9`
-  - `2024-01-03`: `0.47474 m3/m3`, `smap_retrieval_quality_flag = 9`
+**Live observed values for `Lipa_Cropland_AOI` (`2024-01-01` .. `2024-01-15`):**
+- **NASA POWER + FAO-56 ET₀ (`VALID`, all 15 days)**:
+  - `2024-01-01`: `air_temperature_c = 25.96 °C`, `precipitation_mm = 3.42 mm/day`, `et0_mm_day = 3.1400 mm/day`
+  - `2024-01-08`: `air_temperature_c = 25.03 °C`, `precipitation_mm = 11.73 mm/day`, `et0_mm_day = 2.1648 mm/day`
+  - `2024-01-10`: `air_temperature_c = 26.24 °C`, `precipitation_mm = 0.81 mm/day`, `et0_mm_day = 3.5616 mm/day`
+- **GPM IMERG (`GPM_3IMERGDF`, `VALID`, all 15 days via `idw_2x2_coarse_grid`)**:
+  - `precipitation_imerg_mm` captures neighborhood rainfall on `2024-01-05` (`2.564271 mm/day`), `2024-01-06` (`0.031205 mm/day`), `2024-01-08` (`5.369804 mm/day`), `2024-01-09` (`0.051177 mm/day`), `2024-01-14` (`0.458843 mm/day`), and `2024-01-15` (`0.014118 mm/day`).
+- **SMAP (`SPL3SMP_E`, 15 days — 7 overpasses + 8 orbital swath gaps)**:
+  - 7 overpasses (`01-02`, `01-03`, `01-05`, `01-08`, `01-10`, `01-11`, `01-13`): `0.408539` – `0.504141 m3/m3` with decoded `retrieval_qual_flag=9` (`retrieval_not_recommended, surface_vegetation_topography_advisory`)
+  - 8 non-overpass days (`01-01`, `01-04`, `01-06`, `01-07`, `01-09`, `01-12`, `01-14`, `01-15`): `soil_moisture_surface_m3_m3 = null` (`no_overpass_covering_aoi`)
 
 ---
 
@@ -257,7 +258,9 @@ Start the server (`python main.py --action serve --port 8000`) and open <http://
 | `GET /aoi` | Validated Lipa GeoJSON metadata & scale notes | — |
 | `GET /datasets` | Active & Phase 6 planned NASA datasets | `include_planned` |
 | `GET /observations` | Unified observations across all sources | `start_date`, `end_date`, `dataset`, `variable`, `aoi_id`, `quality_status` |
-| `GET /observations/precipitation` | Daily `mm/day` vs rate `mm/hr` series | `start_date`, `end_date`, `dataset`, `aoi_id` |
+| `GET /observations/daily-merged` | Harmonized daily view merging POWER, GPM IMERG (`precipitation_imerg_mm`), SMAP, and `et0_mm_day` | `start_date`, `end_date`, `aoi_id` |
+| `GET /observations/evapotranspiration` | Daily FAO-56 reference evapotranspiration (`et0_mm_day`) | `start_date`, `end_date`, `dataset`, `aoi_id` |
+| `GET /observations/precipitation` | Daily `mm/day` (POWER + IMERG) vs rate `mm/hr` series | `start_date`, `end_date`, `dataset`, `aoi_id` |
 | `GET /observations/soil-moisture` | SMAP `m3/m3` & POWER wetness indices | `start_date`, `end_date`, `dataset`, `aoi_id` |
 | `GET /observations/temperature` | Mean / min / max air temperature (`degC`) | `start_date`, `end_date`, `dataset`, `aoi_id` |
 | `GET /observations/vegetation` | Phase 6 MODIS vegetation endpoint | `start_date`, `end_date`, `aoi_id` |
@@ -272,7 +275,7 @@ curl "http://localhost:8000/observations/soil-moisture?start_date=2024-01-01&end
 
 ## 13. Testing (`tests/test_pipeline.py`)
 
-Run all 8 automated tests (`pytest -v`):
+Run all 10 automated tests (`pytest -v`):
 1. `test_aoi_validation_real_lipa_geojson`
 2. `test_aoi_validation_rejects_unclosed_and_invalid_coords`
 3. `test_unit_conversions_and_rate_vs_accumulation`
@@ -280,15 +283,17 @@ Run all 8 automated tests (`pytest -v`):
 5. `test_nasa_power_missing_values_caching_duplicates_and_extremes`
 6. `test_gpm_netcdf_subset_and_awaiting_credentials`
 7. `test_smap_hdf5_subset_and_quality_flags`
-8. `test_fastapi_endpoints_with_populated_repository`
+8. `test_opendap_subset_url_builders_and_fao56_et0`
+9. `test_fastapi_endpoints_with_populated_repository`
+10. `test_fastapi_daily_merged_and_et0`
 
 ---
 
 ## 14. Troubleshooting
 
-- **`401` / `403` / HTML returned on GPM or SMAP download**: Verify `EARTHDATA_TOKEN` in `.env` and ensure `NASA GESDISC DATA ARCHIVE`, `NSIDC Cumulus Data`, and `NSIDC_DATAPOOL_OPS` are approved at `urs.earthdata.nasa.gov`.
-- **SMAP returns `no_overpass_covering_aoi` (`null`)**: Normal behavior on days when SMAP's 2–3 day revisit swath misses Lipa (`2024-01-01` did not overpass Lipa; `2024-01-02` and `2024-01-03` did).
-- **Large disk usage in `data/raw/`**: Global SMAP `.h5` files are ~637 MB/day. Run shorter date ranges during testing or enable OPeNDAP subsetting in future updates.
+- **`401` / `403` / HTML returned on GPM or SMAP download**: Verify `EARTHDATA_TOKEN` in `.env` and ensure `NASA GESDISC DATA ARCHIVE`, `NSIDC Cumulus Data`, `NSIDC V0 OPeNDAP`, and `NSIDC_DATAPOOL_OPS` are approved at `urs.earthdata.nasa.gov`.
+- **SMAP returns `no_overpass_covering_aoi` (`null`)**: Normal behavior on days when SMAP's 2–3 day revisit swath misses Lipa (`7` overpasses and `8` swath gaps across `2024-01-01..15`).
+- **OPeNDAP subset fallback triggered**: If an OPeNDAP endpoint transiently fails for a granule, `gpm.py` and `smap.py` automatically fall back to direct HTTPS granule downloads in `data/raw/`.
 
 ---
 
@@ -302,6 +307,5 @@ Run all 8 automated tests (`pytest -v`):
 
 ## 16. Future Improvements
 
-- **Server-side OPeNDAP Subsetting**: Slice GPM & SMAP spatially before download to cut ~664 MB/day down to `< 100 KB/day`.
 - **Phase 6 Collectors**: Implement `MODIS` (`MOD13Q1` 250 m NDVI/EVI), `ECOSTRESS` (70 m LST/ET), and `NEX-GDDP-CMIP6` future climate scenarios.
 - **Automated Scheduling & PostGIS**: Scheduled incremental sync + optional PostgreSQL/PostGIS storage backend.

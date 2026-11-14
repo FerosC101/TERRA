@@ -61,10 +61,57 @@ def _subset_1d_grid(
 
     extraction_mode = "bbox_subset"
     if len(lat_idx) == 0 or len(lon_idx) == 0:
-        # Coarse satellite pixel > 1.337 km2 AOI: choose nearest enclosing grid cell center.
-        extraction_mode = "nearest_grid_cell_containing_aoi"
-        lat_idx = np.array([int(np.argmin(np.abs(lats - centroid_lat)))])
-        lon_idx = np.array([int(np.argmin(np.abs(lons - centroid_lon)))])
+        # Coarse satellite pixel > 1.337 km2 AOI: compute 2x2 IDW around centroid and preserve nearest/max.
+        n_lat = int(np.argmin(np.abs(lats - centroid_lat)))
+        n_lon = int(np.argmin(np.abs(lons - centroid_lon)))
+        nearest_raw = float(da.isel({lat_name: n_lat, lon_name: n_lon}).values)
+        nearest_pixel_value: float | None = (
+            None if _is_fill_or_invalid(nearest_raw, fill_val) else nearest_raw
+        )
+
+        lat_idx = np.sort(np.argsort(np.abs(lats - centroid_lat))[: min(2, len(lats))])
+        lon_idx = np.sort(np.argsort(np.abs(lons - centroid_lon))[: min(2, len(lons))])
+        sub = da.isel({lat_name: lat_idx, lon_name: lon_idx}).transpose(lat_name, lon_name)
+
+        valid_pts: list[tuple[float, float]] = []
+        sub_vals = np.asarray(sub.values, dtype=float)
+        for i, glat in enumerate(lats[lat_idx]):
+            for j, glon in enumerate(lons[lon_idx]):
+                val = float(sub_vals[i, j])
+                if not _is_fill_or_invalid(val, fill_val):
+                    dist_deg = math.hypot(float(glat) - centroid_lat, float(glon) - centroid_lon)
+                    valid_pts.append((val, dist_deg))
+
+        if valid_pts:
+            exact = [val for val, dist in valid_pts if dist < 1e-9]
+            if exact:
+                idw_val = float(np.mean(exact))
+            else:
+                weights = [1.0 / (dist ** 2) for _, dist in valid_pts]
+                idw_val = float(
+                    sum(w * val for (val, _), w in zip(valid_pts, weights)) / sum(weights)
+                )
+            neighborhood_max: float | None = float(max(val for val, _ in valid_pts))
+        else:
+            idw_val = None
+            neighborhood_max = None
+
+        extraction_mode = (
+            "idw_2x2_coarse_grid" if int(sub_vals.size) > 1 else "nearest_grid_cell_containing_aoi"
+        )
+        return {
+            "value": idw_val,
+            "nearest_pixel_value": nearest_pixel_value,
+            "neighborhood_max": neighborhood_max,
+            "valid_pixel_count": len(valid_pts),
+            "total_pixel_count": int(sub_vals.size),
+            "unit": unit_attr,
+            "extraction_mode": extraction_mode,
+            "grid_cell_center": {
+                "lat": round(float(lats[n_lat]), 6),
+                "lon": round(float(lons[n_lon]), 6),
+            },
+        }
 
     sub = da.isel({lat_name: lat_idx, lon_name: lon_idx})
     arr = np.asarray(sub.values, dtype=float).ravel()
@@ -77,6 +124,8 @@ def _subset_1d_grid(
 
     return {
         "value": float(np.mean(valid_vals)) if valid_vals else None,
+        "nearest_pixel_value": float(np.mean(valid_vals)) if valid_vals else None,
+        "neighborhood_max": float(max(valid_vals)) if valid_vals else None,
         "valid_pixel_count": len(valid_vals),
         "total_pixel_count": int(arr.size),
         "unit": unit_attr,
@@ -186,42 +235,44 @@ def extract_aoi_from_smap_hdf5(
                 & (lon_ds >= -180.0)
                 & (lon_ds <= 180.0)
             )
-            if not np.any(valid_geo):
-                continue
-
-            if lat_ds.ndim == 1 and lon_ds.ndim == 1:
-                lat_grid, lon_grid = np.meshgrid(lat_ds, lon_ds, indexing="ij")
-            else:
-                lat_grid, lon_grid = lat_ds, lon_ds
-
-            in_bbox = (
-                valid_geo
-                & (lat_grid >= min_lat)
-                & (lat_grid <= max_lat)
-                & (lon_grid >= min_lon)
-                & (lon_grid <= max_lon)
-            )
-
             no_overpass = False
             extraction_mode = "bbox_subset"
-            if not np.any(in_bbox):
-                dist2 = np.where(
-                    valid_geo,
-                    (lat_grid - centroid_lat) ** 2 + (lon_grid - centroid_lon) ** 2,
-                    np.inf,
-                )
-                min_idx = np.unravel_index(int(np.argmin(dist2)), dist2.shape)
-                min_dist_deg = float(math.sqrt(float(dist2[min_idx])))
-                if min_dist_deg > max_distance_deg:
-                    no_overpass = True
-                    extraction_mode = "no_overpass_covering_aoi"
-                    mask = None
-                else:
-                    extraction_mode = "nearest_grid_cell_containing_aoi"
-                    mask = np.zeros_like(lat_grid, dtype=bool)
-                    mask[min_idx] = True
+            mask = None
+            if not np.any(valid_geo):
+                no_overpass = True
+                extraction_mode = "no_overpass_covering_aoi"
+                lat_grid, lon_grid = lat_ds, lon_ds
             else:
-                mask = in_bbox
+                if lat_ds.ndim == 1 and lon_ds.ndim == 1:
+                    lat_grid, lon_grid = np.meshgrid(lat_ds, lon_ds, indexing="ij")
+                else:
+                    lat_grid, lon_grid = lat_ds, lon_ds
+
+                in_bbox = (
+                    valid_geo
+                    & (lat_grid >= min_lat)
+                    & (lat_grid <= max_lat)
+                    & (lon_grid >= min_lon)
+                    & (lon_grid <= max_lon)
+                )
+
+                if not np.any(in_bbox):
+                    dist2 = np.where(
+                        valid_geo,
+                        (lat_grid - centroid_lat) ** 2 + (lon_grid - centroid_lon) ** 2,
+                        np.inf,
+                    )
+                    min_idx = np.unravel_index(int(np.argmin(dist2)), dist2.shape)
+                    min_dist_deg = float(math.sqrt(float(dist2[min_idx])))
+                    if min_dist_deg > max_distance_deg:
+                        no_overpass = True
+                        extraction_mode = "no_overpass_covering_aoi"
+                    else:
+                        extraction_mode = "nearest_grid_cell_containing_aoi"
+                        mask = np.zeros_like(lat_grid, dtype=bool)
+                        mask[min_idx] = True
+                else:
+                    mask = in_bbox
 
             suffix = "_pm" if grp_name.endswith("_PM") else ""
             for var_name in variable_names:

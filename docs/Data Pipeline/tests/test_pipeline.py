@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import math
 from pathlib import Path
 from typing import Any
 
@@ -13,12 +14,16 @@ import xarray as xr
 from fastapi.testclient import TestClient
 
 from api.routes import create_app
+from collectors.earthdata_client import (
+    build_gpm_opendap_subset_url,
+    build_smap_l3_opendap_subset_url,
+)
 from collectors.gpm import GpmImergCollector
 from collectors.nasa_power import NasaPowerCollector
-from collectors.smap import SmapCollector
+from collectors.smap import SmapCollector, decode_smap_qual_flag
 from processors.spatial_processor import load_and_validate_aoi
 from processors.temporal_processor import normalize_timestamp, validate_date_range
-from processors.unit_converter import convert_value_and_unit
+from processors.unit_converter import compute_fao56_et0, convert_value_and_unit
 from storage.cache import FileCache
 from storage.repository import TerraRepository
 from validators.quality_checks import run_quality_checks
@@ -222,8 +227,27 @@ def test_gpm_netcdf_subset_and_awaiting_credentials(tmp_path: Path) -> None:
     assert loaded["status"] == "LOADED_FROM_LOCAL_RAW"
     recs = gpm.process(loaded, aoi)
     assert len(recs) == 1
-    assert recs[0].observations["precipitation_mm"].value == pytest.approx(11.2)
-    assert recs[0].observations["precipitation_mm"].observation_type == "satellite"
+
+    # Verify 2x2 IDW around Lipa centroid + preserved nearest_pixel and neighborhood_max
+    grid_points = [
+        (13.95, 121.15, 11.2),
+        (13.95, 121.25, 14.8),
+        (14.05, 121.15, 18.4),
+        (14.05, 121.25, 9.5),
+    ]
+    weights = [
+        1.0 / (math.hypot(glat - aoi.centroid_lat, glon - aoi.centroid_lon) ** 2)
+        for glat, glon, _ in grid_points
+    ]
+    expected_idw = sum(w * v for (_, _, v), w in zip(grid_points, weights)) / sum(weights)
+
+    precip_obs = recs[0].observations["precipitation_mm"]
+    assert precip_obs.value == pytest.approx(expected_idw, abs=1e-4)
+    assert recs[0].observations["precipitation_imerg_mm"].value == pytest.approx(expected_idw, abs=1e-4)
+    assert precip_obs.extraction_mode == "idw_2x2_coarse_grid"
+    assert "nearest_pixel=11.2" in (precip_obs.notes or "")
+    assert "neighborhood_max=18.4" in (precip_obs.notes or "")
+    assert precip_obs.observation_type == "satellite"
 
 
 def test_smap_hdf5_subset_and_quality_flags(tmp_path: Path) -> None:
@@ -250,6 +274,51 @@ def test_smap_hdf5_subset_and_quality_flags(tmp_path: Path) -> None:
     assert cleaned[0].observations["soil_moisture_surface_m3_m3"].value == pytest.approx(0.34)
     assert cleaned[0].observations["soil_moisture_surface_m3_m3"].observation_type == "satellite"
     assert report.status == "VALID_WITH_WARNINGS"  # bit 0 of retrieval_qual_flag=1 triggers warning
+
+    decoded_1 = cleaned[0].metadata.quality_flags["retrieval_qual_decoded"]
+    assert decoded_1["bit_0_not_recommended"] is True
+    assert "retrieval_not_recommended" in decoded_1["active_bits"]
+
+    decoded_9 = decode_smap_qual_flag(9)
+    assert decoded_9 is not None
+    assert decoded_9["bit_0_not_recommended"] is True
+    assert decoded_9["bit_3_surface_advisory"] is True
+    assert decoded_9["bit_1_not_attempted"] is False
+
+
+def test_opendap_subset_url_builders_and_fao56_et0() -> None:
+    aoi = load_and_validate_aoi(PROJECT_ROOT / "config/farm_config.yaml", base_dir=PROJECT_ROOT)
+
+    gpm_url = build_gpm_opendap_subset_url(
+        "https://opendap.earthdata.nasa.gov/collections/C1/granules/gpm_test.nc4.dmr.html",
+        aoi.bbox,
+    )
+    assert ".dap.nc4?dap4.ce=" in gpm_url
+    assert "/lat[1037:1041];/lon[3009:3013]" in gpm_url
+    assert "/precipitation[0:0][3009:3013][1037:1041]" in gpm_url
+
+    smap_url = build_smap_l3_opendap_subset_url(
+        "https://opendap.earthdata.nasa.gov/collections/C2/granules/SMAP_L3_SM_P_E_test.h5",
+        aoi.bbox,
+    )
+    assert ".dap.nc4?dap4.ce=" in smap_url
+    assert "/Soil_Moisture_Retrieval_Data_AM/soil_moisture[612:617][3223:3228]" in smap_url
+    assert "/Soil_Moisture_Retrieval_Data_PM/soil_moisture_pm[612:617][3223:3228]" in smap_url
+
+    et0 = compute_fao56_et0(
+        t_mean_c=25.4,
+        t_max_c=29.0,
+        t_min_c=21.8,
+        rh_mean_pct=80.0,
+        solar_mj_m2_day=16.5,
+        wind_speed_2m_m_s=2.4,
+        latitude_deg=aoi.centroid_lat,
+        day_of_year=2,
+        elevation_m=315.0,
+    )
+    assert et0 is not None
+    assert 2.0 <= et0 <= 6.0
+    assert compute_fao56_et0(25.4, 80.0, 16.5, None, aoi.centroid_lat, 2) is None
 
 
 def test_fastapi_endpoints_with_populated_repository(tmp_path: Path) -> None:
@@ -289,4 +358,75 @@ def test_fastapi_endpoints_with_populated_repository(tmp_path: Path) -> None:
     assert api_client.get("/observations/vegetation").json()["status"] == "PLANNED_PHASE_6_MODIS"
     assert "NASA_POWER" in api_client.get("/metadata").json()["quality_reports"]
     assert api_client.get("/pipeline/status").json()["total_records_upserted"] == 2
+
+
+def test_fastapi_daily_merged_and_et0(tmp_path: Path) -> None:
+    aoi = load_and_validate_aoi(PROJECT_ROOT / "config/farm_config.yaml", base_dir=PROJECT_ROOT)
+    data_dir = tmp_path / "data"
+    cache = FileCache(data_dir=data_dir)
+    repo = TerraRepository(data_dir=data_dir)
+
+    power_payload = {
+        "header": {"api": {"version": "v2.5.1"}, "fill_value": -999.0},
+        "parameters": {
+            "T2M": {"units": "C"},
+            "T2M_MAX": {"units": "C"},
+            "T2M_MIN": {"units": "C"},
+            "PRECTOTCORR": {"units": "mm/day"},
+            "RH2M": {"units": "%"},
+            "ALLSKY_SFC_SW_DWN": {"units": "MJ/m^2/day"},
+            "WS2M": {"units": "m/s"},
+        },
+        "properties": {
+            "parameter": {
+                "T2M": {"20240101": 25.4},
+                "T2M_MAX": {"20240101": 29.1},
+                "T2M_MIN": {"20240101": 21.8},
+                "PRECTOTCORR": {"20240101": 3.42},
+                "RH2M": {"20240101": 81.5},
+                "ALLSKY_SFC_SW_DWN": {"20240101": 16.4},
+                "WS2M": {"20240101": 2.4},
+            }
+        },
+    }
+    power = NasaPowerCollector(client=DummyClient(power_payload=power_payload), cache=cache)
+    p_recs = power.process(power.retrieve(aoi, "2024-01-01", "2024-01-01"), aoi)
+    p_clean, _ = run_quality_checks(p_recs, "NASA_POWER")
+
+    raw_nc = cache.raw_path("GPM_IMERG", "3B-DAY.MS.MRG.3IMERG.20240101-S000000-E235959.V07B.nc4")
+    xr.Dataset(
+        data_vars={
+            "precipitation": (("lat", "lon"), np.array([[0.0, 0.0], [0.12, 0.33]]), {"units": "mm/day"}),
+        },
+        coords={"lat": [13.95, 14.05], "lon": [121.15, 121.25]},
+    ).to_netcdf(raw_nc)
+    gpm = GpmImergCollector(client=DummyClient(has_creds=False), cache=cache)
+    g_recs = gpm.process(gpm.retrieve(aoi, "2024-01-01", "2024-01-01"), aoi)
+    g_clean, _ = run_quality_checks(g_recs, "GPM_IMERG")
+
+    repo.upsert_observations(p_clean + g_clean)
+    assert repo.merged_json_path.exists()
+
+    app = create_app(
+        farm_config_path=PROJECT_ROOT / "config/farm_config.yaml",
+        datasets_config_path=PROJECT_ROOT / "config/datasets.yaml",
+        data_dir=data_dir,
+        base_dir=PROJECT_ROOT,
+    )
+    api_client = TestClient(app)
+
+    merged_resp = api_client.get("/observations/daily-merged", params={"start_date": "2024-01-01", "end_date": "2024-01-01"})
+    assert merged_resp.status_code == 200
+    body = merged_resp.json()
+    assert body["count"] == 1
+    row = body["daily_observations"][0]
+    assert set(row["sources"]) == {"NASA_POWER", "GPM_IMERG"}
+    assert row["flat_observations"]["precipitation_mm"] == pytest.approx(3.42)
+    assert row["flat_observations"]["precipitation_imerg_mm"] > 0.0
+    assert row["flat_observations"]["et0_mm_day"] > 2.0
+
+    et0_resp = api_client.get("/observations/evapotranspiration")
+    assert et0_resp.status_code == 200
+    assert et0_resp.json()["count"] == 1
+
 

@@ -24,6 +24,7 @@ class TerraRepository:
 
         self.db_path = self.processed_dir / "terra.db"
         self.json_path = self.processed_dir / "terra_observations.json"
+        self.merged_json_path = self.processed_dir / "terra_daily_merged.json"
         self.parquet_path = self.processed_dir / "terra_observations.parquet"
         self.report_path = self.metadata_dir / "pipeline_report.json"
         self._init_db()
@@ -106,10 +107,85 @@ class TerraRepository:
         self._refresh_analysis_ready_files()
         return len(records)
 
+    @staticmethod
+    def _build_daily_merged(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        """Merge multi-source observations per (location_id, YYYY-MM-DD) without clobbering POWER vs IMERG rain."""
+        severity = {"VALID": 1, "VALID_WITH_WARNINGS": 2, "INCOMPLETE": 3, "INVALID": 4}
+        grouped: dict[tuple[str, str], list[dict[str, Any]]] = {}
+        for rec in records:
+            key = (str(rec["location_id"]), str(rec["timestamp"])[:10])
+            grouped.setdefault(key, []).append(rec)
+
+        merged_rows: list[dict[str, Any]] = []
+        for (location_id, date_str), day_recs in sorted(grouped.items(), key=lambda item: (item[0][1], item[0][0])):
+            sources: list[str] = []
+            product_names: list[str] = []
+            source_statuses: dict[str, str] = {}
+            quality_flags: dict[str, Any] = {}
+            merged_obs: dict[str, Any] = {}
+            merged_flat: dict[str, Any] = {}
+            worst_status = "VALID"
+            aoi_name = day_recs[0].get("aoi_name", "")
+
+            for rec in day_recs:
+                meta = rec.get("metadata", {})
+                rec_sources = meta.get("sources", [])
+                primary_source = rec_sources[0] if rec_sources else "UNKNOWN"
+                for src in rec_sources:
+                    if src not in sources:
+                        sources.append(src)
+                for prod in meta.get("product_names", []):
+                    if prod not in product_names:
+                        product_names.append(prod)
+
+                rec_status = str(meta.get("quality_status", "VALID"))
+                source_statuses[primary_source] = rec_status
+                if severity.get(rec_status, 0) > severity.get(worst_status, 0):
+                    worst_status = rec_status
+                if meta.get("quality_flags"):
+                    quality_flags[primary_source] = meta["quality_flags"]
+
+                is_gpm = primary_source == "GPM_IMERG" or "GPM_IMERG" in rec_sources
+                for var_name, obs in rec.get("observations", {}).items():
+                    target_key = (
+                        "precipitation_imerg_mm"
+                        if is_gpm and var_name == "precipitation_mm"
+                        else var_name
+                    )
+                    merged_obs[target_key] = obs
+                for var_name, val in rec.get("flat_observations", {}).items():
+                    target_key = (
+                        "precipitation_imerg_mm"
+                        if is_gpm and var_name == "precipitation_mm"
+                        else var_name
+                    )
+                    merged_flat[target_key] = val
+
+            merged_rows.append(
+                {
+                    "date": date_str,
+                    "timestamp": f"{date_str}T00:00:00Z",
+                    "location_id": location_id,
+                    "aoi_name": aoi_name,
+                    "sources": sources,
+                    "product_names": product_names,
+                    "quality_status": worst_status,
+                    "source_quality_statuses": source_statuses,
+                    "quality_flags": quality_flags,
+                    "flat_observations": merged_flat,
+                    "observations": merged_obs,
+                }
+            )
+        return merged_rows
+
     def _refresh_analysis_ready_files(self) -> None:
         all_records = self.query_observations()
         with self.json_path.open("w", encoding="utf-8") as fh:
             json.dump(all_records, fh, indent=2)
+
+        merged_records = self._build_daily_merged(all_records)
+        with self.merged_json_path.open("w", encoding="utf-8") as fh:
+            json.dump(merged_records, fh, indent=2)
 
         if all_records:
             rows = []
@@ -203,4 +279,15 @@ class TerraRepository:
                 or variable in rec.get("flat_observations", {})
             ]
         return results
+
+    def query_daily_merged(
+        self,
+        start_date: str | None = None,
+        end_date: str | None = None,
+        aoi_id: str | None = None,
+    ) -> list[dict[str, Any]]:
+        """Query harmonized daily records merging NASA POWER, GPM IMERG, and SMAP."""
+        records = self.query_observations(start_date=start_date, end_date=end_date, aoi_id=aoi_id)
+        return self._build_daily_merged(records)
+
 

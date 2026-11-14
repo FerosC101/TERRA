@@ -264,6 +264,7 @@ class TerraNasaPipeline:
             "storage_outputs": {
                 "sqlite_db": str(self.repo.db_path),
                 "json_repository": str(self.repo.json_path),
+                "daily_merged_json": str(self.repo.merged_json_path),
                 "parquet_repository": str(self.repo.parquet_path),
             },
         }

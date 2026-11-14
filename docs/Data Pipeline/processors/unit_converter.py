@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from typing import Any
 
 STANDARD_VARIABLE_MAP: dict[str, dict[str, str]] = {
@@ -65,6 +66,22 @@ STANDARD_VARIABLE_MAP: dict[str, dict[str, str]] = {
         "unit": "bitmask",
         "category": "quality",
     },
+    # Derived agro-meteorological variables
+    "ET0": {
+        "name": "et0_mm_day",
+        "unit": "mm/day",
+        "category": "evapotranspiration",
+    },
+    "et0_mm_day": {
+        "name": "et0_mm_day",
+        "unit": "mm/day",
+        "category": "evapotranspiration",
+    },
+    "precipitation_imerg_mm": {
+        "name": "precipitation_imerg_mm",
+        "unit": "mm/day",
+        "category": "precipitation",
+    },
 }
 
 
@@ -120,4 +137,77 @@ def convert_value_and_unit(
         num = num / 100.0
 
     return round(num, 6), target_unit
+
+
+def compute_fao56_et0(
+    t_mean_c: float | None,
+    rh_mean_pct: float | None,
+    solar_mj_m2_day: float | None,
+    wind_speed_2m_m_s: float | None,
+    latitude_deg: float,
+    day_of_year: int,
+    elevation_m: float = 315.0,
+    t_max_c: float | None = None,
+    t_min_c: float | None = None,
+) -> float | None:
+    """Compute daily FAO-56 Penman-Monteith reference evapotranspiration (mm/day)."""
+    if (
+        t_mean_c is None
+        or rh_mean_pct is None
+        or solar_mj_m2_day is None
+        or wind_speed_2m_m_s is None
+    ):
+        return None
+
+    t_mean = float(t_mean_c)
+    t_hi = float(t_max_c) if t_max_c is not None else t_mean
+    t_lo = float(t_min_c) if t_min_c is not None else t_mean
+    rh = max(1.0, min(100.0, float(rh_mean_pct)))
+    rs = max(0.0, float(solar_mj_m2_day))
+    u2 = max(0.0, float(wind_speed_2m_m_s))
+
+    def _es_kpa(temp_c: float) -> float:
+        return 0.6108 * math.exp((17.27 * temp_c) / (temp_c + 237.3))
+
+    # Atmospheric pressure & psychrometric constant
+    p_kpa = 101.3 * (((293.0 - 0.0065 * elevation_m) / 293.0) ** 5.26)
+    gamma = 0.000665 * p_kpa
+
+    # Vapor pressure & slope
+    if t_max_c is not None and t_min_c is not None:
+        es = (_es_kpa(t_hi) + _es_kpa(t_lo)) / 2.0
+    else:
+        es = _es_kpa(t_mean)
+    ea = es * (rh / 100.0)
+    delta = (4098.0 * _es_kpa(t_mean)) / ((t_mean + 237.3) ** 2)
+
+    # Extraterrestrial & clear-sky radiation (Allen et al., 1998 Eq. 21-39)
+    lat_rad = math.radians(latitude_deg)
+    dr = 1.0 + 0.033 * math.cos((2.0 * math.pi * day_of_year) / 365.0)
+    sol_dec = 0.409 * math.sin((2.0 * math.pi * day_of_year) / 365.0 - 1.39)
+    cos_ws = max(-1.0, min(1.0, -math.tan(lat_rad) * math.tan(sol_dec)))
+    ws = math.acos(cos_ws)
+    ra = ((24.0 * 60.0) / math.pi) * 0.0820 * dr * (
+        ws * math.sin(lat_rad) * math.sin(sol_dec)
+        + math.cos(lat_rad) * math.cos(sol_dec) * math.sin(ws)
+    )
+    rso = max((0.75 + 2e-5 * elevation_m) * ra, 0.1)
+
+    rns = 0.77 * rs
+    rs_rso = max(0.3, min(1.0, rs / rso))
+    tmax_k4 = (t_hi + 273.16) ** 4
+    tmin_k4 = (t_lo + 273.16) ** 4
+    rnl = (
+        4.903e-9
+        * ((tmax_k4 + tmin_k4) / 2.0)
+        * (0.34 - 0.14 * math.sqrt(max(ea, 0.0)))
+        * (1.35 * rs_rso - 0.35)
+    )
+    rn = rns - rnl
+
+    numerator = 0.408 * delta * rn + gamma * (900.0 / (t_mean + 273.0)) * u2 * max(es - ea, 0.0)
+    denominator = delta + gamma * (1.0 + 0.34 * u2)
+    et0 = max(0.0, numerator / denominator)
+    return round(et0, 4)
+
 

@@ -1,0 +1,1159 @@
+[
+  {
+    "record_id": "lipa_cropland_001_SMAP_SPL3SMP_E_20240101T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-01T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "soil_moisture_surface_m3_m3": {
+        "value": null,
+        "unit": "m3/m3",
+        "raw_variable": "soil_moisture",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "NO_BITMASK",
+        "is_missing": true,
+        "extraction_mode": "no_overpass_covering_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_PM; grid_center=None; qual_bits=[unavailable]"
+      },
+      "smap_retrieval_quality_flag": {
+        "value": null,
+        "unit": "bitmask",
+        "raw_variable": "retrieval_qual_flag",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "NO_BITMASK",
+        "is_missing": true,
+        "extraction_mode": "no_overpass_covering_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_PM; grid_center=None; qual_bits=[unavailable]"
+      }
+    },
+    "flat_observations": {
+      "soil_moisture_surface_m3_m3": null,
+      "smap_retrieval_quality_flag": null
+    },
+    "metadata": {
+      "sources": [
+        "SMAP"
+      ],
+      "product_names": [
+        "SPL3SMP_E"
+      ],
+      "product_versions": {
+        "SPL3SMP_E": "006"
+      },
+      "quality_status": "INCOMPLETE",
+      "quality_flags": {
+        "retrieval_qual_flag": null,
+        "retrieval_qual_decoded": null
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "SMAP": "9 km EASE-Grid 2.0"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:52:12Z",
+      "processed_at": "2026-11-14T07:52:57Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\smap\\SMAP_L3_SM_P_E_20240101_R19240_001.subset.dap.nc4"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_SMAP_SPL3SMP_E_20240102T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-02T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "soil_moisture_surface_m3_m3": {
+        "value": 0.408539,
+        "unit": "m3/m3",
+        "raw_variable": "soil_moisture",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": 9,
+        "is_missing": false,
+        "extraction_mode": "nearest_grid_cell_containing_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_AM; grid_center={'lat': 14.010609, 'lon': 121.229256}; qual_bits=[retrieval_not_recommended, surface_vegetation_topography_advisory]"
+      },
+      "smap_retrieval_quality_flag": {
+        "value": 9.0,
+        "unit": "bitmask",
+        "raw_variable": "retrieval_qual_flag",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": 9,
+        "is_missing": false,
+        "extraction_mode": "nearest_grid_cell_containing_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_AM; grid_center={'lat': 14.010609, 'lon': 121.229256}; qual_bits=[retrieval_not_recommended, surface_vegetation_topography_advisory]"
+      }
+    },
+    "flat_observations": {
+      "soil_moisture_surface_m3_m3": 0.408539,
+      "smap_retrieval_quality_flag": 9.0
+    },
+    "metadata": {
+      "sources": [
+        "SMAP"
+      ],
+      "product_names": [
+        "SPL3SMP_E"
+      ],
+      "product_versions": {
+        "SPL3SMP_E": "006"
+      },
+      "quality_status": "VALID_WITH_WARNINGS",
+      "quality_flags": {
+        "retrieval_qual_flag": 9,
+        "retrieval_qual_decoded": {
+          "raw_value": 9,
+          "bit_0_not_recommended": true,
+          "bit_1_not_attempted": false,
+          "bit_2_unsuccessful": false,
+          "bit_3_surface_advisory": true,
+          "active_bits": [
+            "retrieval_not_recommended",
+            "surface_vegetation_topography_advisory"
+          ],
+          "summary": "retrieval_not_recommended, surface_vegetation_topography_advisory"
+        }
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "SMAP": "9 km EASE-Grid 2.0"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:52:15Z",
+      "processed_at": "2026-11-14T07:52:57Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\smap\\SMAP_L3_SM_P_E_20240102_R19240_001.subset.dap.nc4"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_SMAP_SPL3SMP_E_20240103T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-03T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "soil_moisture_surface_m3_m3": {
+        "value": 0.47474,
+        "unit": "m3/m3",
+        "raw_variable": "soil_moisture",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": 9,
+        "is_missing": false,
+        "extraction_mode": "nearest_grid_cell_containing_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_AM; grid_center={'lat': 14.010609, 'lon': 121.229256}; qual_bits=[retrieval_not_recommended, surface_vegetation_topography_advisory]"
+      },
+      "smap_retrieval_quality_flag": {
+        "value": 9.0,
+        "unit": "bitmask",
+        "raw_variable": "retrieval_qual_flag",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": 9,
+        "is_missing": false,
+        "extraction_mode": "nearest_grid_cell_containing_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_AM; grid_center={'lat': 14.010609, 'lon': 121.229256}; qual_bits=[retrieval_not_recommended, surface_vegetation_topography_advisory]"
+      }
+    },
+    "flat_observations": {
+      "soil_moisture_surface_m3_m3": 0.47474,
+      "smap_retrieval_quality_flag": 9.0
+    },
+    "metadata": {
+      "sources": [
+        "SMAP"
+      ],
+      "product_names": [
+        "SPL3SMP_E"
+      ],
+      "product_versions": {
+        "SPL3SMP_E": "006"
+      },
+      "quality_status": "VALID_WITH_WARNINGS",
+      "quality_flags": {
+        "retrieval_qual_flag": 9,
+        "retrieval_qual_decoded": {
+          "raw_value": 9,
+          "bit_0_not_recommended": true,
+          "bit_1_not_attempted": false,
+          "bit_2_unsuccessful": false,
+          "bit_3_surface_advisory": true,
+          "active_bits": [
+            "retrieval_not_recommended",
+            "surface_vegetation_topography_advisory"
+          ],
+          "summary": "retrieval_not_recommended, surface_vegetation_topography_advisory"
+        }
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "SMAP": "9 km EASE-Grid 2.0"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:52:18Z",
+      "processed_at": "2026-11-14T07:52:57Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\smap\\SMAP_L3_SM_P_E_20240103_R19240_001.subset.dap.nc4"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_SMAP_SPL3SMP_E_20240104T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-04T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "soil_moisture_surface_m3_m3": {
+        "value": null,
+        "unit": "m3/m3",
+        "raw_variable": "soil_moisture",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "NO_BITMASK",
+        "is_missing": true,
+        "extraction_mode": "no_overpass_covering_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_PM; grid_center=None; qual_bits=[unavailable]"
+      },
+      "smap_retrieval_quality_flag": {
+        "value": null,
+        "unit": "bitmask",
+        "raw_variable": "retrieval_qual_flag",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "NO_BITMASK",
+        "is_missing": true,
+        "extraction_mode": "no_overpass_covering_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_PM; grid_center=None; qual_bits=[unavailable]"
+      }
+    },
+    "flat_observations": {
+      "soil_moisture_surface_m3_m3": null,
+      "smap_retrieval_quality_flag": null
+    },
+    "metadata": {
+      "sources": [
+        "SMAP"
+      ],
+      "product_names": [
+        "SPL3SMP_E"
+      ],
+      "product_versions": {
+        "SPL3SMP_E": "006"
+      },
+      "quality_status": "INCOMPLETE",
+      "quality_flags": {
+        "retrieval_qual_flag": null,
+        "retrieval_qual_decoded": null
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "SMAP": "9 km EASE-Grid 2.0"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:52:21Z",
+      "processed_at": "2026-11-14T07:52:57Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\smap\\SMAP_L3_SM_P_E_20240104_R19240_001.subset.dap.nc4"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_SMAP_SPL3SMP_E_20240105T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-05T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "soil_moisture_surface_m3_m3": {
+        "value": 0.500053,
+        "unit": "m3/m3",
+        "raw_variable": "soil_moisture",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": 9,
+        "is_missing": false,
+        "extraction_mode": "nearest_grid_cell_containing_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_AM; grid_center={'lat': 14.010609, 'lon': 121.229256}; qual_bits=[retrieval_not_recommended, surface_vegetation_topography_advisory]"
+      },
+      "smap_retrieval_quality_flag": {
+        "value": 9.0,
+        "unit": "bitmask",
+        "raw_variable": "retrieval_qual_flag",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": 9,
+        "is_missing": false,
+        "extraction_mode": "nearest_grid_cell_containing_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_AM; grid_center={'lat': 14.010609, 'lon': 121.229256}; qual_bits=[retrieval_not_recommended, surface_vegetation_topography_advisory]"
+      }
+    },
+    "flat_observations": {
+      "soil_moisture_surface_m3_m3": 0.500053,
+      "smap_retrieval_quality_flag": 9.0
+    },
+    "metadata": {
+      "sources": [
+        "SMAP"
+      ],
+      "product_names": [
+        "SPL3SMP_E"
+      ],
+      "product_versions": {
+        "SPL3SMP_E": "006"
+      },
+      "quality_status": "VALID_WITH_WARNINGS",
+      "quality_flags": {
+        "retrieval_qual_flag": 9,
+        "retrieval_qual_decoded": {
+          "raw_value": 9,
+          "bit_0_not_recommended": true,
+          "bit_1_not_attempted": false,
+          "bit_2_unsuccessful": false,
+          "bit_3_surface_advisory": true,
+          "active_bits": [
+            "retrieval_not_recommended",
+            "surface_vegetation_topography_advisory"
+          ],
+          "summary": "retrieval_not_recommended, surface_vegetation_topography_advisory"
+        }
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "SMAP": "9 km EASE-Grid 2.0"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:52:24Z",
+      "processed_at": "2026-11-14T07:52:57Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\smap\\SMAP_L3_SM_P_E_20240105_R19240_002.subset.dap.nc4"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_SMAP_SPL3SMP_E_20240106T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-06T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "soil_moisture_surface_m3_m3": {
+        "value": null,
+        "unit": "m3/m3",
+        "raw_variable": "soil_moisture",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "NO_BITMASK",
+        "is_missing": true,
+        "extraction_mode": "no_overpass_covering_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_PM; grid_center=None; qual_bits=[unavailable]"
+      },
+      "smap_retrieval_quality_flag": {
+        "value": null,
+        "unit": "bitmask",
+        "raw_variable": "retrieval_qual_flag",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "NO_BITMASK",
+        "is_missing": true,
+        "extraction_mode": "no_overpass_covering_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_PM; grid_center=None; qual_bits=[unavailable]"
+      }
+    },
+    "flat_observations": {
+      "soil_moisture_surface_m3_m3": null,
+      "smap_retrieval_quality_flag": null
+    },
+    "metadata": {
+      "sources": [
+        "SMAP"
+      ],
+      "product_names": [
+        "SPL3SMP_E"
+      ],
+      "product_versions": {
+        "SPL3SMP_E": "006"
+      },
+      "quality_status": "INCOMPLETE",
+      "quality_flags": {
+        "retrieval_qual_flag": null,
+        "retrieval_qual_decoded": null
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "SMAP": "9 km EASE-Grid 2.0"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:52:28Z",
+      "processed_at": "2026-11-14T07:52:57Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\smap\\SMAP_L3_SM_P_E_20240106_R19240_001.subset.dap.nc4"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_SMAP_SPL3SMP_E_20240107T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-07T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "soil_moisture_surface_m3_m3": {
+        "value": null,
+        "unit": "m3/m3",
+        "raw_variable": "soil_moisture",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "NO_BITMASK",
+        "is_missing": true,
+        "extraction_mode": "no_overpass_covering_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_PM; grid_center=None; qual_bits=[unavailable]"
+      },
+      "smap_retrieval_quality_flag": {
+        "value": null,
+        "unit": "bitmask",
+        "raw_variable": "retrieval_qual_flag",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "NO_BITMASK",
+        "is_missing": true,
+        "extraction_mode": "no_overpass_covering_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_PM; grid_center=None; qual_bits=[unavailable]"
+      }
+    },
+    "flat_observations": {
+      "soil_moisture_surface_m3_m3": null,
+      "smap_retrieval_quality_flag": null
+    },
+    "metadata": {
+      "sources": [
+        "SMAP"
+      ],
+      "product_names": [
+        "SPL3SMP_E"
+      ],
+      "product_versions": {
+        "SPL3SMP_E": "006"
+      },
+      "quality_status": "INCOMPLETE",
+      "quality_flags": {
+        "retrieval_qual_flag": null,
+        "retrieval_qual_decoded": null
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "SMAP": "9 km EASE-Grid 2.0"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:52:30Z",
+      "processed_at": "2026-11-14T07:52:57Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\smap\\SMAP_L3_SM_P_E_20240107_R19240_001.subset.dap.nc4"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_SMAP_SPL3SMP_E_20240108T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-08T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "soil_moisture_surface_m3_m3": {
+        "value": 0.504141,
+        "unit": "m3/m3",
+        "raw_variable": "soil_moisture",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": 9,
+        "is_missing": false,
+        "extraction_mode": "nearest_grid_cell_containing_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_AM; grid_center={'lat': 14.010609, 'lon': 121.229256}; qual_bits=[retrieval_not_recommended, surface_vegetation_topography_advisory]"
+      },
+      "smap_retrieval_quality_flag": {
+        "value": 9.0,
+        "unit": "bitmask",
+        "raw_variable": "retrieval_qual_flag",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": 9,
+        "is_missing": false,
+        "extraction_mode": "nearest_grid_cell_containing_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_AM; grid_center={'lat': 14.010609, 'lon': 121.229256}; qual_bits=[retrieval_not_recommended, surface_vegetation_topography_advisory]"
+      }
+    },
+    "flat_observations": {
+      "soil_moisture_surface_m3_m3": 0.504141,
+      "smap_retrieval_quality_flag": 9.0
+    },
+    "metadata": {
+      "sources": [
+        "SMAP"
+      ],
+      "product_names": [
+        "SPL3SMP_E"
+      ],
+      "product_versions": {
+        "SPL3SMP_E": "006"
+      },
+      "quality_status": "VALID_WITH_WARNINGS",
+      "quality_flags": {
+        "retrieval_qual_flag": 9,
+        "retrieval_qual_decoded": {
+          "raw_value": 9,
+          "bit_0_not_recommended": true,
+          "bit_1_not_attempted": false,
+          "bit_2_unsuccessful": false,
+          "bit_3_surface_advisory": true,
+          "active_bits": [
+            "retrieval_not_recommended",
+            "surface_vegetation_topography_advisory"
+          ],
+          "summary": "retrieval_not_recommended, surface_vegetation_topography_advisory"
+        }
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "SMAP": "9 km EASE-Grid 2.0"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:52:34Z",
+      "processed_at": "2026-11-14T07:52:57Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\smap\\SMAP_L3_SM_P_E_20240108_R19240_001.subset.dap.nc4"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_SMAP_SPL3SMP_E_20240109T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-09T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "soil_moisture_surface_m3_m3": {
+        "value": null,
+        "unit": "m3/m3",
+        "raw_variable": "soil_moisture",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "NO_BITMASK",
+        "is_missing": true,
+        "extraction_mode": "no_overpass_covering_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_PM; grid_center=None; qual_bits=[unavailable]"
+      },
+      "smap_retrieval_quality_flag": {
+        "value": null,
+        "unit": "bitmask",
+        "raw_variable": "retrieval_qual_flag",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "NO_BITMASK",
+        "is_missing": true,
+        "extraction_mode": "no_overpass_covering_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_PM; grid_center=None; qual_bits=[unavailable]"
+      }
+    },
+    "flat_observations": {
+      "soil_moisture_surface_m3_m3": null,
+      "smap_retrieval_quality_flag": null
+    },
+    "metadata": {
+      "sources": [
+        "SMAP"
+      ],
+      "product_names": [
+        "SPL3SMP_E"
+      ],
+      "product_versions": {
+        "SPL3SMP_E": "006"
+      },
+      "quality_status": "INCOMPLETE",
+      "quality_flags": {
+        "retrieval_qual_flag": null,
+        "retrieval_qual_decoded": null
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "SMAP": "9 km EASE-Grid 2.0"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:52:37Z",
+      "processed_at": "2026-11-14T07:52:57Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\smap\\SMAP_L3_SM_P_E_20240109_R19240_001.subset.dap.nc4"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_SMAP_SPL3SMP_E_20240110T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-10T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "soil_moisture_surface_m3_m3": {
+        "value": 0.463665,
+        "unit": "m3/m3",
+        "raw_variable": "soil_moisture",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": 9,
+        "is_missing": false,
+        "extraction_mode": "nearest_grid_cell_containing_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_AM; grid_center={'lat': 14.010609, 'lon': 121.229256}; qual_bits=[retrieval_not_recommended, surface_vegetation_topography_advisory]"
+      },
+      "smap_retrieval_quality_flag": {
+        "value": 9.0,
+        "unit": "bitmask",
+        "raw_variable": "retrieval_qual_flag",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": 9,
+        "is_missing": false,
+        "extraction_mode": "nearest_grid_cell_containing_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_AM; grid_center={'lat': 14.010609, 'lon': 121.229256}; qual_bits=[retrieval_not_recommended, surface_vegetation_topography_advisory]"
+      }
+    },
+    "flat_observations": {
+      "soil_moisture_surface_m3_m3": 0.463665,
+      "smap_retrieval_quality_flag": 9.0
+    },
+    "metadata": {
+      "sources": [
+        "SMAP"
+      ],
+      "product_names": [
+        "SPL3SMP_E"
+      ],
+      "product_versions": {
+        "SPL3SMP_E": "006"
+      },
+      "quality_status": "VALID_WITH_WARNINGS",
+      "quality_flags": {
+        "retrieval_qual_flag": 9,
+        "retrieval_qual_decoded": {
+          "raw_value": 9,
+          "bit_0_not_recommended": true,
+          "bit_1_not_attempted": false,
+          "bit_2_unsuccessful": false,
+          "bit_3_surface_advisory": true,
+          "active_bits": [
+            "retrieval_not_recommended",
+            "surface_vegetation_topography_advisory"
+          ],
+          "summary": "retrieval_not_recommended, surface_vegetation_topography_advisory"
+        }
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "SMAP": "9 km EASE-Grid 2.0"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:52:40Z",
+      "processed_at": "2026-11-14T07:52:57Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\smap\\SMAP_L3_SM_P_E_20240110_R19240_001.subset.dap.nc4"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_SMAP_SPL3SMP_E_20240111T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-11T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "soil_moisture_surface_m3_m3": {
+        "value": 0.473746,
+        "unit": "m3/m3",
+        "raw_variable": "soil_moisture",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": 9,
+        "is_missing": false,
+        "extraction_mode": "nearest_grid_cell_containing_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_AM; grid_center={'lat': 14.010609, 'lon': 121.229256}; qual_bits=[retrieval_not_recommended, surface_vegetation_topography_advisory]"
+      },
+      "smap_retrieval_quality_flag": {
+        "value": 9.0,
+        "unit": "bitmask",
+        "raw_variable": "retrieval_qual_flag",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": 9,
+        "is_missing": false,
+        "extraction_mode": "nearest_grid_cell_containing_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_AM; grid_center={'lat': 14.010609, 'lon': 121.229256}; qual_bits=[retrieval_not_recommended, surface_vegetation_topography_advisory]"
+      }
+    },
+    "flat_observations": {
+      "soil_moisture_surface_m3_m3": 0.473746,
+      "smap_retrieval_quality_flag": 9.0
+    },
+    "metadata": {
+      "sources": [
+        "SMAP"
+      ],
+      "product_names": [
+        "SPL3SMP_E"
+      ],
+      "product_versions": {
+        "SPL3SMP_E": "006"
+      },
+      "quality_status": "VALID_WITH_WARNINGS",
+      "quality_flags": {
+        "retrieval_qual_flag": 9,
+        "retrieval_qual_decoded": {
+          "raw_value": 9,
+          "bit_0_not_recommended": true,
+          "bit_1_not_attempted": false,
+          "bit_2_unsuccessful": false,
+          "bit_3_surface_advisory": true,
+          "active_bits": [
+            "retrieval_not_recommended",
+            "surface_vegetation_topography_advisory"
+          ],
+          "summary": "retrieval_not_recommended, surface_vegetation_topography_advisory"
+        }
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "SMAP": "9 km EASE-Grid 2.0"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:52:43Z",
+      "processed_at": "2026-11-14T07:52:57Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\smap\\SMAP_L3_SM_P_E_20240111_R19240_001.subset.dap.nc4"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_SMAP_SPL3SMP_E_20240112T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-12T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "soil_moisture_surface_m3_m3": {
+        "value": null,
+        "unit": "m3/m3",
+        "raw_variable": "soil_moisture",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "NO_BITMASK",
+        "is_missing": true,
+        "extraction_mode": "no_overpass_covering_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_PM; grid_center=None; qual_bits=[unavailable]"
+      },
+      "smap_retrieval_quality_flag": {
+        "value": null,
+        "unit": "bitmask",
+        "raw_variable": "retrieval_qual_flag",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "NO_BITMASK",
+        "is_missing": true,
+        "extraction_mode": "no_overpass_covering_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_PM; grid_center=None; qual_bits=[unavailable]"
+      }
+    },
+    "flat_observations": {
+      "soil_moisture_surface_m3_m3": null,
+      "smap_retrieval_quality_flag": null
+    },
+    "metadata": {
+      "sources": [
+        "SMAP"
+      ],
+      "product_names": [
+        "SPL3SMP_E"
+      ],
+      "product_versions": {
+        "SPL3SMP_E": "006"
+      },
+      "quality_status": "INCOMPLETE",
+      "quality_flags": {
+        "retrieval_qual_flag": null,
+        "retrieval_qual_decoded": null
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "SMAP": "9 km EASE-Grid 2.0"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:52:46Z",
+      "processed_at": "2026-11-14T07:52:57Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\smap\\SMAP_L3_SM_P_E_20240112_R19240_001.subset.dap.nc4"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_SMAP_SPL3SMP_E_20240113T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-13T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "soil_moisture_surface_m3_m3": {
+        "value": 0.439498,
+        "unit": "m3/m3",
+        "raw_variable": "soil_moisture",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": 9,
+        "is_missing": false,
+        "extraction_mode": "nearest_grid_cell_containing_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_AM; grid_center={'lat': 14.010609, 'lon': 121.229256}; qual_bits=[retrieval_not_recommended, surface_vegetation_topography_advisory]"
+      },
+      "smap_retrieval_quality_flag": {
+        "value": 9.0,
+        "unit": "bitmask",
+        "raw_variable": "retrieval_qual_flag",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": 9,
+        "is_missing": false,
+        "extraction_mode": "nearest_grid_cell_containing_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_AM; grid_center={'lat': 14.010609, 'lon': 121.229256}; qual_bits=[retrieval_not_recommended, surface_vegetation_topography_advisory]"
+      }
+    },
+    "flat_observations": {
+      "soil_moisture_surface_m3_m3": 0.439498,
+      "smap_retrieval_quality_flag": 9.0
+    },
+    "metadata": {
+      "sources": [
+        "SMAP"
+      ],
+      "product_names": [
+        "SPL3SMP_E"
+      ],
+      "product_versions": {
+        "SPL3SMP_E": "006"
+      },
+      "quality_status": "VALID_WITH_WARNINGS",
+      "quality_flags": {
+        "retrieval_qual_flag": 9,
+        "retrieval_qual_decoded": {
+          "raw_value": 9,
+          "bit_0_not_recommended": true,
+          "bit_1_not_attempted": false,
+          "bit_2_unsuccessful": false,
+          "bit_3_surface_advisory": true,
+          "active_bits": [
+            "retrieval_not_recommended",
+            "surface_vegetation_topography_advisory"
+          ],
+          "summary": "retrieval_not_recommended, surface_vegetation_topography_advisory"
+        }
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "SMAP": "9 km EASE-Grid 2.0"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:52:49Z",
+      "processed_at": "2026-11-14T07:52:57Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\smap\\SMAP_L3_SM_P_E_20240113_R19240_001.subset.dap.nc4"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_SMAP_SPL3SMP_E_20240114T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-14T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "soil_moisture_surface_m3_m3": {
+        "value": null,
+        "unit": "m3/m3",
+        "raw_variable": "soil_moisture",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "NO_BITMASK",
+        "is_missing": true,
+        "extraction_mode": "no_overpass_covering_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_PM; grid_center=None; qual_bits=[unavailable]"
+      },
+      "smap_retrieval_quality_flag": {
+        "value": null,
+        "unit": "bitmask",
+        "raw_variable": "retrieval_qual_flag",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "NO_BITMASK",
+        "is_missing": true,
+        "extraction_mode": "no_overpass_covering_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_PM; grid_center=None; qual_bits=[unavailable]"
+      }
+    },
+    "flat_observations": {
+      "soil_moisture_surface_m3_m3": null,
+      "smap_retrieval_quality_flag": null
+    },
+    "metadata": {
+      "sources": [
+        "SMAP"
+      ],
+      "product_names": [
+        "SPL3SMP_E"
+      ],
+      "product_versions": {
+        "SPL3SMP_E": "006"
+      },
+      "quality_status": "INCOMPLETE",
+      "quality_flags": {
+        "retrieval_qual_flag": null,
+        "retrieval_qual_decoded": null
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "SMAP": "9 km EASE-Grid 2.0"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:52:52Z",
+      "processed_at": "2026-11-14T07:52:57Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\smap\\SMAP_L3_SM_P_E_20240114_R19240_002.subset.dap.nc4"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_SMAP_SPL3SMP_E_20240115T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-15T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "soil_moisture_surface_m3_m3": {
+        "value": null,
+        "unit": "m3/m3",
+        "raw_variable": "soil_moisture",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "NO_BITMASK",
+        "is_missing": true,
+        "extraction_mode": "no_overpass_covering_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_PM; grid_center=None; qual_bits=[unavailable]"
+      },
+      "smap_retrieval_quality_flag": {
+        "value": null,
+        "unit": "bitmask",
+        "raw_variable": "retrieval_qual_flag",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "NO_BITMASK",
+        "is_missing": true,
+        "extraction_mode": "no_overpass_covering_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_PM; grid_center=None; qual_bits=[unavailable]"
+      }
+    },
+    "flat_observations": {
+      "soil_moisture_surface_m3_m3": null,
+      "smap_retrieval_quality_flag": null
+    },
+    "metadata": {
+      "sources": [
+        "SMAP"
+      ],
+      "product_names": [
+        "SPL3SMP_E"
+      ],
+      "product_versions": {
+        "SPL3SMP_E": "006"
+      },
+      "quality_status": "INCOMPLETE",
+      "quality_flags": {
+        "retrieval_qual_flag": null,
+        "retrieval_qual_decoded": null
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "SMAP": "9 km EASE-Grid 2.0"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:52:55Z",
+      "processed_at": "2026-11-14T07:52:57Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\smap\\SMAP_L3_SM_P_E_20240115_R19240_001.subset.dap.nc4"
+    }
+  }
+]

@@ -412,8 +412,8 @@
         <span class="label green">NASA POWER · Live Verified</span>
         <span class="label green">GPM IMERG · Live Verified</span>
         <span class="label green">SMAP L3 · Live Verified</span>
-        <span class="label green">FastAPI · 10 Endpoints</span>
-        <span class="label green">pytest · 8 / 8 Passing</span>
+        <span class="label green">FastAPI · 12 Endpoints</span>
+        <span class="label green">pytest · 10 / 10 Passing</span>
       </div>
 
       <div class="grid-3">
@@ -423,14 +423,14 @@
           <div class="metric-sub">133.72 ha · 16-vertex Polygon</div>
         </div>
         <div class="card">
-          <div class="metric-label">Processed Repository</div>
-          <div class="metric-val">~0.36 MB</div>
-          <div class="metric-sub">SQLite + Parquet + JSON</div>
+          <div class="metric-label">Processed Repo (15d)</div>
+          <div class="metric-val">~0.62 MB</div>
+          <div class="metric-sub">SQLite + Merged JSON + Parquet</div>
         </div>
         <div class="card">
-          <div class="metric-label">Raw Global Granules (3d)</div>
-          <div class="metric-val">1.99 GB</div>
-          <div class="metric-sub">~637 MB/d SMAP + ~26.7 MB/d GPM</div>
+          <div class="metric-label">OPeNDAP Raw Subsets (15d)</div>
+          <div class="metric-val">1.07 MB</div>
+          <div class="metric-sub">~38.9 KB/d SMAP + ~34.3 KB/d GPM (vs 9.95 GB global)</div>
         </div>
       </div>
     </div>
@@ -446,9 +446,9 @@
         <div class="flow-arrow">&rarr;</div>
         <div class="flow-step"><strong>2. CMR Discovery</strong><small>Granule coverage manifests</small></div>
         <div class="flow-arrow">&rarr;</div>
-        <div class="flow-step"><strong>3. Raw Cache</strong><small>Unchanged in <code>data/raw/</code></small></div>
+        <div class="flow-step"><strong>3. OPeNDAP Subset</strong><small><code>.dap.nc4</code> in <code>data/raw/</code></small></div>
         <div class="flow-arrow">&rarr;</div>
-        <div class="flow-step"><strong>4. Subset &amp; Units</strong><small>Nearest cell, <code>0.25°</code> guard</small></div>
+        <div class="flow-step"><strong>4. IDW, ET₀ &amp; Units</strong><small>2×2 IDW, <code>0.25°</code> guard</small></div>
         <div class="flow-arrow">&rarr;</div>
         <div class="flow-step"><strong>5. QC &amp; Schema</strong><small>Extreme preservation, nulls</small></div>
         <div class="flow-arrow">&rarr;</div>
@@ -484,9 +484,10 @@
           <p style="font-size:0.85rem; margin-bottom:0;">
             Because the farm AOI (<code>1.34 km²</code>) is smaller than native grid pixels
             (POWER <code>~55 km</code>, GPM <code>~11 km</code>, SMAP <code>9 km</code>),
-            <code>raster_processor.py</code> uses <code>nearest_grid_cell_containing_aoi</code> and enforces a
-            <code>0.25°</code> (~27 km) swath distance check so SMAP orbital miss days report
-            <code>no_overpass_covering_aoi</code> instead of matching a distant pixel.
+            <code>raster_processor.py</code> applies <strong>2×2 IDW interpolation</strong>
+            (<code>idw_2x2_coarse_grid</code>, logging <code>nearest_pixel</code> and <code>neighborhood_max</code>)
+            for 1D GPM grids, and enforces a <code>0.25°</code> (~27 km) swath guard for SMAP AM/PM
+            EASE-Grid 2.0 subsets so orbital miss days record <code>no_overpass_covering_aoi</code> (<code>null</code>).
           </p>
         </div>
       </div>
@@ -511,25 +512,25 @@
               <td>1</td>
               <td><strong>NASA POWER</strong></td>
               <td><code>NASA_POWER_AG_DAILY</code> (v2.10.3)</td>
-              <td><code>air_temperature_c</code> (degC), <code>precipitation_mm</code> (mm/day), <code>relative_humidity_pct</code> (%), <code>solar_radiation_mj_m2_day</code>, <code>wind_speed_m_s</code>, <code>surface_soil_wetness_index</code></td>
+              <td><code>air_temperature_c</code> (degC), <code>precipitation_mm</code> (mm/day), <code>et0_mm_day</code> (FAO-56 mm/day), <code>relative_humidity_pct</code> (%), <code>solar_radiation_mj_m2_day</code>, <code>wind_speed_m_s</code>, <code>surface_soil_wetness_index</code></td>
               <td>0.5° × 0.625° (~55 km) · Daily</td>
-              <td><span class="label green">Live Verified</span></td>
+              <td><span class="label green">Live Verified (15d)</span></td>
             </tr>
             <tr>
               <td>2</td>
               <td><strong>GPM IMERG</strong></td>
               <td><code>GPM_3IMERGDF</code> (Final ~3.5 mo), <code>GPM_3IMERGDL</code> (Late ~14 hr), <code>GPM_3IMERGHHE</code> (Early ~4 hr) V07B</td>
-              <td><code>precipitation_mm</code> (mm/day accumulation) vs. <code>precipitation_rate_mm_hr</code> (mm/hr rate), <code>randomError</code>, <code>precipitation_cnt</code></td>
+              <td><code>precipitation_imerg_mm</code> &amp; <code>precipitation_mm</code> (2×2 IDW mm/day), <code>precipitation_rate_mm_hr</code> (mm/hr), <code>randomError</code>, <code>precipitation_cnt</code></td>
               <td>0.1° × 0.1° (~11 km) · Daily / 30-min</td>
-              <td><span class="label green">Live Verified (DF)</span></td>
+              <td><span class="label green">Live Verified (15d)</span></td>
             </tr>
             <tr>
               <td>3</td>
               <td><strong>SMAP</strong></td>
               <td><code>SPL3SMP_E</code> v006 (Daily L3), <code>SPL4SMGP</code> v008 (3-Hr L4)</td>
-              <td><code>soil_moisture_surface_m3_m3</code> (m³/m³), <code>soil_moisture_rootzone_m3_m3</code>, <code>smap_retrieval_quality_flag</code></td>
+              <td><code>soil_moisture_surface_m3_m3</code> (m³/m³), <code>soil_moisture_rootzone_m3_m3</code>, <code>smap_retrieval_quality_flag</code> + <code>retrieval_qual_decoded</code></td>
               <td>9 km EASE-Grid 2.0 · Daily / 3-Hr</td>
-              <td><span class="label green">Live Verified (L3)</span></td>
+              <td><span class="label green">Live Verified (15d)</span></td>
             </tr>
             <tr>
               <td>4–6</td>
@@ -545,13 +546,14 @@
     </section>
 
     <section id="live-results">
-      <h2>5. Live Verified Observations (2024-01-01 .. 2024-01-03)</h2>
-      <p>Actual retrieved and standardized observations processed for <code>Lipa_Cropland_AOI</code>:</p>
+      <h2>5. Live Verified Observations (2024-01-01 .. 2024-01-15)</h2>
+      <p>Actual 15-day retrieved, derived (FAO-56 ET₀), and merged observations processed for <code>Lipa_Cropland_AOI</code>:</p>
 
       <div class="tabs">
-        <button class="tab-btn active" type="button" data-tab="power">NASA POWER (Daily)</button>
-        <button class="tab-btn" type="button" data-tab="gpm">GPM IMERG (Final V07B)</button>
-        <button class="tab-btn" type="button" data-tab="smap">SMAP L3 (SPL3SMP_E v006)</button>
+        <button class="tab-btn active" type="button" data-tab="merged">Daily Merged (15d)</button>
+        <button class="tab-btn" type="button" data-tab="power">NASA POWER + ET₀</button>
+        <button class="tab-btn" type="button" data-tab="gpm">GPM IMERG (2×2 IDW)</button>
+        <button class="tab-btn" type="button" data-tab="smap">SMAP L3 (Bitmask)</button>
       </div>
 
       <div class="card" id="tabContent"></div>
@@ -561,40 +563,41 @@
       <h2>6. Storage Layers &amp; Disk Size Estimator</h2>
       <div class="grid-2">
         <div class="card">
-          <h3 style="margin-top:0;">Observed Disk Footprint (Current Run)</h3>
-          <div class="bar-row"><span class="bar-label">SMAP L3 Raw (3d)</span><div class="bar-track"><div class="bar-fill" style="width:96%"></div></div><span>1,911.4 MB</span></div>
-          <div class="bar-row"><span class="bar-label">GPM IMERG Raw (3d)</span><div class="bar-track"><div class="bar-fill" style="width:12%"></div></div><span>80.1 MB</span></div>
-          <div class="bar-row"><span class="bar-label">NASA POWER Raw</span><div class="bar-track"><div class="bar-fill" style="width:1%"></div></div><span>9.9 KB</span></div>
-          <div class="bar-row"><span class="bar-label">SQLite + JSON + Parquet</span><div class="bar-track"><div class="bar-fill" style="width:2%"></div></div><span>0.27 MB</span></div>
+          <h3 style="margin-top:0;">Observed Disk Footprint (15-Day Live Run)</h3>
+          <div class="bar-row"><span class="bar-label">SMAP OPeNDAP Raw (15d)</span><div class="bar-track"><div class="bar-fill" style="width:92%"></div></div><span>583.9 KB</span></div>
+          <div class="bar-row"><span class="bar-label">GPM OPeNDAP Raw (15d)</span><div class="bar-track"><div class="bar-fill" style="width:81%"></div></div><span>514.9 KB</span></div>
+          <div class="bar-row"><span class="bar-label">Processed SQLite + JSON + Parquet</span><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div><span>632.1 KB</span></div>
+          <div class="bar-row"><span class="bar-label">NASA POWER Raw</span><div class="bar-track"><div class="bar-fill" style="width:2%"></div></div><span>9.9 KB</span></div>
           <p style="font-size:0.82rem; margin:12px 0 0;">
-            Raw files are global NetCDF4/HDF5 granules prior to clipping. After extraction, the entire
-            <code>data/processed/</code> SQLite, JSON, and Parquet store takes <strong>&lt; 0.5 MB</strong>.
+            Server-side OPeNDAP DAP4 subsetting slices global HDF5/NetCDF4 granules before download,
+            cutting 15 days of satellite raw downloads from <strong>~9.95 GB</strong> down to
+            <strong>~1.07 MB</strong>.
           </p>
         </div>
 
         <div class="card">
-          <h3 style="margin-top:0;">Download Size Estimator</h3>
+          <h3 style="margin-top:0;">OPeNDAP Subset Size Estimator</h3>
           <label for="daysSlider" style="font-size:0.85rem; color:var(--text-muted);">
-            Date Range Length: <strong id="daysLabel" style="color:var(--text);">7 days</strong>
+            Date Range Length: <strong id="daysLabel" style="color:var(--text);">15 days</strong>
           </label>
-          <input type="range" id="daysSlider" min="1" max="90" value="7" />
+          <input type="range" id="daysSlider" min="1" max="365" value="15" />
           <div class="grid-3" style="margin-top:14px;">
             <div>
-              <div class="metric-label">SMAP Raw (.h5)</div>
-              <div class="metric-val" id="estSmap" style="font-size:1.15rem;">4.36 GB</div>
+              <div class="metric-label">SMAP Subset (.dap.nc4)</div>
+              <div class="metric-val" id="estSmap" style="font-size:1.15rem;">584 KB</div>
             </div>
             <div>
-              <div class="metric-label">GPM Raw (.nc4)</div>
-              <div class="metric-val" id="estGpm" style="font-size:1.15rem;">187 MB</div>
+              <div class="metric-label">GPM Subset (.dap.nc4)</div>
+              <div class="metric-val" id="estGpm" style="font-size:1.15rem;">515 KB</div>
             </div>
             <div>
               <div class="metric-label">Processed Repo</div>
-              <div class="metric-val" id="estProc" style="font-size:1.15rem;">~0.11 MB</div>
+              <div class="metric-val" id="estProc" style="font-size:1.15rem;">632 KB</div>
             </div>
           </div>
           <p style="font-size:0.78rem; margin:12px 0 0;">
-            Observed rates: SMAP <code>~637 MB/day</code>, GPM <code>~26.7 MB/day</code>,
-            POWER <code>~0.4 KB/day</code>, Processed repo <code>~16 KB/day</code>.
+            OPeNDAP rates: SMAP <code>~38.9 KB/day</code> (vs 637 MB/d global), GPM <code>~34.3 KB/day</code> (vs 26.7 MB/d global),
+            Processed repo <code>~42 KB/day</code>. Full-globe downloads avoided: <strong id="estSaved">9.96 GB</strong>.
           </p>
         </div>
       </div>
@@ -613,20 +616,27 @@
           </ul>
         </div>
         <div class="card">
-          <h3 style="margin-top:0;">Sample JSON Record</h3>
+          <h3 style="margin-top:0;">Sample Merged Daily Record</h3>
           <pre><button class="copy-btn" data-copy="schemaPre">Copy</button><code id="schemaPre">{
-  "record_id": "lipa_cropland_001_SMAP_SPL3SMP_E_20240102T000000Z",
+  "date": "2024-01-08",
   "location_id": "lipa_cropland_001",
-  "timestamp": "2024-01-02T00:00:00Z",
+  "sources": ["NASA_POWER", "GPM_IMERG", "SMAP"],
+  "quality_status": "VALID_WITH_WARNINGS",
   "flat_observations": {
-    "soil_moisture_surface_m3_m3": 0.408539,
+    "air_temperature_c": 25.03,
+    "et0_mm_day": 2.1648,
+    "precipitation_mm": 11.73,
+    "precipitation_imerg_mm": 5.369804,
+    "soil_moisture_surface_m3_m3": 0.504141,
     "smap_retrieval_quality_flag": 9.0
   },
-  "metadata": {
-    "sources": ["SMAP"],
-    "quality_status": "VALID_WITH_WARNINGS",
-    "observation_types": ["satellite"],
-    "spatial_resolution": {"SMAP": "9 km EASE-Grid 2.0"}
+  "quality_flags": {
+    "SMAP": {
+      "retrieval_qual_decoded": {
+        "raw_value": 9,
+        "summary": "retrieval_not_recommended, surface_vegetation_topography_advisory"
+      }
+    }
   }
 }</code></pre>
         </div>
@@ -647,7 +657,9 @@
             <option value="/health">GET /health</option>
             <option value="/aoi">GET /aoi</option>
             <option value="/datasets">GET /datasets</option>
-            <option value="/observations?start_date=2024-01-01&end_date=2024-01-03">GET /observations?start_date=2024-01-01&amp;end_date=2024-01-03</option>
+            <option value="/observations/daily-merged?start_date=2024-01-01&end_date=2024-01-15">GET /observations/daily-merged?start_date=2024-01-01&amp;end_date=2024-01-15</option>
+            <option value="/observations?start_date=2024-01-01&end_date=2024-01-15">GET /observations?start_date=2024-01-01&amp;end_date=2024-01-15</option>
+            <option value="/observations/evapotranspiration">GET /observations/evapotranspiration</option>
             <option value="/observations/precipitation">GET /observations/precipitation</option>
             <option value="/observations/soil-moisture">GET /observations/soil-moisture</option>
             <option value="/observations/temperature">GET /observations/temperature</option>
@@ -660,8 +672,10 @@
         <pre style="margin-top:12px; max-height:260px;"><code id="apiOutput">Click "Send Request" while `python main.py --action serve` is running locally.</code></pre>
       </div>
 
+      <div class="endpoint-card"><span class="label green">GET</span> <code>/observations/daily-merged</code> — Harmonized daily rows merging POWER (<code>precipitation_mm</code>, <code>et0_mm_day</code>), GPM (<code>precipitation_imerg_mm</code>), and SMAP (<code>soil_moisture_surface_m3_m3</code>).</div>
+      <div class="endpoint-card"><span class="label green">GET</span> <code>/observations/evapotranspiration</code> — Daily FAO-56 Penman-Monteith reference evapotranspiration (<code>et0_mm_day</code>).</div>
       <div class="endpoint-card"><span class="label green">GET</span> <code>/observations</code> — Filter by <code>start_date</code>, <code>end_date</code>, <code>dataset</code>, <code>variable</code>, <code>aoi_id</code>, <code>quality_status</code>.</div>
-      <div class="endpoint-card"><span class="label green">GET</span> <code>/observations/precipitation</code> — Separates daily accumulation (<code>mm/day</code>) from rate (<code>mm/hr</code>).</div>
+      <div class="endpoint-card"><span class="label green">GET</span> <code>/observations/precipitation</code> — Separates daily POWER/IMERG accumulation (<code>mm/day</code>) from rate (<code>mm/hr</code>).</div>
       <div class="endpoint-card"><span class="label green">GET</span> <code>/observations/soil-moisture</code> — Distinguishes satellite volumetric <code>m³/m³</code> (SMAP) from modeled wetness indices (POWER).</div>
       <div class="endpoint-card"><span class="label green">GET</span> <code>/observations/temperature</code> — Daily mean, max, and min air temperature (<code>degC</code>).</div>
       <div class="endpoint-card"><span class="label yellow">GET</span> <code>/observations/vegetation</code> — Reserved for Phase 6 MODIS <code>MOD13Q1</code> NDVI/EVI.</div>
@@ -672,10 +686,10 @@
       <pre><button class="copy-btn" data-copy="cliPre">Copy</button><code id="cliPre"># Install dependencies &amp; configure Earthdata token
 pip install -r requirements.txt
 cp .env.example .env
-# Edit .env and set EARTHDATA_TOKEN=... (approve GESDISC + NSIDC Cumulus Data on urs.earthdata.nasa.gov)
+# Edit .env and set EARTHDATA_TOKEN=... (approve GESDISC + NSIDC Cumulus Data + NSIDC V0 OPeNDAP on urs.earthdata.nasa.gov)
 
-# Run full pipeline for a 3-day window
-python main.py --start-date 2024-01-01 --end-date 2024-01-03
+# Run full 15-day OPeNDAP pipeline (~1.07 MB total raw satellite downloads)
+python main.py --start-date 2024-01-01 --end-date 2024-01-15
 
 # Individual actions
 python main.py --action discover
@@ -688,12 +702,12 @@ python main.py --action serve --port 8000</code></pre>
       <h2>10. Tests &amp; Troubleshooting</h2>
       <div class="card">
         <p style="margin-bottom:10px;">
-          <span class="label green">8 / 8 Passing</span>
+          <span class="label green">10 / 10 Passing</span>
           <strong>Run automated suite:</strong> <code>pytest -v</code>
         </p>
         <ul>
-          <li><span class="label red">401 / 403 Error</span> Approve <code>NASA GESDISC DATA ARCHIVE</code>, <code>NSIDC Cumulus Data</code>, and <code>NSIDC_DATAPOOL_OPS</code> in your URS profile.</li>
-          <li><span class="label yellow">Swath Gap</span> <code>no_overpass_covering_aoi</code> in SMAP is expected on days when SMAP's 2–3 day tropical orbit misses Lipa.</li>
+          <li><span class="label red">401 / 403 Error</span> Approve <code>NASA GESDISC DATA ARCHIVE</code>, <code>NSIDC Cumulus Data</code>, <code>NSIDC V0 OPeNDAP</code>, and <code>NSIDC_DATAPOOL_OPS</code> in your URS profile.</li>
+          <li><span class="label yellow">Swath Gap</span> <code>no_overpass_covering_aoi</code> in SMAP is expected on days when SMAP's 2–3 day tropical orbit misses Lipa (7 overpasses + 8 swath gaps across Jan 1–15, 2024).</li>
           <li><span class="label yellow">3.5 mo Lag</span> Switch <code>preferred_product</code> in <code>config/farm_config.yaml</code> from <code>GPM_3IMERGDF</code> to <code>GPM_3IMERGDL</code> for ~14-hour latency.</li>
         </ul>
       </div>
@@ -769,34 +783,60 @@ python main.py --action serve --port 8000</code></pre>
 
     // 3. Tabbed Live Data Explorer
     const tabData = {
-      power: `
-        <h3 style="margin-top:0;">NASA POWER Agroclimatology (NASA_POWER_AG_DAILY v2.10.3)</h3>
+      merged: `
+        <h3 style="margin-top:0;">Harmonized Daily Merged View (<code>terra_daily_merged.json</code> · 2024-01-01 .. 2024-01-15)</h3>
         <div class="table-wrap"><table>
-          <thead><tr><th>Date (UTC)</th><th>Temp Mean / Min / Max</th><th>Precip</th><th>RH2M</th><th>Solar</th><th>Wetness (Top / Root)</th><th>Status</th></tr></thead>
+          <thead><tr><th>Date (UTC)</th><th>Temp Mean</th><th>ET₀ (FAO-56)</th><th>POWER Precip</th><th>IMERG Precip (IDW)</th><th>SMAP 9 km SM</th><th>Merged Status</th></tr></thead>
           <tbody>
-            <tr><td>2024-01-01</td><td>25.96 °C (24.27–28.65)</td><td>3.42 mm/d</td><td>92.39%</td><td>16.68 MJ/m²/d</td><td>0.92 / 0.95</td><td><span class="label green">VALID</span></td></tr>
-            <tr><td>2024-01-02</td><td>25.87 °C (23.63–29.52)</td><td>2.34 mm/d</td><td>90.39%</td><td>14.89 MJ/m²/d</td><td>0.92 / 0.95</td><td><span class="label green">VALID</span></td></tr>
-            <tr><td>2024-01-03</td><td>25.94 °C (23.47–29.94)</td><td>1.32 mm/d</td><td>89.15%</td><td>14.28 MJ/m²/d</td><td>0.91 / 0.94</td><td><span class="label green">VALID</span></td></tr>
+            <tr><td>2024-01-01</td><td>25.96 °C</td><td>3.1400 mm/d</td><td>3.42 mm/d</td><td>0.0000 mm/d</td><td><code>null</code> (swath gap)</td><td><span class="label yellow">INCOMPLETE</span></td></tr>
+            <tr><td>2024-01-02</td><td>25.87 °C</td><td>2.9136 mm/d</td><td>2.34 mm/d</td><td>0.0000 mm/d</td><td><strong>0.408539 m³/m³</strong></td><td><span class="label yellow">VALID_WITH_WARNINGS</span></td></tr>
+            <tr><td>2024-01-03</td><td>25.94 °C</td><td>2.8484 mm/d</td><td>1.32 mm/d</td><td>0.0000 mm/d</td><td><strong>0.474740 m³/m³</strong></td><td><span class="label yellow">VALID_WITH_WARNINGS</span></td></tr>
+            <tr><td>2024-01-04</td><td>25.32 °C</td><td>2.6201 mm/d</td><td>3.62 mm/d</td><td>0.0000 mm/d</td><td><code>null</code> (swath gap)</td><td><span class="label yellow">INCOMPLETE</span></td></tr>
+            <tr><td>2024-01-05</td><td>24.94 °C</td><td>2.3269 mm/d</td><td>3.25 mm/d</td><td><strong>2.5643 mm/d</strong></td><td><strong>0.500053 m³/m³</strong></td><td><span class="label yellow">VALID_WITH_WARNINGS</span></td></tr>
+            <tr><td>2024-01-06</td><td>24.83 °C</td><td>2.7183 mm/d</td><td>1.60 mm/d</td><td>0.0312 mm/d</td><td><code>null</code> (swath gap)</td><td><span class="label yellow">INCOMPLETE</span></td></tr>
+            <tr><td>2024-01-07</td><td>24.76 °C</td><td>2.6931 mm/d</td><td>1.51 mm/d</td><td>0.0000 mm/d</td><td><code>null</code> (swath gap)</td><td><span class="label yellow">INCOMPLETE</span></td></tr>
+            <tr><td>2024-01-08</td><td>25.03 °C</td><td>2.1648 mm/d</td><td>11.73 mm/d</td><td><strong>5.3698 mm/d</strong></td><td><strong>0.504141 m³/m³</strong></td><td><span class="label yellow">VALID_WITH_WARNINGS</span></td></tr>
+            <tr><td>2024-01-09</td><td>25.88 °C</td><td>3.3834 mm/d</td><td>7.80 mm/d</td><td>0.0512 mm/d</td><td><code>null</code> (swath gap)</td><td><span class="label yellow">INCOMPLETE</span></td></tr>
+            <tr><td>2024-01-10</td><td>26.24 °C</td><td>3.5616 mm/d</td><td>0.81 mm/d</td><td>0.0000 mm/d</td><td><strong>0.463665 m³/m³</strong></td><td><span class="label yellow">VALID_WITH_WARNINGS</span></td></tr>
+            <tr><td>2024-01-11</td><td>24.48 °C</td><td>2.9248 mm/d</td><td>1.07 mm/d</td><td>0.0000 mm/d</td><td><strong>0.473746 m³/m³</strong></td><td><span class="label yellow">VALID_WITH_WARNINGS</span></td></tr>
+            <tr><td>2024-01-12</td><td>23.47 °C</td><td>2.6143 mm/d</td><td>0.65 mm/d</td><td>0.0000 mm/d</td><td><code>null</code> (swath gap)</td><td><span class="label yellow">INCOMPLETE</span></td></tr>
+            <tr><td>2024-01-13</td><td>23.41 °C</td><td>2.4664 mm/d</td><td>2.00 mm/d</td><td>0.0000 mm/d</td><td><strong>0.439498 m³/m³</strong></td><td><span class="label yellow">VALID_WITH_WARNINGS</span></td></tr>
+            <tr><td>2024-01-14</td><td>23.57 °C</td><td>2.1400 mm/d</td><td>4.41 mm/d</td><td>0.4588 mm/d</td><td><code>null</code> (swath gap)</td><td><span class="label yellow">INCOMPLETE</span></td></tr>
+            <tr><td>2024-01-15</td><td>23.52 °C</td><td>2.4981 mm/d</td><td>3.43 mm/d</td><td>0.0141 mm/d</td><td><code>null</code> (swath gap)</td><td><span class="label yellow">INCOMPLETE</span></td></tr>
+          </tbody>
+        </table></div>`,
+      power: `
+        <h3 style="margin-top:0;">NASA POWER Agroclimatology + FAO-56 ET₀ (NASA_POWER_AG_DAILY v2.10.3)</h3>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Date (UTC)</th><th>Temp Mean (Min–Max)</th><th>Precip</th><th>ET₀ (FAO-56)</th><th>RH2M</th><th>Solar</th><th>Wetness (Top / Root)</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>2024-01-01</td><td>25.96 °C (24.27–28.65)</td><td>3.42 mm/d</td><td><strong>3.1400 mm/d</strong></td><td>92.39%</td><td>16.68 MJ/m²/d</td><td>0.92 / 0.95</td><td><span class="label green">VALID</span></td></tr>
+            <tr><td>2024-01-02</td><td>25.87 °C (23.63–29.52)</td><td>2.34 mm/d</td><td><strong>2.9136 mm/d</strong></td><td>90.39%</td><td>14.89 MJ/m²/d</td><td>0.92 / 0.95</td><td><span class="label green">VALID</span></td></tr>
+            <tr><td>2024-01-03</td><td>25.94 °C (23.47–29.94)</td><td>1.32 mm/d</td><td><strong>2.8484 mm/d</strong></td><td>89.15%</td><td>14.28 MJ/m²/d</td><td>0.91 / 0.94</td><td><span class="label green">VALID</span></td></tr>
+            <tr><td>2024-01-05</td><td>24.94 °C (23.07–28.47)</td><td>3.25 mm/d</td><td><strong>2.3269 mm/d</strong></td><td>89.80%</td><td>11.09 MJ/m²/d</td><td>0.91 / 0.94</td><td><span class="label green">VALID</span></td></tr>
+            <tr><td>2024-01-08</td><td>25.03 °C (22.98–28.56)</td><td>11.73 mm/d</td><td><strong>2.1648 mm/d</strong></td><td>91.08%</td><td>10.23 MJ/m²/d</td><td>0.91 / 0.93</td><td><span class="label green">VALID</span></td></tr>
           </tbody>
         </table></div>`,
       gpm: `
-        <h3 style="margin-top:0;">GPM IMERG Final Run (GPM_3IMERGDF V07B · ~11 km grid center 13.95° N, 121.15° E)</h3>
+        <h3 style="margin-top:0;">GPM IMERG Final Run (GPM_3IMERGDF V07B · 2×2 IDW around 13.95° N, 121.15° E)</h3>
         <div class="table-wrap"><table>
-          <thead><tr><th>Date (UTC)</th><th>Precipitation</th><th>Random Error</th><th>Valid Samples</th><th>Extraction Mode</th><th>Status</th></tr></thead>
+          <thead><tr><th>Date (UTC)</th><th>IDW Precip</th><th>Nearest Pixel / Neighbor Max</th><th>Random Error</th><th>Extraction Mode</th><th>Status</th></tr></thead>
           <tbody>
-            <tr><td>2024-01-01</td><td>0.0 mm/day</td><td>2.764801 mm/day</td><td>48 / 48</td><td>nearest_grid_cell_containing_aoi</td><td><span class="label green">VALID</span></td></tr>
-            <tr><td>2024-01-02</td><td>0.0 mm/day</td><td>2.764801 mm/day</td><td>48 / 48</td><td>nearest_grid_cell_containing_aoi</td><td><span class="label green">VALID</span></td></tr>
-            <tr><td>2024-01-03</td><td>0.0 mm/day</td><td>2.764801 mm/day</td><td>48 / 48</td><td>nearest_grid_cell_containing_aoi</td><td><span class="label green">VALID</span></td></tr>
+            <tr><td>2024-01-01</td><td>0.000000 mm/d</td><td>0.0 / 0.0 mm/d</td><td>2.764801 mm/d</td><td>idw_2x2_coarse_grid</td><td><span class="label green">VALID</span></td></tr>
+            <tr><td>2024-01-05</td><td><strong>2.564271 mm/d</strong></td><td>1.535 / 5.23 mm/d</td><td>237.067484 mm/d</td><td>idw_2x2_coarse_grid</td><td><span class="label green">VALID</span></td></tr>
+            <tr><td>2024-01-08</td><td><strong>5.369804 mm/d</strong></td><td>1.37 / 20.68 mm/d</td><td>632.356028 mm/d</td><td>idw_2x2_coarse_grid</td><td><span class="label green">VALID</span></td></tr>
           </tbody>
         </table></div>`,
       smap: `
-        <h3 style="margin-top:0;">SMAP L3 Enhanced 9 km Soil Moisture (SPL3SMP_E v006)</h3>
+        <h3 style="margin-top:0;">SMAP L3 Enhanced 9 km Soil Moisture (SPL3SMP_E v006 · OPeNDAP Subsets)</h3>
         <div class="table-wrap"><table>
-          <thead><tr><th>Date (UTC)</th><th>Surface Soil Moisture</th><th>Quality Bitmask</th><th>Extraction Mode</th><th>Status</th></tr></thead>
+          <thead><tr><th>Date (UTC)</th><th>Surface Soil Moisture</th><th>Bitmask</th><th>Decoded Quality Flags</th><th>Status</th></tr></thead>
           <tbody>
             <tr><td>2024-01-01</td><td><code>null</code></td><td><code>null</code></td><td><span class="label red">no_overpass_covering_aoi</span></td><td><span class="label yellow">INCOMPLETE</span></td></tr>
-            <tr><td>2024-01-02</td><td><strong>0.408539 m³/m³</strong></td><td>9</td><td>nearest_grid_cell_containing_aoi</td><td><span class="label yellow">VALID_WITH_WARNINGS</span></td></tr>
-            <tr><td>2024-01-03</td><td><strong>0.474740 m³/m³</strong></td><td>9</td><td>nearest_grid_cell_containing_aoi</td><td><span class="label yellow">VALID_WITH_WARNINGS</span></td></tr>
+            <tr><td>2024-01-02</td><td><strong>0.408539 m³/m³</strong></td><td>9</td><td>retrieval_not_recommended, surface_vegetation_topography_advisory</td><td><span class="label yellow">VALID_WITH_WARNINGS</span></td></tr>
+            <tr><td>2024-01-03</td><td><strong>0.474740 m³/m³</strong></td><td>9</td><td>retrieval_not_recommended, surface_vegetation_topography_advisory</td><td><span class="label yellow">VALID_WITH_WARNINGS</span></td></tr>
+            <tr><td>2024-01-05</td><td><strong>0.500053 m³/m³</strong></td><td>9</td><td>retrieval_not_recommended, surface_vegetation_topography_advisory</td><td><span class="label yellow">VALID_WITH_WARNINGS</span></td></tr>
+            <tr><td>2024-01-08</td><td><strong>0.504141 m³/m³</strong></td><td>9</td><td>retrieval_not_recommended, surface_vegetation_topography_advisory</td><td><span class="label yellow">VALID_WITH_WARNINGS</span></td></tr>
           </tbody>
         </table></div>`
     };
@@ -807,19 +847,19 @@ python main.py --action serve --port 8000</code></pre>
       tabContent.innerHTML = tabData[key];
     };
     tabButtons.forEach(btn => btn.addEventListener("click", () => renderTab(btn.dataset.tab)));
-    renderTab("power");
+    renderTab("merged");
 
-    // 4. Storage Estimator
+    // 4. OPeNDAP Subset Storage Estimator
     const slider = document.getElementById("daysSlider");
+    const fmtKb = (kb) => kb >= 1024 ? `${(kb / 1024).toFixed(2)} MB` : `${Math.round(kb)} KB`;
     const updateEst = () => {
       const days = Number(slider.value);
       document.getElementById("daysLabel").textContent = `${days} day${days > 1 ? "s" : ""}`;
-      const smapMb = days * 637.1;
-      document.getElementById("estSmap").textContent = smapMb >= 1024 ? `${(smapMb / 1024).toFixed(2)} GB` : `${Math.round(smapMb)} MB`;
-      const gpmMb = days * 26.7;
-      document.getElementById("estGpm").textContent = gpmMb >= 1024 ? `${(gpmMb / 1024).toFixed(2)} GB` : `${Math.round(gpmMb)} MB`;
-      const procMb = (days * 16) / 1024;
-      document.getElementById("estProc").textContent = `~${procMb.toFixed(2)} MB`;
+      document.getElementById("estSmap").textContent = fmtKb(days * 38.9);
+      document.getElementById("estGpm").textContent = fmtKb(days * 34.3);
+      document.getElementById("estProc").textContent = fmtKb(days * 42.1);
+      const savedGb = (days * (637.1 + 26.7)) / 1024;
+      document.getElementById("estSaved").textContent = savedGb >= 1 ? `${savedGb.toFixed(2)} GB` : `${Math.round(savedGb * 1024)} MB`;
     };
     slider.addEventListener("input", updateEst);
     updateEst();

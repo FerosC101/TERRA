@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 import json
+import logging
 import re
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from collectors.earthdata_client import EarthdataClient
+from collectors.earthdata_client import EarthdataClient, build_smap_l3_opendap_subset_url
 from processors.raster_processor import extract_aoi_from_smap_hdf5
 from processors.spatial_processor import AOIInfo
 from processors.temporal_processor import normalize_timestamp, to_cmr_temporal, validate_date_range
@@ -36,6 +37,38 @@ SMAP_PRODUCT_CONFIG: dict[str, dict[str, Any]] = {
         "variables": ["sm_surface", "sm_rootzone"],
     },
 }
+
+
+def decode_smap_qual_flag(flag_val: int | float | None) -> dict[str, Any] | None:
+    """Decode SMAP SPL3SMP_E uint16 retrieval_qual_flag bitmask into readable meanings."""
+    if flag_val is None:
+        return None
+    flag_int = int(flag_val)
+    bit_definitions = {
+        0: "retrieval_not_recommended",
+        1: "retrieval_not_attempted",
+        2: "retrieval_unsuccessful",
+        3: "surface_vegetation_topography_advisory",
+    }
+    active_bits = [
+        {"bit": bit, "flag": label}
+        for bit, label in bit_definitions.items()
+        if (flag_int & (1 << bit)) != 0
+    ]
+    summary = (
+        ", ".join(item["flag"] for item in active_bits)
+        if active_bits
+        else "recommended_quality"
+    )
+    return {
+        "raw_value": flag_int,
+        "bit_0_not_recommended": bool(flag_int & 1),
+        "bit_1_not_attempted": bool(flag_int & 2),
+        "bit_2_unsuccessful": bool(flag_int & 4),
+        "bit_3_surface_advisory": bool(flag_int & 8),
+        "active_bits": [item["flag"] for item in active_bits],
+        "summary": summary,
+    }
 
 
 def _infer_timestamp_from_smap_filename(filename: str, fallback: str | None = None) -> str:
@@ -159,12 +192,30 @@ class SmapCollector:
 
         for gran in granules:
             data_url = gran.get("data_url")
-            if not data_url:
+            opendap_url = gran.get("opendap_url")
+            if not data_url and not opendap_url:
                 continue
-            fname = data_url.rstrip("/").split("/")[-1]
-            dest = self.cache.raw_path(self.dataset_key, fname)
+
+            orig_fname = (
+                data_url.rstrip("/").split("/")[-1]
+                if data_url
+                else str(gran.get("title", "smap_granule")).split(":")[-1]
+            )
+            stem = Path(orig_fname).stem
+            use_opendap = bool(opendap_url and product == "SPL3SMP_E")
+            target_url = (
+                build_smap_l3_opendap_subset_url(opendap_url, aoi.bbox)
+                if use_opendap
+                else data_url
+            )
+            dest = self.cache.raw_path(
+                self.dataset_key,
+                f"{stem}.subset.dap.nc4" if use_opendap else orig_fname,
+            )
             cache_key = self.cache.build_cache_key(
-                f"{self.dataset_key}_{product}", aoi.location_id, {"title": gran["title"]}
+                f"{self.dataset_key}_{product}",
+                aoi.location_id,
+                {"title": gran["title"], "mode": "opendap_subset" if use_opendap else "direct"},
             )
             if not force_refresh and self.cache.has_valid_file(dest):
                 raw_files.append(
@@ -173,18 +224,40 @@ class SmapCollector:
                         "time_start": gran.get("time_start"),
                         "title": gran.get("title"),
                         "retrieved_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+                        "retrieval_mode": "opendap_subset" if use_opendap else "direct_granule",
                     }
                 )
                 continue
 
-            self.client.download_authenticated(data_url, dest)
+            retrieval_mode = "opendap_subset" if use_opendap else "direct_granule"
+            downloaded_url = target_url
+            try:
+                self.client.download_authenticated(target_url, dest)
+            except Exception as exc:
+                if use_opendap and data_url:
+                    logging.getLogger("terra.pipeline").warning(
+                        "OPeNDAP subset failed for %s (%s); falling back to direct granule.",
+                        orig_fname,
+                        exc,
+                    )
+                    dest = self.cache.raw_path(self.dataset_key, orig_fname)
+                    downloaded_url = data_url
+                    retrieval_mode = "direct_granule_fallback"
+                    self.client.download_authenticated(data_url, dest)
+                else:
+                    raise
+
             entry = self.cache.record_retrieval(
                 cache_key=cache_key,
                 file_path=dest,
                 dataset=self.dataset_key,
                 aoi_id=aoi.location_id,
-                source_url=data_url,
-                extra_metadata={"product": product, "granule_id": gran.get("id")},
+                source_url=downloaded_url,
+                extra_metadata={
+                    "product": product,
+                    "granule_id": gran.get("id"),
+                    "retrieval_mode": retrieval_mode,
+                },
             )
             raw_files.append(
                 {
@@ -192,6 +265,7 @@ class SmapCollector:
                     "time_start": gran.get("time_start"),
                     "title": gran.get("title"),
                     "retrieved_at": entry["retrieved_at"],
+                    "retrieval_mode": retrieval_mode,
                 }
             )
 
@@ -239,6 +313,12 @@ class SmapCollector:
             flat_dict: dict[str, float | None] = {}
 
             qual_flag_val = extracted.get("retrieval_qual_flag", {}).get("value")
+            qual_decoded = decode_smap_qual_flag(qual_flag_val)
+            qual_note = (
+                f"qual_bits=[{qual_decoded['summary']}]"
+                if qual_decoded
+                else "qual_bits=[unavailable]"
+            )
             for raw_var, stats in extracted.items():
                 std_name = standardize_variable_name(raw_var)
                 std_val, std_unit = convert_value_and_unit(
@@ -262,7 +342,7 @@ class SmapCollector:
                     extraction_mode=stats.get("extraction_mode"),
                     notes=(
                         "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. "
-                        f"grid_center={stats.get('grid_cell_center')}"
+                        f"group={stats.get('group')}; grid_center={stats.get('grid_cell_center')}; {qual_note}"
                     ),
                 )
                 flat_dict[std_name] = std_val
@@ -285,7 +365,8 @@ class SmapCollector:
                         quality_flags={
                             "retrieval_qual_flag": (
                                 int(qual_flag_val) if qual_flag_val is not None else None
-                            )
+                            ),
+                            "retrieval_qual_decoded": qual_decoded,
                         },
                         observation_types=["satellite"],
                         spatial_resolution={self.dataset_key: spatial_res},

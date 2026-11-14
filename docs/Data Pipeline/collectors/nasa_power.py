@@ -10,7 +10,11 @@ from typing import Any
 from collectors.earthdata_client import EarthdataClient
 from processors.spatial_processor import AOIInfo
 from processors.temporal_processor import normalize_timestamp, to_power_date, validate_date_range
-from processors.unit_converter import convert_value_and_unit, standardize_variable_name
+from processors.unit_converter import (
+    compute_fao56_et0,
+    convert_value_and_unit,
+    standardize_variable_name,
+)
 from storage.cache import FileCache
 from validators.schema_validation import (
     RecordMetadata,
@@ -173,6 +177,37 @@ class NasaPowerCollector:
                     notes=note,
                 )
                 flat_dict[std_name] = std_val
+
+            day_of_year = datetime.strptime(ts_iso[:10], "%Y-%m-%d").timetuple().tm_yday
+            elevation_m = float(self.dataset_meta.get("elevation_m", 315.0))
+            et0_val = compute_fao56_et0(
+                t_mean_c=flat_dict.get("air_temperature_c"),
+                rh_mean_pct=flat_dict.get("relative_humidity_pct"),
+                solar_mj_m2_day=flat_dict.get("solar_radiation_mj_m2_day"),
+                wind_speed_2m_m_s=flat_dict.get("wind_speed_m_s"),
+                latitude_deg=aoi.centroid_lat,
+                day_of_year=day_of_year,
+                elevation_m=elevation_m,
+                t_max_c=flat_dict.get("air_temperature_max_c"),
+                t_min_c=flat_dict.get("air_temperature_min_c"),
+            )
+            if et0_val is not None:
+                obs_dict["et0_mm_day"] = VariableObservation(
+                    value=et0_val,
+                    unit="mm/day",
+                    raw_variable="DERIVED_FAO56_PM",
+                    source_dataset=self.dataset_key,
+                    product_name="TERRA_DERIVED_FAO56",
+                    product_version="FAO56-PM-1998",
+                    spatial_resolution=spatial_res,
+                    temporal_resolution="daily",
+                    observation_type="derived_agrometeorological",
+                    quality_flag="OK",
+                    is_missing=False,
+                    extraction_mode="fao56_penman_monteith",
+                    notes=f"Computed via FAO-56 Penman-Monteith from NASA POWER AG daily vars (elevation={elevation_m:.0f}m).",
+                )
+                flat_dict["et0_mm_day"] = et0_val
 
             record_id = f"{aoi.location_id}_NASA_POWER_{ymd}"
             records.append(

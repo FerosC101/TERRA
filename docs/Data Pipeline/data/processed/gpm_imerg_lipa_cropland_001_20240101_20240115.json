@@ -1,0 +1,1547 @@
+[
+  {
+    "record_id": "lipa_cropland_001_GPM_GPM_3IMERGDF_20240101T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-01T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "precipitation_mm": {
+        "value": 0.0,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.0; neighborhood_max=0.0"
+      },
+      "precipitation_imerg_mm": {
+        "value": 0.0,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.0; neighborhood_max=0.0"
+      },
+      "precipitation_random_error_mm": {
+        "value": 2.764801,
+        "unit": "mm/day",
+        "raw_variable": "randomError",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=2.764801; neighborhood_max=2.764801"
+      },
+      "precipitation_valid_sample_count": {
+        "value": 48.0,
+        "unit": "count",
+        "raw_variable": "precipitation_cnt",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=48.0; neighborhood_max=48.0"
+      }
+    },
+    "flat_observations": {
+      "precipitation_mm": 0.0,
+      "precipitation_imerg_mm": 0.0,
+      "precipitation_random_error_mm": 2.764801,
+      "precipitation_valid_sample_count": 48.0
+    },
+    "metadata": {
+      "sources": [
+        "GPM_IMERG"
+      ],
+      "product_names": [
+        "GPM_3IMERGDF"
+      ],
+      "product_versions": {
+        "GPM_3IMERGDF": "07B"
+      },
+      "quality_status": "VALID",
+      "quality_flags": {
+        "run_type": "Final"
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "GPM_IMERG": "0.1 deg x 0.1 deg (~11 km)"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:51:42Z",
+      "processed_at": "2026-11-14T07:52:55Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\gpm_imerg\\3B-DAY.MS.MRG.3IMERG.20240101-S000000-E235959.V07B.subset.dap.nc4"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_GPM_GPM_3IMERGDF_20240102T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-02T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "precipitation_mm": {
+        "value": 0.0,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.0; neighborhood_max=0.0"
+      },
+      "precipitation_imerg_mm": {
+        "value": 0.0,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.0; neighborhood_max=0.0"
+      },
+      "precipitation_random_error_mm": {
+        "value": 2.764801,
+        "unit": "mm/day",
+        "raw_variable": "randomError",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=2.764801; neighborhood_max=2.764801"
+      },
+      "precipitation_valid_sample_count": {
+        "value": 48.0,
+        "unit": "count",
+        "raw_variable": "precipitation_cnt",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=48.0; neighborhood_max=48.0"
+      }
+    },
+    "flat_observations": {
+      "precipitation_mm": 0.0,
+      "precipitation_imerg_mm": 0.0,
+      "precipitation_random_error_mm": 2.764801,
+      "precipitation_valid_sample_count": 48.0
+    },
+    "metadata": {
+      "sources": [
+        "GPM_IMERG"
+      ],
+      "product_names": [
+        "GPM_3IMERGDF"
+      ],
+      "product_versions": {
+        "GPM_3IMERGDF": "07B"
+      },
+      "quality_status": "VALID",
+      "quality_flags": {
+        "run_type": "Final"
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "GPM_IMERG": "0.1 deg x 0.1 deg (~11 km)"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:51:44Z",
+      "processed_at": "2026-11-14T07:52:55Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\gpm_imerg\\3B-DAY.MS.MRG.3IMERG.20240102-S000000-E235959.V07B.subset.dap.nc4"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_GPM_GPM_3IMERGDF_20240103T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-03T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "precipitation_mm": {
+        "value": 0.0,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.0; neighborhood_max=0.0"
+      },
+      "precipitation_imerg_mm": {
+        "value": 0.0,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.0; neighborhood_max=0.0"
+      },
+      "precipitation_random_error_mm": {
+        "value": 2.764801,
+        "unit": "mm/day",
+        "raw_variable": "randomError",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=2.764801; neighborhood_max=2.764801"
+      },
+      "precipitation_valid_sample_count": {
+        "value": 48.0,
+        "unit": "count",
+        "raw_variable": "precipitation_cnt",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=48.0; neighborhood_max=48.0"
+      }
+    },
+    "flat_observations": {
+      "precipitation_mm": 0.0,
+      "precipitation_imerg_mm": 0.0,
+      "precipitation_random_error_mm": 2.764801,
+      "precipitation_valid_sample_count": 48.0
+    },
+    "metadata": {
+      "sources": [
+        "GPM_IMERG"
+      ],
+      "product_names": [
+        "GPM_3IMERGDF"
+      ],
+      "product_versions": {
+        "GPM_3IMERGDF": "07B"
+      },
+      "quality_status": "VALID",
+      "quality_flags": {
+        "run_type": "Final"
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "GPM_IMERG": "0.1 deg x 0.1 deg (~11 km)"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:51:46Z",
+      "processed_at": "2026-11-14T07:52:55Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\gpm_imerg\\3B-DAY.MS.MRG.3IMERG.20240103-S000000-E235959.V07B.subset.dap.nc4"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_GPM_GPM_3IMERGDF_20240104T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-04T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "precipitation_mm": {
+        "value": 0.0,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.0; neighborhood_max=0.0"
+      },
+      "precipitation_imerg_mm": {
+        "value": 0.0,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.0; neighborhood_max=0.0"
+      },
+      "precipitation_random_error_mm": {
+        "value": 2.764801,
+        "unit": "mm/day",
+        "raw_variable": "randomError",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=2.764801; neighborhood_max=2.764801"
+      },
+      "precipitation_valid_sample_count": {
+        "value": 48.0,
+        "unit": "count",
+        "raw_variable": "precipitation_cnt",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=48.0; neighborhood_max=48.0"
+      }
+    },
+    "flat_observations": {
+      "precipitation_mm": 0.0,
+      "precipitation_imerg_mm": 0.0,
+      "precipitation_random_error_mm": 2.764801,
+      "precipitation_valid_sample_count": 48.0
+    },
+    "metadata": {
+      "sources": [
+        "GPM_IMERG"
+      ],
+      "product_names": [
+        "GPM_3IMERGDF"
+      ],
+      "product_versions": {
+        "GPM_3IMERGDF": "07B"
+      },
+      "quality_status": "VALID",
+      "quality_flags": {
+        "run_type": "Final"
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "GPM_IMERG": "0.1 deg x 0.1 deg (~11 km)"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:51:47Z",
+      "processed_at": "2026-11-14T07:52:55Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\gpm_imerg\\3B-DAY.MS.MRG.3IMERG.20240104-S000000-E235959.V07B.subset.dap.nc4"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_GPM_GPM_3IMERGDF_20240105T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-05T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "precipitation_mm": {
+        "value": 2.564271,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=1.535; neighborhood_max=5.23"
+      },
+      "precipitation_imerg_mm": {
+        "value": 2.564271,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=1.535; neighborhood_max=5.23"
+      },
+      "precipitation_random_error_mm": {
+        "value": 237.067484,
+        "unit": "mm/day",
+        "raw_variable": "randomError",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=109.635468; neighborhood_max=590.989746"
+      },
+      "precipitation_valid_sample_count": {
+        "value": 48.0,
+        "unit": "count",
+        "raw_variable": "precipitation_cnt",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=48.0; neighborhood_max=48.0"
+      }
+    },
+    "flat_observations": {
+      "precipitation_mm": 2.564271,
+      "precipitation_imerg_mm": 2.564271,
+      "precipitation_random_error_mm": 237.067484,
+      "precipitation_valid_sample_count": 48.0
+    },
+    "metadata": {
+      "sources": [
+        "GPM_IMERG"
+      ],
+      "product_names": [
+        "GPM_3IMERGDF"
+      ],
+      "product_versions": {
+        "GPM_3IMERGDF": "07B"
+      },
+      "quality_status": "VALID",
+      "quality_flags": {
+        "run_type": "Final"
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "GPM_IMERG": "0.1 deg x 0.1 deg (~11 km)"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:51:49Z",
+      "processed_at": "2026-11-14T07:52:55Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\gpm_imerg\\3B-DAY.MS.MRG.3IMERG.20240105-S000000-E235959.V07B.subset.dap.nc4"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_GPM_GPM_3IMERGDF_20240106T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-06T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "precipitation_mm": {
+        "value": 0.031205,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.06; neighborhood_max=0.06"
+      },
+      "precipitation_imerg_mm": {
+        "value": 0.031205,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.06; neighborhood_max=0.06"
+      },
+      "precipitation_random_error_mm": {
+        "value": 3.466169,
+        "unit": "mm/day",
+        "raw_variable": "randomError",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=4.117701; neighborhood_max=4.117701"
+      },
+      "precipitation_valid_sample_count": {
+        "value": 48.0,
+        "unit": "count",
+        "raw_variable": "precipitation_cnt",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=48.0; neighborhood_max=48.0"
+      }
+    },
+    "flat_observations": {
+      "precipitation_mm": 0.031205,
+      "precipitation_imerg_mm": 0.031205,
+      "precipitation_random_error_mm": 3.466169,
+      "precipitation_valid_sample_count": 48.0
+    },
+    "metadata": {
+      "sources": [
+        "GPM_IMERG"
+      ],
+      "product_names": [
+        "GPM_3IMERGDF"
+      ],
+      "product_versions": {
+        "GPM_3IMERGDF": "07B"
+      },
+      "quality_status": "VALID",
+      "quality_flags": {
+        "run_type": "Final"
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "GPM_IMERG": "0.1 deg x 0.1 deg (~11 km)"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:51:51Z",
+      "processed_at": "2026-11-14T07:52:55Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\gpm_imerg\\3B-DAY.MS.MRG.3IMERG.20240106-S000000-E235959.V07B.subset.dap.nc4"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_GPM_GPM_3IMERGDF_20240107T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-07T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "precipitation_mm": {
+        "value": 0.0,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.0; neighborhood_max=0.0"
+      },
+      "precipitation_imerg_mm": {
+        "value": 0.0,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.0; neighborhood_max=0.0"
+      },
+      "precipitation_random_error_mm": {
+        "value": 2.764801,
+        "unit": "mm/day",
+        "raw_variable": "randomError",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=2.764801; neighborhood_max=2.764801"
+      },
+      "precipitation_valid_sample_count": {
+        "value": 48.0,
+        "unit": "count",
+        "raw_variable": "precipitation_cnt",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=48.0; neighborhood_max=48.0"
+      }
+    },
+    "flat_observations": {
+      "precipitation_mm": 0.0,
+      "precipitation_imerg_mm": 0.0,
+      "precipitation_random_error_mm": 2.764801,
+      "precipitation_valid_sample_count": 48.0
+    },
+    "metadata": {
+      "sources": [
+        "GPM_IMERG"
+      ],
+      "product_names": [
+        "GPM_3IMERGDF"
+      ],
+      "product_versions": {
+        "GPM_3IMERGDF": "07B"
+      },
+      "quality_status": "VALID",
+      "quality_flags": {
+        "run_type": "Final"
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "GPM_IMERG": "0.1 deg x 0.1 deg (~11 km)"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:51:52Z",
+      "processed_at": "2026-11-14T07:52:55Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\gpm_imerg\\3B-DAY.MS.MRG.3IMERG.20240107-S000000-E235959.V07B.subset.dap.nc4"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_GPM_GPM_3IMERGDF_20240108T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-08T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "precipitation_mm": {
+        "value": 5.369804,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=1.37; neighborhood_max=20.68"
+      },
+      "precipitation_imerg_mm": {
+        "value": 5.369804,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=1.37; neighborhood_max=20.68"
+      },
+      "precipitation_random_error_mm": {
+        "value": 632.356028,
+        "unit": "mm/day",
+        "raw_variable": "randomError",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=63.38879; neighborhood_max=2861.673584"
+      },
+      "precipitation_valid_sample_count": {
+        "value": 48.0,
+        "unit": "count",
+        "raw_variable": "precipitation_cnt",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=48.0; neighborhood_max=48.0"
+      }
+    },
+    "flat_observations": {
+      "precipitation_mm": 5.369804,
+      "precipitation_imerg_mm": 5.369804,
+      "precipitation_random_error_mm": 632.356028,
+      "precipitation_valid_sample_count": 48.0
+    },
+    "metadata": {
+      "sources": [
+        "GPM_IMERG"
+      ],
+      "product_names": [
+        "GPM_3IMERGDF"
+      ],
+      "product_versions": {
+        "GPM_3IMERGDF": "07B"
+      },
+      "quality_status": "VALID",
+      "quality_flags": {
+        "run_type": "Final"
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "GPM_IMERG": "0.1 deg x 0.1 deg (~11 km)"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:51:54Z",
+      "processed_at": "2026-11-14T07:52:55Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\gpm_imerg\\3B-DAY.MS.MRG.3IMERG.20240108-S000000-E235959.V07B.subset.dap.nc4"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_GPM_GPM_3IMERGDF_20240109T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-09T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "precipitation_mm": {
+        "value": 0.051177,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.075; neighborhood_max=0.075"
+      },
+      "precipitation_imerg_mm": {
+        "value": 0.051177,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.075; neighborhood_max=0.075"
+      },
+      "precipitation_random_error_mm": {
+        "value": 3.972728,
+        "unit": "mm/day",
+        "raw_variable": "randomError",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=4.5252; neighborhood_max=4.5252"
+      },
+      "precipitation_valid_sample_count": {
+        "value": 48.0,
+        "unit": "count",
+        "raw_variable": "precipitation_cnt",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=48.0; neighborhood_max=48.0"
+      }
+    },
+    "flat_observations": {
+      "precipitation_mm": 0.051177,
+      "precipitation_imerg_mm": 0.051177,
+      "precipitation_random_error_mm": 3.972728,
+      "precipitation_valid_sample_count": 48.0
+    },
+    "metadata": {
+      "sources": [
+        "GPM_IMERG"
+      ],
+      "product_names": [
+        "GPM_3IMERGDF"
+      ],
+      "product_versions": {
+        "GPM_3IMERGDF": "07B"
+      },
+      "quality_status": "VALID",
+      "quality_flags": {
+        "run_type": "Final"
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "GPM_IMERG": "0.1 deg x 0.1 deg (~11 km)"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:51:56Z",
+      "processed_at": "2026-11-14T07:52:55Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\gpm_imerg\\3B-DAY.MS.MRG.3IMERG.20240109-S000000-E235959.V07B.subset.dap.nc4"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_GPM_GPM_3IMERGDF_20240110T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-10T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "precipitation_mm": {
+        "value": 0.0,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.0; neighborhood_max=0.0"
+      },
+      "precipitation_imerg_mm": {
+        "value": 0.0,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.0; neighborhood_max=0.0"
+      },
+      "precipitation_random_error_mm": {
+        "value": 2.764801,
+        "unit": "mm/day",
+        "raw_variable": "randomError",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=2.764801; neighborhood_max=2.764801"
+      },
+      "precipitation_valid_sample_count": {
+        "value": 48.0,
+        "unit": "count",
+        "raw_variable": "precipitation_cnt",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=48.0; neighborhood_max=48.0"
+      }
+    },
+    "flat_observations": {
+      "precipitation_mm": 0.0,
+      "precipitation_imerg_mm": 0.0,
+      "precipitation_random_error_mm": 2.764801,
+      "precipitation_valid_sample_count": 48.0
+    },
+    "metadata": {
+      "sources": [
+        "GPM_IMERG"
+      ],
+      "product_names": [
+        "GPM_3IMERGDF"
+      ],
+      "product_versions": {
+        "GPM_3IMERGDF": "07B"
+      },
+      "quality_status": "VALID",
+      "quality_flags": {
+        "run_type": "Final"
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "GPM_IMERG": "0.1 deg x 0.1 deg (~11 km)"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:51:58Z",
+      "processed_at": "2026-11-14T07:52:55Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\gpm_imerg\\3B-DAY.MS.MRG.3IMERG.20240110-S000000-E235959.V07B.subset.dap.nc4"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_GPM_GPM_3IMERGDF_20240111T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-11T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "precipitation_mm": {
+        "value": 0.0,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.0; neighborhood_max=0.0"
+      },
+      "precipitation_imerg_mm": {
+        "value": 0.0,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.0; neighborhood_max=0.0"
+      },
+      "precipitation_random_error_mm": {
+        "value": 2.764801,
+        "unit": "mm/day",
+        "raw_variable": "randomError",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=2.764801; neighborhood_max=2.764801"
+      },
+      "precipitation_valid_sample_count": {
+        "value": 48.0,
+        "unit": "count",
+        "raw_variable": "precipitation_cnt",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=48.0; neighborhood_max=48.0"
+      }
+    },
+    "flat_observations": {
+      "precipitation_mm": 0.0,
+      "precipitation_imerg_mm": 0.0,
+      "precipitation_random_error_mm": 2.764801,
+      "precipitation_valid_sample_count": 48.0
+    },
+    "metadata": {
+      "sources": [
+        "GPM_IMERG"
+      ],
+      "product_names": [
+        "GPM_3IMERGDF"
+      ],
+      "product_versions": {
+        "GPM_3IMERGDF": "07B"
+      },
+      "quality_status": "VALID",
+      "quality_flags": {
+        "run_type": "Final"
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "GPM_IMERG": "0.1 deg x 0.1 deg (~11 km)"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:52:00Z",
+      "processed_at": "2026-11-14T07:52:55Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\gpm_imerg\\3B-DAY.MS.MRG.3IMERG.20240111-S000000-E235959.V07B.subset.dap.nc4"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_GPM_GPM_3IMERGDF_20240112T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-12T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "precipitation_mm": {
+        "value": 0.0,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.0; neighborhood_max=0.0"
+      },
+      "precipitation_imerg_mm": {
+        "value": 0.0,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.0; neighborhood_max=0.0"
+      },
+      "precipitation_random_error_mm": {
+        "value": 2.764801,
+        "unit": "mm/day",
+        "raw_variable": "randomError",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=2.764801; neighborhood_max=2.764801"
+      },
+      "precipitation_valid_sample_count": {
+        "value": 48.0,
+        "unit": "count",
+        "raw_variable": "precipitation_cnt",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=48.0; neighborhood_max=48.0"
+      }
+    },
+    "flat_observations": {
+      "precipitation_mm": 0.0,
+      "precipitation_imerg_mm": 0.0,
+      "precipitation_random_error_mm": 2.764801,
+      "precipitation_valid_sample_count": 48.0
+    },
+    "metadata": {
+      "sources": [
+        "GPM_IMERG"
+      ],
+      "product_names": [
+        "GPM_3IMERGDF"
+      ],
+      "product_versions": {
+        "GPM_3IMERGDF": "07B"
+      },
+      "quality_status": "VALID",
+      "quality_flags": {
+        "run_type": "Final"
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "GPM_IMERG": "0.1 deg x 0.1 deg (~11 km)"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:52:01Z",
+      "processed_at": "2026-11-14T07:52:55Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\gpm_imerg\\3B-DAY.MS.MRG.3IMERG.20240112-S000000-E235959.V07B.subset.dap.nc4"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_GPM_GPM_3IMERGDF_20240113T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-13T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "precipitation_mm": {
+        "value": 0.0,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.0; neighborhood_max=0.0"
+      },
+      "precipitation_imerg_mm": {
+        "value": 0.0,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.0; neighborhood_max=0.0"
+      },
+      "precipitation_random_error_mm": {
+        "value": 2.764801,
+        "unit": "mm/day",
+        "raw_variable": "randomError",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=2.764801; neighborhood_max=2.764801"
+      },
+      "precipitation_valid_sample_count": {
+        "value": 48.0,
+        "unit": "count",
+        "raw_variable": "precipitation_cnt",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=48.0; neighborhood_max=48.0"
+      }
+    },
+    "flat_observations": {
+      "precipitation_mm": 0.0,
+      "precipitation_imerg_mm": 0.0,
+      "precipitation_random_error_mm": 2.764801,
+      "precipitation_valid_sample_count": 48.0
+    },
+    "metadata": {
+      "sources": [
+        "GPM_IMERG"
+      ],
+      "product_names": [
+        "GPM_3IMERGDF"
+      ],
+      "product_versions": {
+        "GPM_3IMERGDF": "07B"
+      },
+      "quality_status": "VALID",
+      "quality_flags": {
+        "run_type": "Final"
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "GPM_IMERG": "0.1 deg x 0.1 deg (~11 km)"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:52:03Z",
+      "processed_at": "2026-11-14T07:52:55Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\gpm_imerg\\3B-DAY.MS.MRG.3IMERG.20240113-S000000-E235959.V07B.subset.dap.nc4"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_GPM_GPM_3IMERGDF_20240114T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-14T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "precipitation_mm": {
+        "value": 0.458843,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.975; neighborhood_max=0.975"
+      },
+      "precipitation_imerg_mm": {
+        "value": 0.458843,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.975; neighborhood_max=0.975"
+      },
+      "precipitation_random_error_mm": {
+        "value": 24.874613,
+        "unit": "mm/day",
+        "raw_variable": "randomError",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=49.746132; neighborhood_max=49.746132"
+      },
+      "precipitation_valid_sample_count": {
+        "value": 48.0,
+        "unit": "count",
+        "raw_variable": "precipitation_cnt",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=48.0; neighborhood_max=48.0"
+      }
+    },
+    "flat_observations": {
+      "precipitation_mm": 0.458843,
+      "precipitation_imerg_mm": 0.458843,
+      "precipitation_random_error_mm": 24.874613,
+      "precipitation_valid_sample_count": 48.0
+    },
+    "metadata": {
+      "sources": [
+        "GPM_IMERG"
+      ],
+      "product_names": [
+        "GPM_3IMERGDF"
+      ],
+      "product_versions": {
+        "GPM_3IMERGDF": "07B"
+      },
+      "quality_status": "VALID",
+      "quality_flags": {
+        "run_type": "Final"
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "GPM_IMERG": "0.1 deg x 0.1 deg (~11 km)"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:52:05Z",
+      "processed_at": "2026-11-14T07:52:55Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\gpm_imerg\\3B-DAY.MS.MRG.3IMERG.20240114-S000000-E235959.V07B.subset.dap.nc4"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_GPM_GPM_3IMERGDF_20240115T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-15T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "precipitation_mm": {
+        "value": 0.014118,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.03; neighborhood_max=0.03"
+      },
+      "precipitation_imerg_mm": {
+        "value": 0.014118,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.03; neighborhood_max=0.03"
+      },
+      "precipitation_random_error_mm": {
+        "value": 3.102133,
+        "unit": "mm/day",
+        "raw_variable": "randomError",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=3.481601; neighborhood_max=3.481601"
+      },
+      "precipitation_valid_sample_count": {
+        "value": 48.0,
+        "unit": "count",
+        "raw_variable": "precipitation_cnt",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=48.0; neighborhood_max=48.0"
+      }
+    },
+    "flat_observations": {
+      "precipitation_mm": 0.014118,
+      "precipitation_imerg_mm": 0.014118,
+      "precipitation_random_error_mm": 3.102133,
+      "precipitation_valid_sample_count": 48.0
+    },
+    "metadata": {
+      "sources": [
+        "GPM_IMERG"
+      ],
+      "product_names": [
+        "GPM_3IMERGDF"
+      ],
+      "product_versions": {
+        "GPM_3IMERGDF": "07B"
+      },
+      "quality_status": "VALID",
+      "quality_flags": {
+        "run_type": "Final"
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "GPM_IMERG": "0.1 deg x 0.1 deg (~11 km)"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:52:06Z",
+      "processed_at": "2026-11-14T07:52:55Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\gpm_imerg\\3B-DAY.MS.MRG.3IMERG.20240115-S000000-E235959.V07B.subset.dap.nc4"
+    }
+  }
+]

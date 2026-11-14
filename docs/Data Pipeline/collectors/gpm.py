@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 import json
+import logging
 import re
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from collectors.earthdata_client import EarthdataClient
+from collectors.earthdata_client import EarthdataClient, build_gpm_opendap_subset_url
 from processors.raster_processor import extract_aoi_from_netcdf
 from processors.spatial_processor import AOIInfo
 from processors.temporal_processor import normalize_timestamp, to_cmr_temporal, validate_date_range
@@ -155,12 +156,34 @@ class GpmImergCollector:
 
         for gran in granules:
             data_url = gran.get("data_url")
-            if not data_url:
+            opendap_url = gran.get("opendap_url")
+            if not data_url and not opendap_url:
                 continue
-            fname = data_url.rstrip("/").split("/")[-1]
-            dest = self.cache.raw_path(self.dataset_key, fname)
+
+            orig_fname = (
+                data_url.rstrip("/").split("/")[-1]
+                if data_url
+                else str(gran.get("title", "gpm_granule")).split(":")[-1]
+            )
+            stem = Path(orig_fname).stem
+            use_opendap = bool(opendap_url and product in {"GPM_3IMERGDF", "GPM_3IMERGDL"})
+            target_url = (
+                build_gpm_opendap_subset_url(
+                    opendap_url,
+                    aoi.bbox,
+                    variables=GPM_PRODUCT_CONFIG[product]["variables"],
+                )
+                if use_opendap
+                else data_url
+            )
+            dest = self.cache.raw_path(
+                self.dataset_key,
+                f"{stem}.subset.dap.nc4" if use_opendap else orig_fname,
+            )
             cache_key = self.cache.build_cache_key(
-                f"{self.dataset_key}_{product}", aoi.location_id, {"title": gran["title"]}
+                f"{self.dataset_key}_{product}",
+                aoi.location_id,
+                {"title": gran["title"], "mode": "opendap_subset" if use_opendap else "direct"},
             )
             if not force_refresh and self.cache.has_valid_file(dest):
                 raw_files.append(
@@ -169,18 +192,40 @@ class GpmImergCollector:
                         "time_start": gran.get("time_start"),
                         "title": gran.get("title"),
                         "retrieved_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+                        "retrieval_mode": "opendap_subset" if use_opendap else "direct_granule",
                     }
                 )
                 continue
 
-            self.client.download_authenticated(data_url, dest)
+            retrieval_mode = "opendap_subset" if use_opendap else "direct_granule"
+            downloaded_url = target_url
+            try:
+                self.client.download_authenticated(target_url, dest)
+            except Exception as exc:
+                if use_opendap and data_url:
+                    logging.getLogger("terra.pipeline").warning(
+                        "OPeNDAP subset failed for %s (%s); falling back to direct granule.",
+                        orig_fname,
+                        exc,
+                    )
+                    dest = self.cache.raw_path(self.dataset_key, orig_fname)
+                    downloaded_url = data_url
+                    retrieval_mode = "direct_granule_fallback"
+                    self.client.download_authenticated(data_url, dest)
+                else:
+                    raise
+
             entry = self.cache.record_retrieval(
                 cache_key=cache_key,
                 file_path=dest,
                 dataset=self.dataset_key,
                 aoi_id=aoi.location_id,
-                source_url=data_url,
-                extra_metadata={"product": product, "granule_id": gran.get("id")},
+                source_url=downloaded_url,
+                extra_metadata={
+                    "product": product,
+                    "granule_id": gran.get("id"),
+                    "retrieval_mode": retrieval_mode,
+                },
             )
             raw_files.append(
                 {
@@ -188,6 +233,7 @@ class GpmImergCollector:
                     "time_start": gran.get("time_start"),
                     "title": gran.get("title"),
                     "retrieved_at": entry["retrieved_at"],
+                    "retrieval_mode": retrieval_mode,
                 }
             )
 
@@ -244,7 +290,15 @@ class GpmImergCollector:
                 quantity_kind = (
                     "precipitation_rate" if raw_var == "precipitationCal" else "accumulated_precipitation"
                 )
-                obs_dict[std_name] = VariableObservation(
+                note_parts = [
+                    quantity_kind,
+                    f"grid_center={stats.get('grid_cell_center')}",
+                ]
+                if stats.get("nearest_pixel_value") is not None:
+                    note_parts.append(f"nearest_pixel={round(float(stats['nearest_pixel_value']), 6)}")
+                if stats.get("neighborhood_max") is not None:
+                    note_parts.append(f"neighborhood_max={round(float(stats['neighborhood_max']), 6)}")
+                obs = VariableObservation(
                     value=std_val,
                     unit=std_unit,
                     raw_variable=raw_var,
@@ -257,9 +311,13 @@ class GpmImergCollector:
                     quality_flag=f"valid_pixels={stats.get('valid_pixel_count', 0)}",
                     is_missing=is_missing,
                     extraction_mode=stats.get("extraction_mode"),
-                    notes=f"{quantity_kind}; grid_center={stats.get('grid_cell_center')}",
+                    notes="; ".join(note_parts),
                 )
+                obs_dict[std_name] = obs
                 flat_dict[std_name] = std_val
+                if std_name == "precipitation_mm":
+                    obs_dict["precipitation_imerg_mm"] = obs.model_copy(deep=True)
+                    flat_dict["precipitation_imerg_mm"] = std_val
 
             safe_ts = ts_iso.replace(":", "").replace("-", "")
             records.append(

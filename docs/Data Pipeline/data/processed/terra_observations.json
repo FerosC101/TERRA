@@ -16,10 +16,25 @@
         "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
         "temporal_resolution": "daily",
         "observation_type": "satellite",
-        "quality_flag": "valid_pixels=1",
+        "quality_flag": "valid_pixels=4",
         "is_missing": false,
-        "extraction_mode": "nearest_grid_cell_containing_aoi",
-        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}"
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.0; neighborhood_max=0.0"
+      },
+      "precipitation_imerg_mm": {
+        "value": 0.0,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.0; neighborhood_max=0.0"
       },
       "precipitation_random_error_mm": {
         "value": 2.764801,
@@ -31,10 +46,10 @@
         "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
         "temporal_resolution": "daily",
         "observation_type": "satellite",
-        "quality_flag": "valid_pixels=1",
+        "quality_flag": "valid_pixels=4",
         "is_missing": false,
-        "extraction_mode": "nearest_grid_cell_containing_aoi",
-        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}"
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=2.764801; neighborhood_max=2.764801"
       },
       "precipitation_valid_sample_count": {
         "value": 48.0,
@@ -46,14 +61,15 @@
         "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
         "temporal_resolution": "daily",
         "observation_type": "satellite",
-        "quality_flag": "valid_pixels=1",
+        "quality_flag": "valid_pixels=4",
         "is_missing": false,
-        "extraction_mode": "nearest_grid_cell_containing_aoi",
-        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}"
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=48.0; neighborhood_max=48.0"
       }
     },
     "flat_observations": {
       "precipitation_mm": 0.0,
+      "precipitation_imerg_mm": 0.0,
       "precipitation_random_error_mm": 2.764801,
       "precipitation_valid_sample_count": 48.0
     },
@@ -80,10 +96,10 @@
       "temporal_resolution": "daily",
       "centroid_lat": 13.983842,
       "centroid_lon": 121.184648,
-      "retrieved_at": "2026-11-14T07:13:39Z",
-      "processed_at": "2026-11-14T07:19:54Z",
+      "retrieved_at": "2026-11-14T07:51:42Z",
+      "processed_at": "2026-11-14T07:52:55Z",
       "processing_version": "1.0",
-      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\data\\raw\\gpm_imerg\\3B-DAY.MS.MRG.3IMERG.20240101-S000000-E235959.V07B.nc4"
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\gpm_imerg\\3B-DAY.MS.MRG.3IMERG.20240101-S000000-E235959.V07B.subset.dap.nc4"
     }
   },
   {
@@ -227,6 +243,21 @@
         "is_missing": false,
         "extraction_mode": "point_centroid_enclosing_grid",
         "notes": "Modeled soil wetness index (0-1), not direct volumetric sensor reading."
+      },
+      "et0_mm_day": {
+        "value": 3.14,
+        "unit": "mm/day",
+        "raw_variable": "DERIVED_FAO56_PM",
+        "source_dataset": "NASA_POWER",
+        "product_name": "TERRA_DERIVED_FAO56",
+        "product_version": "FAO56-PM-1998",
+        "spatial_resolution": "0.5 deg x 0.625 deg (~55 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "derived_agrometeorological",
+        "quality_flag": "OK",
+        "is_missing": false,
+        "extraction_mode": "fao56_penman_monteith",
+        "notes": "Computed via FAO-56 Penman-Monteith from NASA POWER AG daily vars (elevation=315m)."
       }
     },
     "flat_observations": {
@@ -238,7 +269,8 @@
       "solar_radiation_mj_m2_day": 16.68,
       "wind_speed_m_s": 1.21,
       "surface_soil_wetness_index": 0.92,
-      "rootzone_soil_wetness_index": 0.95
+      "rootzone_soil_wetness_index": 0.95,
+      "et0_mm_day": 3.14
     },
     "metadata": {
       "sources": [
@@ -261,10 +293,10 @@
       "temporal_resolution": "daily",
       "centroid_lat": 13.983842,
       "centroid_lon": 121.184648,
-      "retrieved_at": "2026-11-14T07:13:39Z",
-      "processed_at": "2026-11-14T07:19:54Z",
+      "retrieved_at": "2026-11-14T07:51:40Z",
+      "processed_at": "2026-11-14T07:52:55Z",
       "processing_version": "1.0",
-      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\data\\raw\\nasa_power\\nasa_power_lipa_cropland_001_20240101_20240103.json"
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\nasa_power\\nasa_power_lipa_cropland_001_20240101_20240115.json"
     }
   },
   {
@@ -287,7 +319,7 @@
         "quality_flag": "NO_BITMASK",
         "is_missing": true,
         "extraction_mode": "no_overpass_covering_aoi",
-        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. grid_center=None"
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_PM; grid_center=None; qual_bits=[unavailable]"
       },
       "smap_retrieval_quality_flag": {
         "value": null,
@@ -302,7 +334,7 @@
         "quality_flag": "NO_BITMASK",
         "is_missing": true,
         "extraction_mode": "no_overpass_covering_aoi",
-        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. grid_center=None"
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_PM; grid_center=None; qual_bits=[unavailable]"
       }
     },
     "flat_observations": {
@@ -321,7 +353,8 @@
       },
       "quality_status": "INCOMPLETE",
       "quality_flags": {
-        "retrieval_qual_flag": null
+        "retrieval_qual_flag": null,
+        "retrieval_qual_decoded": null
       },
       "observation_types": [
         "satellite"
@@ -332,10 +365,10 @@
       "temporal_resolution": "daily",
       "centroid_lat": 13.983842,
       "centroid_lon": 121.184648,
-      "retrieved_at": "2026-11-14T07:13:59Z",
-      "processed_at": "2026-11-14T07:19:55Z",
+      "retrieved_at": "2026-11-14T07:52:12Z",
+      "processed_at": "2026-11-14T07:52:57Z",
       "processing_version": "1.0",
-      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\data\\raw\\smap\\SMAP_L3_SM_P_E_20240101_R19240_001.h5"
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\smap\\SMAP_L3_SM_P_E_20240101_R19240_001.subset.dap.nc4"
     }
   },
   {
@@ -355,10 +388,25 @@
         "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
         "temporal_resolution": "daily",
         "observation_type": "satellite",
-        "quality_flag": "valid_pixels=1",
+        "quality_flag": "valid_pixels=4",
         "is_missing": false,
-        "extraction_mode": "nearest_grid_cell_containing_aoi",
-        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}"
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.0; neighborhood_max=0.0"
+      },
+      "precipitation_imerg_mm": {
+        "value": 0.0,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.0; neighborhood_max=0.0"
       },
       "precipitation_random_error_mm": {
         "value": 2.764801,
@@ -370,10 +418,10 @@
         "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
         "temporal_resolution": "daily",
         "observation_type": "satellite",
-        "quality_flag": "valid_pixels=1",
+        "quality_flag": "valid_pixels=4",
         "is_missing": false,
-        "extraction_mode": "nearest_grid_cell_containing_aoi",
-        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}"
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=2.764801; neighborhood_max=2.764801"
       },
       "precipitation_valid_sample_count": {
         "value": 48.0,
@@ -385,14 +433,15 @@
         "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
         "temporal_resolution": "daily",
         "observation_type": "satellite",
-        "quality_flag": "valid_pixels=1",
+        "quality_flag": "valid_pixels=4",
         "is_missing": false,
-        "extraction_mode": "nearest_grid_cell_containing_aoi",
-        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}"
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=48.0; neighborhood_max=48.0"
       }
     },
     "flat_observations": {
       "precipitation_mm": 0.0,
+      "precipitation_imerg_mm": 0.0,
       "precipitation_random_error_mm": 2.764801,
       "precipitation_valid_sample_count": 48.0
     },
@@ -419,10 +468,10 @@
       "temporal_resolution": "daily",
       "centroid_lat": 13.983842,
       "centroid_lon": 121.184648,
-      "retrieved_at": "2026-11-14T07:13:52Z",
-      "processed_at": "2026-11-14T07:19:54Z",
+      "retrieved_at": "2026-11-14T07:51:44Z",
+      "processed_at": "2026-11-14T07:52:55Z",
       "processing_version": "1.0",
-      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\data\\raw\\gpm_imerg\\3B-DAY.MS.MRG.3IMERG.20240102-S000000-E235959.V07B.nc4"
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\gpm_imerg\\3B-DAY.MS.MRG.3IMERG.20240102-S000000-E235959.V07B.subset.dap.nc4"
     }
   },
   {
@@ -566,6 +615,21 @@
         "is_missing": false,
         "extraction_mode": "point_centroid_enclosing_grid",
         "notes": "Modeled soil wetness index (0-1), not direct volumetric sensor reading."
+      },
+      "et0_mm_day": {
+        "value": 2.9136,
+        "unit": "mm/day",
+        "raw_variable": "DERIVED_FAO56_PM",
+        "source_dataset": "NASA_POWER",
+        "product_name": "TERRA_DERIVED_FAO56",
+        "product_version": "FAO56-PM-1998",
+        "spatial_resolution": "0.5 deg x 0.625 deg (~55 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "derived_agrometeorological",
+        "quality_flag": "OK",
+        "is_missing": false,
+        "extraction_mode": "fao56_penman_monteith",
+        "notes": "Computed via FAO-56 Penman-Monteith from NASA POWER AG daily vars (elevation=315m)."
       }
     },
     "flat_observations": {
@@ -577,7 +641,8 @@
       "solar_radiation_mj_m2_day": 14.89,
       "wind_speed_m_s": 1.24,
       "surface_soil_wetness_index": 0.92,
-      "rootzone_soil_wetness_index": 0.95
+      "rootzone_soil_wetness_index": 0.95,
+      "et0_mm_day": 2.9136
     },
     "metadata": {
       "sources": [
@@ -600,10 +665,10 @@
       "temporal_resolution": "daily",
       "centroid_lat": 13.983842,
       "centroid_lon": 121.184648,
-      "retrieved_at": "2026-11-14T07:13:39Z",
-      "processed_at": "2026-11-14T07:19:54Z",
+      "retrieved_at": "2026-11-14T07:51:40Z",
+      "processed_at": "2026-11-14T07:52:55Z",
       "processing_version": "1.0",
-      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\data\\raw\\nasa_power\\nasa_power_lipa_cropland_001_20240101_20240103.json"
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\nasa_power\\nasa_power_lipa_cropland_001_20240101_20240115.json"
     }
   },
   {
@@ -626,7 +691,7 @@
         "quality_flag": 9,
         "is_missing": false,
         "extraction_mode": "nearest_grid_cell_containing_aoi",
-        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. grid_center={'lat': 14.010609, 'lon': 121.229256}"
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_AM; grid_center={'lat': 14.010609, 'lon': 121.229256}; qual_bits=[retrieval_not_recommended, surface_vegetation_topography_advisory]"
       },
       "smap_retrieval_quality_flag": {
         "value": 9.0,
@@ -641,7 +706,7 @@
         "quality_flag": 9,
         "is_missing": false,
         "extraction_mode": "nearest_grid_cell_containing_aoi",
-        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. grid_center={'lat': 14.010609, 'lon': 121.229256}"
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_AM; grid_center={'lat': 14.010609, 'lon': 121.229256}; qual_bits=[retrieval_not_recommended, surface_vegetation_topography_advisory]"
       }
     },
     "flat_observations": {
@@ -660,7 +725,19 @@
       },
       "quality_status": "VALID_WITH_WARNINGS",
       "quality_flags": {
-        "retrieval_qual_flag": 9
+        "retrieval_qual_flag": 9,
+        "retrieval_qual_decoded": {
+          "raw_value": 9,
+          "bit_0_not_recommended": true,
+          "bit_1_not_attempted": false,
+          "bit_2_unsuccessful": false,
+          "bit_3_surface_advisory": true,
+          "active_bits": [
+            "retrieval_not_recommended",
+            "surface_vegetation_topography_advisory"
+          ],
+          "summary": "retrieval_not_recommended, surface_vegetation_topography_advisory"
+        }
       },
       "observation_types": [
         "satellite"
@@ -671,10 +748,10 @@
       "temporal_resolution": "daily",
       "centroid_lat": 13.983842,
       "centroid_lon": 121.184648,
-      "retrieved_at": "2026-11-14T07:19:00Z",
-      "processed_at": "2026-11-14T07:19:55Z",
+      "retrieved_at": "2026-11-14T07:52:15Z",
+      "processed_at": "2026-11-14T07:52:57Z",
       "processing_version": "1.0",
-      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\data\\raw\\smap\\SMAP_L3_SM_P_E_20240102_R19240_001.h5"
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\smap\\SMAP_L3_SM_P_E_20240102_R19240_001.subset.dap.nc4"
     }
   },
   {
@@ -694,10 +771,25 @@
         "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
         "temporal_resolution": "daily",
         "observation_type": "satellite",
-        "quality_flag": "valid_pixels=1",
+        "quality_flag": "valid_pixels=4",
         "is_missing": false,
-        "extraction_mode": "nearest_grid_cell_containing_aoi",
-        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}"
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.0; neighborhood_max=0.0"
+      },
+      "precipitation_imerg_mm": {
+        "value": 0.0,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.0; neighborhood_max=0.0"
       },
       "precipitation_random_error_mm": {
         "value": 2.764801,
@@ -709,10 +801,10 @@
         "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
         "temporal_resolution": "daily",
         "observation_type": "satellite",
-        "quality_flag": "valid_pixels=1",
+        "quality_flag": "valid_pixels=4",
         "is_missing": false,
-        "extraction_mode": "nearest_grid_cell_containing_aoi",
-        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}"
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=2.764801; neighborhood_max=2.764801"
       },
       "precipitation_valid_sample_count": {
         "value": 48.0,
@@ -724,14 +816,15 @@
         "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
         "temporal_resolution": "daily",
         "observation_type": "satellite",
-        "quality_flag": "valid_pixels=1",
+        "quality_flag": "valid_pixels=4",
         "is_missing": false,
-        "extraction_mode": "nearest_grid_cell_containing_aoi",
-        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}"
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=48.0; neighborhood_max=48.0"
       }
     },
     "flat_observations": {
       "precipitation_mm": 0.0,
+      "precipitation_imerg_mm": 0.0,
       "precipitation_random_error_mm": 2.764801,
       "precipitation_valid_sample_count": 48.0
     },
@@ -758,10 +851,10 @@
       "temporal_resolution": "daily",
       "centroid_lat": 13.983842,
       "centroid_lon": 121.184648,
-      "retrieved_at": "2026-11-14T07:13:58Z",
-      "processed_at": "2026-11-14T07:19:54Z",
+      "retrieved_at": "2026-11-14T07:51:46Z",
+      "processed_at": "2026-11-14T07:52:55Z",
       "processing_version": "1.0",
-      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\data\\raw\\gpm_imerg\\3B-DAY.MS.MRG.3IMERG.20240103-S000000-E235959.V07B.nc4"
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\gpm_imerg\\3B-DAY.MS.MRG.3IMERG.20240103-S000000-E235959.V07B.subset.dap.nc4"
     }
   },
   {
@@ -905,6 +998,21 @@
         "is_missing": false,
         "extraction_mode": "point_centroid_enclosing_grid",
         "notes": "Modeled soil wetness index (0-1), not direct volumetric sensor reading."
+      },
+      "et0_mm_day": {
+        "value": 2.8484,
+        "unit": "mm/day",
+        "raw_variable": "DERIVED_FAO56_PM",
+        "source_dataset": "NASA_POWER",
+        "product_name": "TERRA_DERIVED_FAO56",
+        "product_version": "FAO56-PM-1998",
+        "spatial_resolution": "0.5 deg x 0.625 deg (~55 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "derived_agrometeorological",
+        "quality_flag": "OK",
+        "is_missing": false,
+        "extraction_mode": "fao56_penman_monteith",
+        "notes": "Computed via FAO-56 Penman-Monteith from NASA POWER AG daily vars (elevation=315m)."
       }
     },
     "flat_observations": {
@@ -916,7 +1024,8 @@
       "solar_radiation_mj_m2_day": 14.28,
       "wind_speed_m_s": 0.98,
       "surface_soil_wetness_index": 0.91,
-      "rootzone_soil_wetness_index": 0.94
+      "rootzone_soil_wetness_index": 0.94,
+      "et0_mm_day": 2.8484
     },
     "metadata": {
       "sources": [
@@ -939,10 +1048,10 @@
       "temporal_resolution": "daily",
       "centroid_lat": 13.983842,
       "centroid_lon": 121.184648,
-      "retrieved_at": "2026-11-14T07:13:39Z",
-      "processed_at": "2026-11-14T07:19:54Z",
+      "retrieved_at": "2026-11-14T07:51:40Z",
+      "processed_at": "2026-11-14T07:52:55Z",
       "processing_version": "1.0",
-      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\data\\raw\\nasa_power\\nasa_power_lipa_cropland_001_20240101_20240103.json"
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\nasa_power\\nasa_power_lipa_cropland_001_20240101_20240115.json"
     }
   },
   {
@@ -965,7 +1074,7 @@
         "quality_flag": 9,
         "is_missing": false,
         "extraction_mode": "nearest_grid_cell_containing_aoi",
-        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. grid_center={'lat': 14.010609, 'lon': 121.229256}"
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_AM; grid_center={'lat': 14.010609, 'lon': 121.229256}; qual_bits=[retrieval_not_recommended, surface_vegetation_topography_advisory]"
       },
       "smap_retrieval_quality_flag": {
         "value": 9.0,
@@ -980,7 +1089,7 @@
         "quality_flag": 9,
         "is_missing": false,
         "extraction_mode": "nearest_grid_cell_containing_aoi",
-        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. grid_center={'lat': 14.010609, 'lon': 121.229256}"
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_AM; grid_center={'lat': 14.010609, 'lon': 121.229256}; qual_bits=[retrieval_not_recommended, surface_vegetation_topography_advisory]"
       }
     },
     "flat_observations": {
@@ -999,7 +1108,19 @@
       },
       "quality_status": "VALID_WITH_WARNINGS",
       "quality_flags": {
-        "retrieval_qual_flag": 9
+        "retrieval_qual_flag": 9,
+        "retrieval_qual_decoded": {
+          "raw_value": 9,
+          "bit_0_not_recommended": true,
+          "bit_1_not_attempted": false,
+          "bit_2_unsuccessful": false,
+          "bit_3_surface_advisory": true,
+          "active_bits": [
+            "retrieval_not_recommended",
+            "surface_vegetation_topography_advisory"
+          ],
+          "summary": "retrieval_not_recommended, surface_vegetation_topography_advisory"
+        }
       },
       "observation_types": [
         "satellite"
@@ -1010,10 +1131,113 @@
       "temporal_resolution": "daily",
       "centroid_lat": 13.983842,
       "centroid_lon": 121.184648,
-      "retrieved_at": "2026-11-14T07:19:54Z",
-      "processed_at": "2026-11-14T07:19:55Z",
+      "retrieved_at": "2026-11-14T07:52:18Z",
+      "processed_at": "2026-11-14T07:52:57Z",
       "processing_version": "1.0",
-      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\data\\raw\\smap\\SMAP_L3_SM_P_E_20240103_R19240_001.h5"
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\smap\\SMAP_L3_SM_P_E_20240103_R19240_001.subset.dap.nc4"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_GPM_GPM_3IMERGDF_20240104T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-04T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "precipitation_mm": {
+        "value": 0.0,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.0; neighborhood_max=0.0"
+      },
+      "precipitation_imerg_mm": {
+        "value": 0.0,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.0; neighborhood_max=0.0"
+      },
+      "precipitation_random_error_mm": {
+        "value": 2.764801,
+        "unit": "mm/day",
+        "raw_variable": "randomError",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=2.764801; neighborhood_max=2.764801"
+      },
+      "precipitation_valid_sample_count": {
+        "value": 48.0,
+        "unit": "count",
+        "raw_variable": "precipitation_cnt",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=48.0; neighborhood_max=48.0"
+      }
+    },
+    "flat_observations": {
+      "precipitation_mm": 0.0,
+      "precipitation_imerg_mm": 0.0,
+      "precipitation_random_error_mm": 2.764801,
+      "precipitation_valid_sample_count": 48.0
+    },
+    "metadata": {
+      "sources": [
+        "GPM_IMERG"
+      ],
+      "product_names": [
+        "GPM_3IMERGDF"
+      ],
+      "product_versions": {
+        "GPM_3IMERGDF": "07B"
+      },
+      "quality_status": "VALID",
+      "quality_flags": {
+        "run_type": "Final"
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "GPM_IMERG": "0.1 deg x 0.1 deg (~11 km)"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:51:47Z",
+      "processed_at": "2026-11-14T07:52:55Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\gpm_imerg\\3B-DAY.MS.MRG.3IMERG.20240104-S000000-E235959.V07B.subset.dap.nc4"
     }
   },
   {
@@ -1157,6 +1381,21 @@
         "is_missing": false,
         "extraction_mode": "point_centroid_enclosing_grid",
         "notes": "Modeled soil wetness index (0-1), not direct volumetric sensor reading."
+      },
+      "et0_mm_day": {
+        "value": 2.6201,
+        "unit": "mm/day",
+        "raw_variable": "DERIVED_FAO56_PM",
+        "source_dataset": "NASA_POWER",
+        "product_name": "TERRA_DERIVED_FAO56",
+        "product_version": "FAO56-PM-1998",
+        "spatial_resolution": "0.5 deg x 0.625 deg (~55 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "derived_agrometeorological",
+        "quality_flag": "OK",
+        "is_missing": false,
+        "extraction_mode": "fao56_penman_monteith",
+        "notes": "Computed via FAO-56 Penman-Monteith from NASA POWER AG daily vars (elevation=315m)."
       }
     },
     "flat_observations": {
@@ -1168,7 +1407,8 @@
       "solar_radiation_mj_m2_day": 13.13,
       "wind_speed_m_s": 1.6,
       "surface_soil_wetness_index": 0.91,
-      "rootzone_soil_wetness_index": 0.94
+      "rootzone_soil_wetness_index": 0.94,
+      "et0_mm_day": 2.6201
     },
     "metadata": {
       "sources": [
@@ -1191,10 +1431,185 @@
       "temporal_resolution": "daily",
       "centroid_lat": 13.983842,
       "centroid_lon": 121.184648,
-      "retrieved_at": "2026-11-14T07:00:59Z",
-      "processed_at": "2026-11-14T07:02:33Z",
+      "retrieved_at": "2026-11-14T07:51:40Z",
+      "processed_at": "2026-11-14T07:52:55Z",
       "processing_version": "1.0",
-      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\data\\raw\\nasa_power\\nasa_power_lipa_cropland_001_20240101_20240115.json"
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\nasa_power\\nasa_power_lipa_cropland_001_20240101_20240115.json"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_SMAP_SPL3SMP_E_20240104T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-04T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "soil_moisture_surface_m3_m3": {
+        "value": null,
+        "unit": "m3/m3",
+        "raw_variable": "soil_moisture",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "NO_BITMASK",
+        "is_missing": true,
+        "extraction_mode": "no_overpass_covering_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_PM; grid_center=None; qual_bits=[unavailable]"
+      },
+      "smap_retrieval_quality_flag": {
+        "value": null,
+        "unit": "bitmask",
+        "raw_variable": "retrieval_qual_flag",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "NO_BITMASK",
+        "is_missing": true,
+        "extraction_mode": "no_overpass_covering_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_PM; grid_center=None; qual_bits=[unavailable]"
+      }
+    },
+    "flat_observations": {
+      "soil_moisture_surface_m3_m3": null,
+      "smap_retrieval_quality_flag": null
+    },
+    "metadata": {
+      "sources": [
+        "SMAP"
+      ],
+      "product_names": [
+        "SPL3SMP_E"
+      ],
+      "product_versions": {
+        "SPL3SMP_E": "006"
+      },
+      "quality_status": "INCOMPLETE",
+      "quality_flags": {
+        "retrieval_qual_flag": null,
+        "retrieval_qual_decoded": null
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "SMAP": "9 km EASE-Grid 2.0"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:52:21Z",
+      "processed_at": "2026-11-14T07:52:57Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\smap\\SMAP_L3_SM_P_E_20240104_R19240_001.subset.dap.nc4"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_GPM_GPM_3IMERGDF_20240105T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-05T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "precipitation_mm": {
+        "value": 2.564271,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=1.535; neighborhood_max=5.23"
+      },
+      "precipitation_imerg_mm": {
+        "value": 2.564271,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=1.535; neighborhood_max=5.23"
+      },
+      "precipitation_random_error_mm": {
+        "value": 237.067484,
+        "unit": "mm/day",
+        "raw_variable": "randomError",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=109.635468; neighborhood_max=590.989746"
+      },
+      "precipitation_valid_sample_count": {
+        "value": 48.0,
+        "unit": "count",
+        "raw_variable": "precipitation_cnt",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=48.0; neighborhood_max=48.0"
+      }
+    },
+    "flat_observations": {
+      "precipitation_mm": 2.564271,
+      "precipitation_imerg_mm": 2.564271,
+      "precipitation_random_error_mm": 237.067484,
+      "precipitation_valid_sample_count": 48.0
+    },
+    "metadata": {
+      "sources": [
+        "GPM_IMERG"
+      ],
+      "product_names": [
+        "GPM_3IMERGDF"
+      ],
+      "product_versions": {
+        "GPM_3IMERGDF": "07B"
+      },
+      "quality_status": "VALID",
+      "quality_flags": {
+        "run_type": "Final"
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "GPM_IMERG": "0.1 deg x 0.1 deg (~11 km)"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:51:49Z",
+      "processed_at": "2026-11-14T07:52:55Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\gpm_imerg\\3B-DAY.MS.MRG.3IMERG.20240105-S000000-E235959.V07B.subset.dap.nc4"
     }
   },
   {
@@ -1338,6 +1753,21 @@
         "is_missing": false,
         "extraction_mode": "point_centroid_enclosing_grid",
         "notes": "Modeled soil wetness index (0-1), not direct volumetric sensor reading."
+      },
+      "et0_mm_day": {
+        "value": 2.3269,
+        "unit": "mm/day",
+        "raw_variable": "DERIVED_FAO56_PM",
+        "source_dataset": "NASA_POWER",
+        "product_name": "TERRA_DERIVED_FAO56",
+        "product_version": "FAO56-PM-1998",
+        "spatial_resolution": "0.5 deg x 0.625 deg (~55 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "derived_agrometeorological",
+        "quality_flag": "OK",
+        "is_missing": false,
+        "extraction_mode": "fao56_penman_monteith",
+        "notes": "Computed via FAO-56 Penman-Monteith from NASA POWER AG daily vars (elevation=315m)."
       }
     },
     "flat_observations": {
@@ -1349,7 +1779,8 @@
       "solar_radiation_mj_m2_day": 11.09,
       "wind_speed_m_s": 1.81,
       "surface_soil_wetness_index": 0.91,
-      "rootzone_soil_wetness_index": 0.94
+      "rootzone_soil_wetness_index": 0.94,
+      "et0_mm_day": 2.3269
     },
     "metadata": {
       "sources": [
@@ -1372,10 +1803,196 @@
       "temporal_resolution": "daily",
       "centroid_lat": 13.983842,
       "centroid_lon": 121.184648,
-      "retrieved_at": "2026-11-14T07:00:59Z",
-      "processed_at": "2026-11-14T07:02:33Z",
+      "retrieved_at": "2026-11-14T07:51:40Z",
+      "processed_at": "2026-11-14T07:52:55Z",
       "processing_version": "1.0",
-      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\data\\raw\\nasa_power\\nasa_power_lipa_cropland_001_20240101_20240115.json"
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\nasa_power\\nasa_power_lipa_cropland_001_20240101_20240115.json"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_SMAP_SPL3SMP_E_20240105T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-05T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "soil_moisture_surface_m3_m3": {
+        "value": 0.500053,
+        "unit": "m3/m3",
+        "raw_variable": "soil_moisture",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": 9,
+        "is_missing": false,
+        "extraction_mode": "nearest_grid_cell_containing_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_AM; grid_center={'lat': 14.010609, 'lon': 121.229256}; qual_bits=[retrieval_not_recommended, surface_vegetation_topography_advisory]"
+      },
+      "smap_retrieval_quality_flag": {
+        "value": 9.0,
+        "unit": "bitmask",
+        "raw_variable": "retrieval_qual_flag",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": 9,
+        "is_missing": false,
+        "extraction_mode": "nearest_grid_cell_containing_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_AM; grid_center={'lat': 14.010609, 'lon': 121.229256}; qual_bits=[retrieval_not_recommended, surface_vegetation_topography_advisory]"
+      }
+    },
+    "flat_observations": {
+      "soil_moisture_surface_m3_m3": 0.500053,
+      "smap_retrieval_quality_flag": 9.0
+    },
+    "metadata": {
+      "sources": [
+        "SMAP"
+      ],
+      "product_names": [
+        "SPL3SMP_E"
+      ],
+      "product_versions": {
+        "SPL3SMP_E": "006"
+      },
+      "quality_status": "VALID_WITH_WARNINGS",
+      "quality_flags": {
+        "retrieval_qual_flag": 9,
+        "retrieval_qual_decoded": {
+          "raw_value": 9,
+          "bit_0_not_recommended": true,
+          "bit_1_not_attempted": false,
+          "bit_2_unsuccessful": false,
+          "bit_3_surface_advisory": true,
+          "active_bits": [
+            "retrieval_not_recommended",
+            "surface_vegetation_topography_advisory"
+          ],
+          "summary": "retrieval_not_recommended, surface_vegetation_topography_advisory"
+        }
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "SMAP": "9 km EASE-Grid 2.0"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:52:24Z",
+      "processed_at": "2026-11-14T07:52:57Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\smap\\SMAP_L3_SM_P_E_20240105_R19240_002.subset.dap.nc4"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_GPM_GPM_3IMERGDF_20240106T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-06T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "precipitation_mm": {
+        "value": 0.031205,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.06; neighborhood_max=0.06"
+      },
+      "precipitation_imerg_mm": {
+        "value": 0.031205,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.06; neighborhood_max=0.06"
+      },
+      "precipitation_random_error_mm": {
+        "value": 3.466169,
+        "unit": "mm/day",
+        "raw_variable": "randomError",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=4.117701; neighborhood_max=4.117701"
+      },
+      "precipitation_valid_sample_count": {
+        "value": 48.0,
+        "unit": "count",
+        "raw_variable": "precipitation_cnt",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=48.0; neighborhood_max=48.0"
+      }
+    },
+    "flat_observations": {
+      "precipitation_mm": 0.031205,
+      "precipitation_imerg_mm": 0.031205,
+      "precipitation_random_error_mm": 3.466169,
+      "precipitation_valid_sample_count": 48.0
+    },
+    "metadata": {
+      "sources": [
+        "GPM_IMERG"
+      ],
+      "product_names": [
+        "GPM_3IMERGDF"
+      ],
+      "product_versions": {
+        "GPM_3IMERGDF": "07B"
+      },
+      "quality_status": "VALID",
+      "quality_flags": {
+        "run_type": "Final"
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "GPM_IMERG": "0.1 deg x 0.1 deg (~11 km)"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:51:51Z",
+      "processed_at": "2026-11-14T07:52:55Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\gpm_imerg\\3B-DAY.MS.MRG.3IMERG.20240106-S000000-E235959.V07B.subset.dap.nc4"
     }
   },
   {
@@ -1519,6 +2136,21 @@
         "is_missing": false,
         "extraction_mode": "point_centroid_enclosing_grid",
         "notes": "Modeled soil wetness index (0-1), not direct volumetric sensor reading."
+      },
+      "et0_mm_day": {
+        "value": 2.7183,
+        "unit": "mm/day",
+        "raw_variable": "DERIVED_FAO56_PM",
+        "source_dataset": "NASA_POWER",
+        "product_name": "TERRA_DERIVED_FAO56",
+        "product_version": "FAO56-PM-1998",
+        "spatial_resolution": "0.5 deg x 0.625 deg (~55 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "derived_agrometeorological",
+        "quality_flag": "OK",
+        "is_missing": false,
+        "extraction_mode": "fao56_penman_monteith",
+        "notes": "Computed via FAO-56 Penman-Monteith from NASA POWER AG daily vars (elevation=315m)."
       }
     },
     "flat_observations": {
@@ -1530,7 +2162,8 @@
       "solar_radiation_mj_m2_day": 13.77,
       "wind_speed_m_s": 1.58,
       "surface_soil_wetness_index": 0.9,
-      "rootzone_soil_wetness_index": 0.93
+      "rootzone_soil_wetness_index": 0.93,
+      "et0_mm_day": 2.7183
     },
     "metadata": {
       "sources": [
@@ -1553,10 +2186,185 @@
       "temporal_resolution": "daily",
       "centroid_lat": 13.983842,
       "centroid_lon": 121.184648,
-      "retrieved_at": "2026-11-14T07:00:59Z",
-      "processed_at": "2026-11-14T07:02:33Z",
+      "retrieved_at": "2026-11-14T07:51:40Z",
+      "processed_at": "2026-11-14T07:52:55Z",
       "processing_version": "1.0",
-      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\data\\raw\\nasa_power\\nasa_power_lipa_cropland_001_20240101_20240115.json"
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\nasa_power\\nasa_power_lipa_cropland_001_20240101_20240115.json"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_SMAP_SPL3SMP_E_20240106T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-06T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "soil_moisture_surface_m3_m3": {
+        "value": null,
+        "unit": "m3/m3",
+        "raw_variable": "soil_moisture",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "NO_BITMASK",
+        "is_missing": true,
+        "extraction_mode": "no_overpass_covering_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_PM; grid_center=None; qual_bits=[unavailable]"
+      },
+      "smap_retrieval_quality_flag": {
+        "value": null,
+        "unit": "bitmask",
+        "raw_variable": "retrieval_qual_flag",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "NO_BITMASK",
+        "is_missing": true,
+        "extraction_mode": "no_overpass_covering_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_PM; grid_center=None; qual_bits=[unavailable]"
+      }
+    },
+    "flat_observations": {
+      "soil_moisture_surface_m3_m3": null,
+      "smap_retrieval_quality_flag": null
+    },
+    "metadata": {
+      "sources": [
+        "SMAP"
+      ],
+      "product_names": [
+        "SPL3SMP_E"
+      ],
+      "product_versions": {
+        "SPL3SMP_E": "006"
+      },
+      "quality_status": "INCOMPLETE",
+      "quality_flags": {
+        "retrieval_qual_flag": null,
+        "retrieval_qual_decoded": null
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "SMAP": "9 km EASE-Grid 2.0"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:52:28Z",
+      "processed_at": "2026-11-14T07:52:57Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\smap\\SMAP_L3_SM_P_E_20240106_R19240_001.subset.dap.nc4"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_GPM_GPM_3IMERGDF_20240107T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-07T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "precipitation_mm": {
+        "value": 0.0,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.0; neighborhood_max=0.0"
+      },
+      "precipitation_imerg_mm": {
+        "value": 0.0,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.0; neighborhood_max=0.0"
+      },
+      "precipitation_random_error_mm": {
+        "value": 2.764801,
+        "unit": "mm/day",
+        "raw_variable": "randomError",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=2.764801; neighborhood_max=2.764801"
+      },
+      "precipitation_valid_sample_count": {
+        "value": 48.0,
+        "unit": "count",
+        "raw_variable": "precipitation_cnt",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=48.0; neighborhood_max=48.0"
+      }
+    },
+    "flat_observations": {
+      "precipitation_mm": 0.0,
+      "precipitation_imerg_mm": 0.0,
+      "precipitation_random_error_mm": 2.764801,
+      "precipitation_valid_sample_count": 48.0
+    },
+    "metadata": {
+      "sources": [
+        "GPM_IMERG"
+      ],
+      "product_names": [
+        "GPM_3IMERGDF"
+      ],
+      "product_versions": {
+        "GPM_3IMERGDF": "07B"
+      },
+      "quality_status": "VALID",
+      "quality_flags": {
+        "run_type": "Final"
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "GPM_IMERG": "0.1 deg x 0.1 deg (~11 km)"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:51:52Z",
+      "processed_at": "2026-11-14T07:52:55Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\gpm_imerg\\3B-DAY.MS.MRG.3IMERG.20240107-S000000-E235959.V07B.subset.dap.nc4"
     }
   },
   {
@@ -1700,6 +2508,21 @@
         "is_missing": false,
         "extraction_mode": "point_centroid_enclosing_grid",
         "notes": "Modeled soil wetness index (0-1), not direct volumetric sensor reading."
+      },
+      "et0_mm_day": {
+        "value": 2.6931,
+        "unit": "mm/day",
+        "raw_variable": "DERIVED_FAO56_PM",
+        "source_dataset": "NASA_POWER",
+        "product_name": "TERRA_DERIVED_FAO56",
+        "product_version": "FAO56-PM-1998",
+        "spatial_resolution": "0.5 deg x 0.625 deg (~55 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "derived_agrometeorological",
+        "quality_flag": "OK",
+        "is_missing": false,
+        "extraction_mode": "fao56_penman_monteith",
+        "notes": "Computed via FAO-56 Penman-Monteith from NASA POWER AG daily vars (elevation=315m)."
       }
     },
     "flat_observations": {
@@ -1711,7 +2534,8 @@
       "solar_radiation_mj_m2_day": 13.38,
       "wind_speed_m_s": 1.85,
       "surface_soil_wetness_index": 0.9,
-      "rootzone_soil_wetness_index": 0.93
+      "rootzone_soil_wetness_index": 0.93,
+      "et0_mm_day": 2.6931
     },
     "metadata": {
       "sources": [
@@ -1734,10 +2558,185 @@
       "temporal_resolution": "daily",
       "centroid_lat": 13.983842,
       "centroid_lon": 121.184648,
-      "retrieved_at": "2026-11-14T07:00:59Z",
-      "processed_at": "2026-11-14T07:02:33Z",
+      "retrieved_at": "2026-11-14T07:51:40Z",
+      "processed_at": "2026-11-14T07:52:55Z",
       "processing_version": "1.0",
-      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\data\\raw\\nasa_power\\nasa_power_lipa_cropland_001_20240101_20240115.json"
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\nasa_power\\nasa_power_lipa_cropland_001_20240101_20240115.json"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_SMAP_SPL3SMP_E_20240107T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-07T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "soil_moisture_surface_m3_m3": {
+        "value": null,
+        "unit": "m3/m3",
+        "raw_variable": "soil_moisture",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "NO_BITMASK",
+        "is_missing": true,
+        "extraction_mode": "no_overpass_covering_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_PM; grid_center=None; qual_bits=[unavailable]"
+      },
+      "smap_retrieval_quality_flag": {
+        "value": null,
+        "unit": "bitmask",
+        "raw_variable": "retrieval_qual_flag",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "NO_BITMASK",
+        "is_missing": true,
+        "extraction_mode": "no_overpass_covering_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_PM; grid_center=None; qual_bits=[unavailable]"
+      }
+    },
+    "flat_observations": {
+      "soil_moisture_surface_m3_m3": null,
+      "smap_retrieval_quality_flag": null
+    },
+    "metadata": {
+      "sources": [
+        "SMAP"
+      ],
+      "product_names": [
+        "SPL3SMP_E"
+      ],
+      "product_versions": {
+        "SPL3SMP_E": "006"
+      },
+      "quality_status": "INCOMPLETE",
+      "quality_flags": {
+        "retrieval_qual_flag": null,
+        "retrieval_qual_decoded": null
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "SMAP": "9 km EASE-Grid 2.0"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:52:30Z",
+      "processed_at": "2026-11-14T07:52:57Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\smap\\SMAP_L3_SM_P_E_20240107_R19240_001.subset.dap.nc4"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_GPM_GPM_3IMERGDF_20240108T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-08T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "precipitation_mm": {
+        "value": 5.369804,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=1.37; neighborhood_max=20.68"
+      },
+      "precipitation_imerg_mm": {
+        "value": 5.369804,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=1.37; neighborhood_max=20.68"
+      },
+      "precipitation_random_error_mm": {
+        "value": 632.356028,
+        "unit": "mm/day",
+        "raw_variable": "randomError",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=63.38879; neighborhood_max=2861.673584"
+      },
+      "precipitation_valid_sample_count": {
+        "value": 48.0,
+        "unit": "count",
+        "raw_variable": "precipitation_cnt",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=48.0; neighborhood_max=48.0"
+      }
+    },
+    "flat_observations": {
+      "precipitation_mm": 5.369804,
+      "precipitation_imerg_mm": 5.369804,
+      "precipitation_random_error_mm": 632.356028,
+      "precipitation_valid_sample_count": 48.0
+    },
+    "metadata": {
+      "sources": [
+        "GPM_IMERG"
+      ],
+      "product_names": [
+        "GPM_3IMERGDF"
+      ],
+      "product_versions": {
+        "GPM_3IMERGDF": "07B"
+      },
+      "quality_status": "VALID",
+      "quality_flags": {
+        "run_type": "Final"
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "GPM_IMERG": "0.1 deg x 0.1 deg (~11 km)"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:51:54Z",
+      "processed_at": "2026-11-14T07:52:55Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\gpm_imerg\\3B-DAY.MS.MRG.3IMERG.20240108-S000000-E235959.V07B.subset.dap.nc4"
     }
   },
   {
@@ -1881,6 +2880,21 @@
         "is_missing": false,
         "extraction_mode": "point_centroid_enclosing_grid",
         "notes": "Modeled soil wetness index (0-1), not direct volumetric sensor reading."
+      },
+      "et0_mm_day": {
+        "value": 2.1648,
+        "unit": "mm/day",
+        "raw_variable": "DERIVED_FAO56_PM",
+        "source_dataset": "NASA_POWER",
+        "product_name": "TERRA_DERIVED_FAO56",
+        "product_version": "FAO56-PM-1998",
+        "spatial_resolution": "0.5 deg x 0.625 deg (~55 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "derived_agrometeorological",
+        "quality_flag": "OK",
+        "is_missing": false,
+        "extraction_mode": "fao56_penman_monteith",
+        "notes": "Computed via FAO-56 Penman-Monteith from NASA POWER AG daily vars (elevation=315m)."
       }
     },
     "flat_observations": {
@@ -1892,7 +2906,8 @@
       "solar_radiation_mj_m2_day": 10.23,
       "wind_speed_m_s": 1.83,
       "surface_soil_wetness_index": 0.91,
-      "rootzone_soil_wetness_index": 0.93
+      "rootzone_soil_wetness_index": 0.93,
+      "et0_mm_day": 2.1648
     },
     "metadata": {
       "sources": [
@@ -1915,10 +2930,196 @@
       "temporal_resolution": "daily",
       "centroid_lat": 13.983842,
       "centroid_lon": 121.184648,
-      "retrieved_at": "2026-11-14T07:00:59Z",
-      "processed_at": "2026-11-14T07:02:33Z",
+      "retrieved_at": "2026-11-14T07:51:40Z",
+      "processed_at": "2026-11-14T07:52:55Z",
       "processing_version": "1.0",
-      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\data\\raw\\nasa_power\\nasa_power_lipa_cropland_001_20240101_20240115.json"
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\nasa_power\\nasa_power_lipa_cropland_001_20240101_20240115.json"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_SMAP_SPL3SMP_E_20240108T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-08T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "soil_moisture_surface_m3_m3": {
+        "value": 0.504141,
+        "unit": "m3/m3",
+        "raw_variable": "soil_moisture",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": 9,
+        "is_missing": false,
+        "extraction_mode": "nearest_grid_cell_containing_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_AM; grid_center={'lat': 14.010609, 'lon': 121.229256}; qual_bits=[retrieval_not_recommended, surface_vegetation_topography_advisory]"
+      },
+      "smap_retrieval_quality_flag": {
+        "value": 9.0,
+        "unit": "bitmask",
+        "raw_variable": "retrieval_qual_flag",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": 9,
+        "is_missing": false,
+        "extraction_mode": "nearest_grid_cell_containing_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_AM; grid_center={'lat': 14.010609, 'lon': 121.229256}; qual_bits=[retrieval_not_recommended, surface_vegetation_topography_advisory]"
+      }
+    },
+    "flat_observations": {
+      "soil_moisture_surface_m3_m3": 0.504141,
+      "smap_retrieval_quality_flag": 9.0
+    },
+    "metadata": {
+      "sources": [
+        "SMAP"
+      ],
+      "product_names": [
+        "SPL3SMP_E"
+      ],
+      "product_versions": {
+        "SPL3SMP_E": "006"
+      },
+      "quality_status": "VALID_WITH_WARNINGS",
+      "quality_flags": {
+        "retrieval_qual_flag": 9,
+        "retrieval_qual_decoded": {
+          "raw_value": 9,
+          "bit_0_not_recommended": true,
+          "bit_1_not_attempted": false,
+          "bit_2_unsuccessful": false,
+          "bit_3_surface_advisory": true,
+          "active_bits": [
+            "retrieval_not_recommended",
+            "surface_vegetation_topography_advisory"
+          ],
+          "summary": "retrieval_not_recommended, surface_vegetation_topography_advisory"
+        }
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "SMAP": "9 km EASE-Grid 2.0"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:52:34Z",
+      "processed_at": "2026-11-14T07:52:57Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\smap\\SMAP_L3_SM_P_E_20240108_R19240_001.subset.dap.nc4"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_GPM_GPM_3IMERGDF_20240109T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-09T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "precipitation_mm": {
+        "value": 0.051177,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.075; neighborhood_max=0.075"
+      },
+      "precipitation_imerg_mm": {
+        "value": 0.051177,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.075; neighborhood_max=0.075"
+      },
+      "precipitation_random_error_mm": {
+        "value": 3.972728,
+        "unit": "mm/day",
+        "raw_variable": "randomError",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=4.5252; neighborhood_max=4.5252"
+      },
+      "precipitation_valid_sample_count": {
+        "value": 48.0,
+        "unit": "count",
+        "raw_variable": "precipitation_cnt",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=48.0; neighborhood_max=48.0"
+      }
+    },
+    "flat_observations": {
+      "precipitation_mm": 0.051177,
+      "precipitation_imerg_mm": 0.051177,
+      "precipitation_random_error_mm": 3.972728,
+      "precipitation_valid_sample_count": 48.0
+    },
+    "metadata": {
+      "sources": [
+        "GPM_IMERG"
+      ],
+      "product_names": [
+        "GPM_3IMERGDF"
+      ],
+      "product_versions": {
+        "GPM_3IMERGDF": "07B"
+      },
+      "quality_status": "VALID",
+      "quality_flags": {
+        "run_type": "Final"
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "GPM_IMERG": "0.1 deg x 0.1 deg (~11 km)"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:51:56Z",
+      "processed_at": "2026-11-14T07:52:55Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\gpm_imerg\\3B-DAY.MS.MRG.3IMERG.20240109-S000000-E235959.V07B.subset.dap.nc4"
     }
   },
   {
@@ -2062,6 +3263,21 @@
         "is_missing": false,
         "extraction_mode": "point_centroid_enclosing_grid",
         "notes": "Modeled soil wetness index (0-1), not direct volumetric sensor reading."
+      },
+      "et0_mm_day": {
+        "value": 3.3834,
+        "unit": "mm/day",
+        "raw_variable": "DERIVED_FAO56_PM",
+        "source_dataset": "NASA_POWER",
+        "product_name": "TERRA_DERIVED_FAO56",
+        "product_version": "FAO56-PM-1998",
+        "spatial_resolution": "0.5 deg x 0.625 deg (~55 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "derived_agrometeorological",
+        "quality_flag": "OK",
+        "is_missing": false,
+        "extraction_mode": "fao56_penman_monteith",
+        "notes": "Computed via FAO-56 Penman-Monteith from NASA POWER AG daily vars (elevation=315m)."
       }
     },
     "flat_observations": {
@@ -2073,7 +3289,8 @@
       "solar_radiation_mj_m2_day": 17.7,
       "wind_speed_m_s": 1.16,
       "surface_soil_wetness_index": 0.91,
-      "rootzone_soil_wetness_index": 0.93
+      "rootzone_soil_wetness_index": 0.93,
+      "et0_mm_day": 3.3834
     },
     "metadata": {
       "sources": [
@@ -2096,10 +3313,185 @@
       "temporal_resolution": "daily",
       "centroid_lat": 13.983842,
       "centroid_lon": 121.184648,
-      "retrieved_at": "2026-11-14T07:00:59Z",
-      "processed_at": "2026-11-14T07:02:33Z",
+      "retrieved_at": "2026-11-14T07:51:40Z",
+      "processed_at": "2026-11-14T07:52:55Z",
       "processing_version": "1.0",
-      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\data\\raw\\nasa_power\\nasa_power_lipa_cropland_001_20240101_20240115.json"
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\nasa_power\\nasa_power_lipa_cropland_001_20240101_20240115.json"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_SMAP_SPL3SMP_E_20240109T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-09T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "soil_moisture_surface_m3_m3": {
+        "value": null,
+        "unit": "m3/m3",
+        "raw_variable": "soil_moisture",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "NO_BITMASK",
+        "is_missing": true,
+        "extraction_mode": "no_overpass_covering_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_PM; grid_center=None; qual_bits=[unavailable]"
+      },
+      "smap_retrieval_quality_flag": {
+        "value": null,
+        "unit": "bitmask",
+        "raw_variable": "retrieval_qual_flag",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "NO_BITMASK",
+        "is_missing": true,
+        "extraction_mode": "no_overpass_covering_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_PM; grid_center=None; qual_bits=[unavailable]"
+      }
+    },
+    "flat_observations": {
+      "soil_moisture_surface_m3_m3": null,
+      "smap_retrieval_quality_flag": null
+    },
+    "metadata": {
+      "sources": [
+        "SMAP"
+      ],
+      "product_names": [
+        "SPL3SMP_E"
+      ],
+      "product_versions": {
+        "SPL3SMP_E": "006"
+      },
+      "quality_status": "INCOMPLETE",
+      "quality_flags": {
+        "retrieval_qual_flag": null,
+        "retrieval_qual_decoded": null
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "SMAP": "9 km EASE-Grid 2.0"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:52:37Z",
+      "processed_at": "2026-11-14T07:52:57Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\smap\\SMAP_L3_SM_P_E_20240109_R19240_001.subset.dap.nc4"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_GPM_GPM_3IMERGDF_20240110T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-10T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "precipitation_mm": {
+        "value": 0.0,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.0; neighborhood_max=0.0"
+      },
+      "precipitation_imerg_mm": {
+        "value": 0.0,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.0; neighborhood_max=0.0"
+      },
+      "precipitation_random_error_mm": {
+        "value": 2.764801,
+        "unit": "mm/day",
+        "raw_variable": "randomError",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=2.764801; neighborhood_max=2.764801"
+      },
+      "precipitation_valid_sample_count": {
+        "value": 48.0,
+        "unit": "count",
+        "raw_variable": "precipitation_cnt",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=48.0; neighborhood_max=48.0"
+      }
+    },
+    "flat_observations": {
+      "precipitation_mm": 0.0,
+      "precipitation_imerg_mm": 0.0,
+      "precipitation_random_error_mm": 2.764801,
+      "precipitation_valid_sample_count": 48.0
+    },
+    "metadata": {
+      "sources": [
+        "GPM_IMERG"
+      ],
+      "product_names": [
+        "GPM_3IMERGDF"
+      ],
+      "product_versions": {
+        "GPM_3IMERGDF": "07B"
+      },
+      "quality_status": "VALID",
+      "quality_flags": {
+        "run_type": "Final"
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "GPM_IMERG": "0.1 deg x 0.1 deg (~11 km)"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:51:58Z",
+      "processed_at": "2026-11-14T07:52:55Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\gpm_imerg\\3B-DAY.MS.MRG.3IMERG.20240110-S000000-E235959.V07B.subset.dap.nc4"
     }
   },
   {
@@ -2243,6 +3635,21 @@
         "is_missing": false,
         "extraction_mode": "point_centroid_enclosing_grid",
         "notes": "Modeled soil wetness index (0-1), not direct volumetric sensor reading."
+      },
+      "et0_mm_day": {
+        "value": 3.5616,
+        "unit": "mm/day",
+        "raw_variable": "DERIVED_FAO56_PM",
+        "source_dataset": "NASA_POWER",
+        "product_name": "TERRA_DERIVED_FAO56",
+        "product_version": "FAO56-PM-1998",
+        "spatial_resolution": "0.5 deg x 0.625 deg (~55 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "derived_agrometeorological",
+        "quality_flag": "OK",
+        "is_missing": false,
+        "extraction_mode": "fao56_penman_monteith",
+        "notes": "Computed via FAO-56 Penman-Monteith from NASA POWER AG daily vars (elevation=315m)."
       }
     },
     "flat_observations": {
@@ -2254,7 +3661,8 @@
       "solar_radiation_mj_m2_day": 18.3,
       "wind_speed_m_s": 0.92,
       "surface_soil_wetness_index": 0.9,
-      "rootzone_soil_wetness_index": 0.92
+      "rootzone_soil_wetness_index": 0.92,
+      "et0_mm_day": 3.5616
     },
     "metadata": {
       "sources": [
@@ -2277,10 +3685,196 @@
       "temporal_resolution": "daily",
       "centroid_lat": 13.983842,
       "centroid_lon": 121.184648,
-      "retrieved_at": "2026-11-14T07:00:59Z",
-      "processed_at": "2026-11-14T07:02:33Z",
+      "retrieved_at": "2026-11-14T07:51:40Z",
+      "processed_at": "2026-11-14T07:52:55Z",
       "processing_version": "1.0",
-      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\data\\raw\\nasa_power\\nasa_power_lipa_cropland_001_20240101_20240115.json"
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\nasa_power\\nasa_power_lipa_cropland_001_20240101_20240115.json"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_SMAP_SPL3SMP_E_20240110T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-10T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "soil_moisture_surface_m3_m3": {
+        "value": 0.463665,
+        "unit": "m3/m3",
+        "raw_variable": "soil_moisture",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": 9,
+        "is_missing": false,
+        "extraction_mode": "nearest_grid_cell_containing_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_AM; grid_center={'lat': 14.010609, 'lon': 121.229256}; qual_bits=[retrieval_not_recommended, surface_vegetation_topography_advisory]"
+      },
+      "smap_retrieval_quality_flag": {
+        "value": 9.0,
+        "unit": "bitmask",
+        "raw_variable": "retrieval_qual_flag",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": 9,
+        "is_missing": false,
+        "extraction_mode": "nearest_grid_cell_containing_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_AM; grid_center={'lat': 14.010609, 'lon': 121.229256}; qual_bits=[retrieval_not_recommended, surface_vegetation_topography_advisory]"
+      }
+    },
+    "flat_observations": {
+      "soil_moisture_surface_m3_m3": 0.463665,
+      "smap_retrieval_quality_flag": 9.0
+    },
+    "metadata": {
+      "sources": [
+        "SMAP"
+      ],
+      "product_names": [
+        "SPL3SMP_E"
+      ],
+      "product_versions": {
+        "SPL3SMP_E": "006"
+      },
+      "quality_status": "VALID_WITH_WARNINGS",
+      "quality_flags": {
+        "retrieval_qual_flag": 9,
+        "retrieval_qual_decoded": {
+          "raw_value": 9,
+          "bit_0_not_recommended": true,
+          "bit_1_not_attempted": false,
+          "bit_2_unsuccessful": false,
+          "bit_3_surface_advisory": true,
+          "active_bits": [
+            "retrieval_not_recommended",
+            "surface_vegetation_topography_advisory"
+          ],
+          "summary": "retrieval_not_recommended, surface_vegetation_topography_advisory"
+        }
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "SMAP": "9 km EASE-Grid 2.0"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:52:40Z",
+      "processed_at": "2026-11-14T07:52:57Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\smap\\SMAP_L3_SM_P_E_20240110_R19240_001.subset.dap.nc4"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_GPM_GPM_3IMERGDF_20240111T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-11T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "precipitation_mm": {
+        "value": 0.0,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.0; neighborhood_max=0.0"
+      },
+      "precipitation_imerg_mm": {
+        "value": 0.0,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.0; neighborhood_max=0.0"
+      },
+      "precipitation_random_error_mm": {
+        "value": 2.764801,
+        "unit": "mm/day",
+        "raw_variable": "randomError",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=2.764801; neighborhood_max=2.764801"
+      },
+      "precipitation_valid_sample_count": {
+        "value": 48.0,
+        "unit": "count",
+        "raw_variable": "precipitation_cnt",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=48.0; neighborhood_max=48.0"
+      }
+    },
+    "flat_observations": {
+      "precipitation_mm": 0.0,
+      "precipitation_imerg_mm": 0.0,
+      "precipitation_random_error_mm": 2.764801,
+      "precipitation_valid_sample_count": 48.0
+    },
+    "metadata": {
+      "sources": [
+        "GPM_IMERG"
+      ],
+      "product_names": [
+        "GPM_3IMERGDF"
+      ],
+      "product_versions": {
+        "GPM_3IMERGDF": "07B"
+      },
+      "quality_status": "VALID",
+      "quality_flags": {
+        "run_type": "Final"
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "GPM_IMERG": "0.1 deg x 0.1 deg (~11 km)"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:52:00Z",
+      "processed_at": "2026-11-14T07:52:55Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\gpm_imerg\\3B-DAY.MS.MRG.3IMERG.20240111-S000000-E235959.V07B.subset.dap.nc4"
     }
   },
   {
@@ -2424,6 +4018,21 @@
         "is_missing": false,
         "extraction_mode": "point_centroid_enclosing_grid",
         "notes": "Modeled soil wetness index (0-1), not direct volumetric sensor reading."
+      },
+      "et0_mm_day": {
+        "value": 2.9248,
+        "unit": "mm/day",
+        "raw_variable": "DERIVED_FAO56_PM",
+        "source_dataset": "NASA_POWER",
+        "product_name": "TERRA_DERIVED_FAO56",
+        "product_version": "FAO56-PM-1998",
+        "spatial_resolution": "0.5 deg x 0.625 deg (~55 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "derived_agrometeorological",
+        "quality_flag": "OK",
+        "is_missing": false,
+        "extraction_mode": "fao56_penman_monteith",
+        "notes": "Computed via FAO-56 Penman-Monteith from NASA POWER AG daily vars (elevation=315m)."
       }
     },
     "flat_observations": {
@@ -2435,7 +4044,8 @@
       "solar_radiation_mj_m2_day": 15.26,
       "wind_speed_m_s": 1.93,
       "surface_soil_wetness_index": 0.89,
-      "rootzone_soil_wetness_index": 0.92
+      "rootzone_soil_wetness_index": 0.92,
+      "et0_mm_day": 2.9248
     },
     "metadata": {
       "sources": [
@@ -2458,10 +4068,196 @@
       "temporal_resolution": "daily",
       "centroid_lat": 13.983842,
       "centroid_lon": 121.184648,
-      "retrieved_at": "2026-11-14T07:00:59Z",
-      "processed_at": "2026-11-14T07:02:33Z",
+      "retrieved_at": "2026-11-14T07:51:40Z",
+      "processed_at": "2026-11-14T07:52:55Z",
       "processing_version": "1.0",
-      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\data\\raw\\nasa_power\\nasa_power_lipa_cropland_001_20240101_20240115.json"
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\nasa_power\\nasa_power_lipa_cropland_001_20240101_20240115.json"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_SMAP_SPL3SMP_E_20240111T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-11T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "soil_moisture_surface_m3_m3": {
+        "value": 0.473746,
+        "unit": "m3/m3",
+        "raw_variable": "soil_moisture",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": 9,
+        "is_missing": false,
+        "extraction_mode": "nearest_grid_cell_containing_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_AM; grid_center={'lat': 14.010609, 'lon': 121.229256}; qual_bits=[retrieval_not_recommended, surface_vegetation_topography_advisory]"
+      },
+      "smap_retrieval_quality_flag": {
+        "value": 9.0,
+        "unit": "bitmask",
+        "raw_variable": "retrieval_qual_flag",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": 9,
+        "is_missing": false,
+        "extraction_mode": "nearest_grid_cell_containing_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_AM; grid_center={'lat': 14.010609, 'lon': 121.229256}; qual_bits=[retrieval_not_recommended, surface_vegetation_topography_advisory]"
+      }
+    },
+    "flat_observations": {
+      "soil_moisture_surface_m3_m3": 0.473746,
+      "smap_retrieval_quality_flag": 9.0
+    },
+    "metadata": {
+      "sources": [
+        "SMAP"
+      ],
+      "product_names": [
+        "SPL3SMP_E"
+      ],
+      "product_versions": {
+        "SPL3SMP_E": "006"
+      },
+      "quality_status": "VALID_WITH_WARNINGS",
+      "quality_flags": {
+        "retrieval_qual_flag": 9,
+        "retrieval_qual_decoded": {
+          "raw_value": 9,
+          "bit_0_not_recommended": true,
+          "bit_1_not_attempted": false,
+          "bit_2_unsuccessful": false,
+          "bit_3_surface_advisory": true,
+          "active_bits": [
+            "retrieval_not_recommended",
+            "surface_vegetation_topography_advisory"
+          ],
+          "summary": "retrieval_not_recommended, surface_vegetation_topography_advisory"
+        }
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "SMAP": "9 km EASE-Grid 2.0"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:52:43Z",
+      "processed_at": "2026-11-14T07:52:57Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\smap\\SMAP_L3_SM_P_E_20240111_R19240_001.subset.dap.nc4"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_GPM_GPM_3IMERGDF_20240112T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-12T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "precipitation_mm": {
+        "value": 0.0,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.0; neighborhood_max=0.0"
+      },
+      "precipitation_imerg_mm": {
+        "value": 0.0,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.0; neighborhood_max=0.0"
+      },
+      "precipitation_random_error_mm": {
+        "value": 2.764801,
+        "unit": "mm/day",
+        "raw_variable": "randomError",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=2.764801; neighborhood_max=2.764801"
+      },
+      "precipitation_valid_sample_count": {
+        "value": 48.0,
+        "unit": "count",
+        "raw_variable": "precipitation_cnt",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=48.0; neighborhood_max=48.0"
+      }
+    },
+    "flat_observations": {
+      "precipitation_mm": 0.0,
+      "precipitation_imerg_mm": 0.0,
+      "precipitation_random_error_mm": 2.764801,
+      "precipitation_valid_sample_count": 48.0
+    },
+    "metadata": {
+      "sources": [
+        "GPM_IMERG"
+      ],
+      "product_names": [
+        "GPM_3IMERGDF"
+      ],
+      "product_versions": {
+        "GPM_3IMERGDF": "07B"
+      },
+      "quality_status": "VALID",
+      "quality_flags": {
+        "run_type": "Final"
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "GPM_IMERG": "0.1 deg x 0.1 deg (~11 km)"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:52:01Z",
+      "processed_at": "2026-11-14T07:52:55Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\gpm_imerg\\3B-DAY.MS.MRG.3IMERG.20240112-S000000-E235959.V07B.subset.dap.nc4"
     }
   },
   {
@@ -2605,6 +4401,21 @@
         "is_missing": false,
         "extraction_mode": "point_centroid_enclosing_grid",
         "notes": "Modeled soil wetness index (0-1), not direct volumetric sensor reading."
+      },
+      "et0_mm_day": {
+        "value": 2.6143,
+        "unit": "mm/day",
+        "raw_variable": "DERIVED_FAO56_PM",
+        "source_dataset": "NASA_POWER",
+        "product_name": "TERRA_DERIVED_FAO56",
+        "product_version": "FAO56-PM-1998",
+        "spatial_resolution": "0.5 deg x 0.625 deg (~55 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "derived_agrometeorological",
+        "quality_flag": "OK",
+        "is_missing": false,
+        "extraction_mode": "fao56_penman_monteith",
+        "notes": "Computed via FAO-56 Penman-Monteith from NASA POWER AG daily vars (elevation=315m)."
       }
     },
     "flat_observations": {
@@ -2616,7 +4427,8 @@
       "solar_radiation_mj_m2_day": 12.75,
       "wind_speed_m_s": 2.07,
       "surface_soil_wetness_index": 0.89,
-      "rootzone_soil_wetness_index": 0.91
+      "rootzone_soil_wetness_index": 0.91,
+      "et0_mm_day": 2.6143
     },
     "metadata": {
       "sources": [
@@ -2639,10 +4451,185 @@
       "temporal_resolution": "daily",
       "centroid_lat": 13.983842,
       "centroid_lon": 121.184648,
-      "retrieved_at": "2026-11-14T07:00:59Z",
-      "processed_at": "2026-11-14T07:02:33Z",
+      "retrieved_at": "2026-11-14T07:51:40Z",
+      "processed_at": "2026-11-14T07:52:55Z",
       "processing_version": "1.0",
-      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\data\\raw\\nasa_power\\nasa_power_lipa_cropland_001_20240101_20240115.json"
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\nasa_power\\nasa_power_lipa_cropland_001_20240101_20240115.json"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_SMAP_SPL3SMP_E_20240112T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-12T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "soil_moisture_surface_m3_m3": {
+        "value": null,
+        "unit": "m3/m3",
+        "raw_variable": "soil_moisture",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "NO_BITMASK",
+        "is_missing": true,
+        "extraction_mode": "no_overpass_covering_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_PM; grid_center=None; qual_bits=[unavailable]"
+      },
+      "smap_retrieval_quality_flag": {
+        "value": null,
+        "unit": "bitmask",
+        "raw_variable": "retrieval_qual_flag",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "NO_BITMASK",
+        "is_missing": true,
+        "extraction_mode": "no_overpass_covering_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_PM; grid_center=None; qual_bits=[unavailable]"
+      }
+    },
+    "flat_observations": {
+      "soil_moisture_surface_m3_m3": null,
+      "smap_retrieval_quality_flag": null
+    },
+    "metadata": {
+      "sources": [
+        "SMAP"
+      ],
+      "product_names": [
+        "SPL3SMP_E"
+      ],
+      "product_versions": {
+        "SPL3SMP_E": "006"
+      },
+      "quality_status": "INCOMPLETE",
+      "quality_flags": {
+        "retrieval_qual_flag": null,
+        "retrieval_qual_decoded": null
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "SMAP": "9 km EASE-Grid 2.0"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:52:46Z",
+      "processed_at": "2026-11-14T07:52:57Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\smap\\SMAP_L3_SM_P_E_20240112_R19240_001.subset.dap.nc4"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_GPM_GPM_3IMERGDF_20240113T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-13T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "precipitation_mm": {
+        "value": 0.0,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.0; neighborhood_max=0.0"
+      },
+      "precipitation_imerg_mm": {
+        "value": 0.0,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.0; neighborhood_max=0.0"
+      },
+      "precipitation_random_error_mm": {
+        "value": 2.764801,
+        "unit": "mm/day",
+        "raw_variable": "randomError",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=2.764801; neighborhood_max=2.764801"
+      },
+      "precipitation_valid_sample_count": {
+        "value": 48.0,
+        "unit": "count",
+        "raw_variable": "precipitation_cnt",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=48.0; neighborhood_max=48.0"
+      }
+    },
+    "flat_observations": {
+      "precipitation_mm": 0.0,
+      "precipitation_imerg_mm": 0.0,
+      "precipitation_random_error_mm": 2.764801,
+      "precipitation_valid_sample_count": 48.0
+    },
+    "metadata": {
+      "sources": [
+        "GPM_IMERG"
+      ],
+      "product_names": [
+        "GPM_3IMERGDF"
+      ],
+      "product_versions": {
+        "GPM_3IMERGDF": "07B"
+      },
+      "quality_status": "VALID",
+      "quality_flags": {
+        "run_type": "Final"
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "GPM_IMERG": "0.1 deg x 0.1 deg (~11 km)"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:52:03Z",
+      "processed_at": "2026-11-14T07:52:55Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\gpm_imerg\\3B-DAY.MS.MRG.3IMERG.20240113-S000000-E235959.V07B.subset.dap.nc4"
     }
   },
   {
@@ -2786,6 +4773,21 @@
         "is_missing": false,
         "extraction_mode": "point_centroid_enclosing_grid",
         "notes": "Modeled soil wetness index (0-1), not direct volumetric sensor reading."
+      },
+      "et0_mm_day": {
+        "value": 2.4664,
+        "unit": "mm/day",
+        "raw_variable": "DERIVED_FAO56_PM",
+        "source_dataset": "NASA_POWER",
+        "product_name": "TERRA_DERIVED_FAO56",
+        "product_version": "FAO56-PM-1998",
+        "spatial_resolution": "0.5 deg x 0.625 deg (~55 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "derived_agrometeorological",
+        "quality_flag": "OK",
+        "is_missing": false,
+        "extraction_mode": "fao56_penman_monteith",
+        "notes": "Computed via FAO-56 Penman-Monteith from NASA POWER AG daily vars (elevation=315m)."
       }
     },
     "flat_observations": {
@@ -2797,7 +4799,8 @@
       "solar_radiation_mj_m2_day": 12.0,
       "wind_speed_m_s": 2.11,
       "surface_soil_wetness_index": 0.88,
-      "rootzone_soil_wetness_index": 0.91
+      "rootzone_soil_wetness_index": 0.91,
+      "et0_mm_day": 2.4664
     },
     "metadata": {
       "sources": [
@@ -2820,10 +4823,196 @@
       "temporal_resolution": "daily",
       "centroid_lat": 13.983842,
       "centroid_lon": 121.184648,
-      "retrieved_at": "2026-11-14T07:00:59Z",
-      "processed_at": "2026-11-14T07:02:33Z",
+      "retrieved_at": "2026-11-14T07:51:40Z",
+      "processed_at": "2026-11-14T07:52:55Z",
       "processing_version": "1.0",
-      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\data\\raw\\nasa_power\\nasa_power_lipa_cropland_001_20240101_20240115.json"
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\nasa_power\\nasa_power_lipa_cropland_001_20240101_20240115.json"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_SMAP_SPL3SMP_E_20240113T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-13T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "soil_moisture_surface_m3_m3": {
+        "value": 0.439498,
+        "unit": "m3/m3",
+        "raw_variable": "soil_moisture",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": 9,
+        "is_missing": false,
+        "extraction_mode": "nearest_grid_cell_containing_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_AM; grid_center={'lat': 14.010609, 'lon': 121.229256}; qual_bits=[retrieval_not_recommended, surface_vegetation_topography_advisory]"
+      },
+      "smap_retrieval_quality_flag": {
+        "value": 9.0,
+        "unit": "bitmask",
+        "raw_variable": "retrieval_qual_flag",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": 9,
+        "is_missing": false,
+        "extraction_mode": "nearest_grid_cell_containing_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_AM; grid_center={'lat': 14.010609, 'lon': 121.229256}; qual_bits=[retrieval_not_recommended, surface_vegetation_topography_advisory]"
+      }
+    },
+    "flat_observations": {
+      "soil_moisture_surface_m3_m3": 0.439498,
+      "smap_retrieval_quality_flag": 9.0
+    },
+    "metadata": {
+      "sources": [
+        "SMAP"
+      ],
+      "product_names": [
+        "SPL3SMP_E"
+      ],
+      "product_versions": {
+        "SPL3SMP_E": "006"
+      },
+      "quality_status": "VALID_WITH_WARNINGS",
+      "quality_flags": {
+        "retrieval_qual_flag": 9,
+        "retrieval_qual_decoded": {
+          "raw_value": 9,
+          "bit_0_not_recommended": true,
+          "bit_1_not_attempted": false,
+          "bit_2_unsuccessful": false,
+          "bit_3_surface_advisory": true,
+          "active_bits": [
+            "retrieval_not_recommended",
+            "surface_vegetation_topography_advisory"
+          ],
+          "summary": "retrieval_not_recommended, surface_vegetation_topography_advisory"
+        }
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "SMAP": "9 km EASE-Grid 2.0"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:52:49Z",
+      "processed_at": "2026-11-14T07:52:57Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\smap\\SMAP_L3_SM_P_E_20240113_R19240_001.subset.dap.nc4"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_GPM_GPM_3IMERGDF_20240114T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-14T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "precipitation_mm": {
+        "value": 0.458843,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.975; neighborhood_max=0.975"
+      },
+      "precipitation_imerg_mm": {
+        "value": 0.458843,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.975; neighborhood_max=0.975"
+      },
+      "precipitation_random_error_mm": {
+        "value": 24.874613,
+        "unit": "mm/day",
+        "raw_variable": "randomError",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=49.746132; neighborhood_max=49.746132"
+      },
+      "precipitation_valid_sample_count": {
+        "value": 48.0,
+        "unit": "count",
+        "raw_variable": "precipitation_cnt",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=48.0; neighborhood_max=48.0"
+      }
+    },
+    "flat_observations": {
+      "precipitation_mm": 0.458843,
+      "precipitation_imerg_mm": 0.458843,
+      "precipitation_random_error_mm": 24.874613,
+      "precipitation_valid_sample_count": 48.0
+    },
+    "metadata": {
+      "sources": [
+        "GPM_IMERG"
+      ],
+      "product_names": [
+        "GPM_3IMERGDF"
+      ],
+      "product_versions": {
+        "GPM_3IMERGDF": "07B"
+      },
+      "quality_status": "VALID",
+      "quality_flags": {
+        "run_type": "Final"
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "GPM_IMERG": "0.1 deg x 0.1 deg (~11 km)"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:52:05Z",
+      "processed_at": "2026-11-14T07:52:55Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\gpm_imerg\\3B-DAY.MS.MRG.3IMERG.20240114-S000000-E235959.V07B.subset.dap.nc4"
     }
   },
   {
@@ -2967,6 +5156,21 @@
         "is_missing": false,
         "extraction_mode": "point_centroid_enclosing_grid",
         "notes": "Modeled soil wetness index (0-1), not direct volumetric sensor reading."
+      },
+      "et0_mm_day": {
+        "value": 2.14,
+        "unit": "mm/day",
+        "raw_variable": "DERIVED_FAO56_PM",
+        "source_dataset": "NASA_POWER",
+        "product_name": "TERRA_DERIVED_FAO56",
+        "product_version": "FAO56-PM-1998",
+        "spatial_resolution": "0.5 deg x 0.625 deg (~55 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "derived_agrometeorological",
+        "quality_flag": "OK",
+        "is_missing": false,
+        "extraction_mode": "fao56_penman_monteith",
+        "notes": "Computed via FAO-56 Penman-Monteith from NASA POWER AG daily vars (elevation=315m)."
       }
     },
     "flat_observations": {
@@ -2978,7 +5182,8 @@
       "solar_radiation_mj_m2_day": 10.15,
       "wind_speed_m_s": 1.93,
       "surface_soil_wetness_index": 0.88,
-      "rootzone_soil_wetness_index": 0.9
+      "rootzone_soil_wetness_index": 0.9,
+      "et0_mm_day": 2.14
     },
     "metadata": {
       "sources": [
@@ -3001,10 +5206,185 @@
       "temporal_resolution": "daily",
       "centroid_lat": 13.983842,
       "centroid_lon": 121.184648,
-      "retrieved_at": "2026-11-14T07:00:59Z",
-      "processed_at": "2026-11-14T07:02:33Z",
+      "retrieved_at": "2026-11-14T07:51:40Z",
+      "processed_at": "2026-11-14T07:52:55Z",
       "processing_version": "1.0",
-      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\data\\raw\\nasa_power\\nasa_power_lipa_cropland_001_20240101_20240115.json"
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\nasa_power\\nasa_power_lipa_cropland_001_20240101_20240115.json"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_SMAP_SPL3SMP_E_20240114T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-14T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "soil_moisture_surface_m3_m3": {
+        "value": null,
+        "unit": "m3/m3",
+        "raw_variable": "soil_moisture",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "NO_BITMASK",
+        "is_missing": true,
+        "extraction_mode": "no_overpass_covering_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_PM; grid_center=None; qual_bits=[unavailable]"
+      },
+      "smap_retrieval_quality_flag": {
+        "value": null,
+        "unit": "bitmask",
+        "raw_variable": "retrieval_qual_flag",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "NO_BITMASK",
+        "is_missing": true,
+        "extraction_mode": "no_overpass_covering_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_PM; grid_center=None; qual_bits=[unavailable]"
+      }
+    },
+    "flat_observations": {
+      "soil_moisture_surface_m3_m3": null,
+      "smap_retrieval_quality_flag": null
+    },
+    "metadata": {
+      "sources": [
+        "SMAP"
+      ],
+      "product_names": [
+        "SPL3SMP_E"
+      ],
+      "product_versions": {
+        "SPL3SMP_E": "006"
+      },
+      "quality_status": "INCOMPLETE",
+      "quality_flags": {
+        "retrieval_qual_flag": null,
+        "retrieval_qual_decoded": null
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "SMAP": "9 km EASE-Grid 2.0"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:52:52Z",
+      "processed_at": "2026-11-14T07:52:57Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\smap\\SMAP_L3_SM_P_E_20240114_R19240_002.subset.dap.nc4"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_GPM_GPM_3IMERGDF_20240115T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-15T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "precipitation_mm": {
+        "value": 0.014118,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.03; neighborhood_max=0.03"
+      },
+      "precipitation_imerg_mm": {
+        "value": 0.014118,
+        "unit": "mm/day",
+        "raw_variable": "precipitation",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=0.03; neighborhood_max=0.03"
+      },
+      "precipitation_random_error_mm": {
+        "value": 3.102133,
+        "unit": "mm/day",
+        "raw_variable": "randomError",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=3.481601; neighborhood_max=3.481601"
+      },
+      "precipitation_valid_sample_count": {
+        "value": 48.0,
+        "unit": "count",
+        "raw_variable": "precipitation_cnt",
+        "source_dataset": "GPM_IMERG",
+        "product_name": "GPM_3IMERGDF (Final Run)",
+        "product_version": "07B",
+        "spatial_resolution": "0.1 deg x 0.1 deg (~11 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "valid_pixels=4",
+        "is_missing": false,
+        "extraction_mode": "idw_2x2_coarse_grid",
+        "notes": "accumulated_precipitation; grid_center={'lat': 13.95, 'lon': 121.150002}; nearest_pixel=48.0; neighborhood_max=48.0"
+      }
+    },
+    "flat_observations": {
+      "precipitation_mm": 0.014118,
+      "precipitation_imerg_mm": 0.014118,
+      "precipitation_random_error_mm": 3.102133,
+      "precipitation_valid_sample_count": 48.0
+    },
+    "metadata": {
+      "sources": [
+        "GPM_IMERG"
+      ],
+      "product_names": [
+        "GPM_3IMERGDF"
+      ],
+      "product_versions": {
+        "GPM_3IMERGDF": "07B"
+      },
+      "quality_status": "VALID",
+      "quality_flags": {
+        "run_type": "Final"
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "GPM_IMERG": "0.1 deg x 0.1 deg (~11 km)"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:52:06Z",
+      "processed_at": "2026-11-14T07:52:55Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\gpm_imerg\\3B-DAY.MS.MRG.3IMERG.20240115-S000000-E235959.V07B.subset.dap.nc4"
     }
   },
   {
@@ -3148,6 +5528,21 @@
         "is_missing": false,
         "extraction_mode": "point_centroid_enclosing_grid",
         "notes": "Modeled soil wetness index (0-1), not direct volumetric sensor reading."
+      },
+      "et0_mm_day": {
+        "value": 2.4981,
+        "unit": "mm/day",
+        "raw_variable": "DERIVED_FAO56_PM",
+        "source_dataset": "NASA_POWER",
+        "product_name": "TERRA_DERIVED_FAO56",
+        "product_version": "FAO56-PM-1998",
+        "spatial_resolution": "0.5 deg x 0.625 deg (~55 km)",
+        "temporal_resolution": "daily",
+        "observation_type": "derived_agrometeorological",
+        "quality_flag": "OK",
+        "is_missing": false,
+        "extraction_mode": "fao56_penman_monteith",
+        "notes": "Computed via FAO-56 Penman-Monteith from NASA POWER AG daily vars (elevation=315m)."
       }
     },
     "flat_observations": {
@@ -3159,7 +5554,8 @@
       "solar_radiation_mj_m2_day": 12.27,
       "wind_speed_m_s": 1.93,
       "surface_soil_wetness_index": 0.88,
-      "rootzone_soil_wetness_index": 0.9
+      "rootzone_soil_wetness_index": 0.9,
+      "et0_mm_day": 2.4981
     },
     "metadata": {
       "sources": [
@@ -3182,10 +5578,82 @@
       "temporal_resolution": "daily",
       "centroid_lat": 13.983842,
       "centroid_lon": 121.184648,
-      "retrieved_at": "2026-11-14T07:00:59Z",
-      "processed_at": "2026-11-14T07:02:33Z",
+      "retrieved_at": "2026-11-14T07:51:40Z",
+      "processed_at": "2026-11-14T07:52:55Z",
       "processing_version": "1.0",
-      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\data\\raw\\nasa_power\\nasa_power_lipa_cropland_001_20240101_20240115.json"
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\nasa_power\\nasa_power_lipa_cropland_001_20240101_20240115.json"
+    }
+  },
+  {
+    "record_id": "lipa_cropland_001_SMAP_SPL3SMP_E_20240115T000000Z",
+    "location_id": "lipa_cropland_001",
+    "aoi_name": "Lipa_Cropland_AOI",
+    "timestamp": "2024-01-15T00:00:00Z",
+    "temporal_resolution": "daily",
+    "observations": {
+      "soil_moisture_surface_m3_m3": {
+        "value": null,
+        "unit": "m3/m3",
+        "raw_variable": "soil_moisture",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "NO_BITMASK",
+        "is_missing": true,
+        "extraction_mode": "no_overpass_covering_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_PM; grid_center=None; qual_bits=[unavailable]"
+      },
+      "smap_retrieval_quality_flag": {
+        "value": null,
+        "unit": "bitmask",
+        "raw_variable": "retrieval_qual_flag",
+        "source_dataset": "SMAP",
+        "product_name": "SPL3SMP_E (L3 Enhanced Radiometer)",
+        "product_version": "006",
+        "spatial_resolution": "9 km EASE-Grid 2.0",
+        "temporal_resolution": "daily",
+        "observation_type": "satellite",
+        "quality_flag": "NO_BITMASK",
+        "is_missing": true,
+        "extraction_mode": "no_overpass_covering_aoi",
+        "notes": "Satellite soil moisture (9 km footprint); distinct from in-situ field probes. group=Soil_Moisture_Retrieval_Data_PM; grid_center=None; qual_bits=[unavailable]"
+      }
+    },
+    "flat_observations": {
+      "soil_moisture_surface_m3_m3": null,
+      "smap_retrieval_quality_flag": null
+    },
+    "metadata": {
+      "sources": [
+        "SMAP"
+      ],
+      "product_names": [
+        "SPL3SMP_E"
+      ],
+      "product_versions": {
+        "SPL3SMP_E": "006"
+      },
+      "quality_status": "INCOMPLETE",
+      "quality_flags": {
+        "retrieval_qual_flag": null,
+        "retrieval_qual_decoded": null
+      },
+      "observation_types": [
+        "satellite"
+      ],
+      "spatial_resolution": {
+        "SMAP": "9 km EASE-Grid 2.0"
+      },
+      "temporal_resolution": "daily",
+      "centroid_lat": 13.983842,
+      "centroid_lon": 121.184648,
+      "retrieved_at": "2026-11-14T07:52:55Z",
+      "processed_at": "2026-11-14T07:52:57Z",
+      "processing_version": "1.0",
+      "raw_file": "F:\\Coding Projects\\Space APP Challenge Data Pipeline\\docs\\Data Pipeline\\data\\raw\\smap\\SMAP_L3_SM_P_E_20240115_R19240_001.subset.dap.nc4"
     }
   }
 ]
