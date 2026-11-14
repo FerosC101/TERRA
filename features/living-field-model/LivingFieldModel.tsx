@@ -64,9 +64,7 @@ function Body({ model, snapshot }: { model: FieldModel; snapshot: NasaSnapshot |
           <div className="mb-8 flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
             <div className="max-w-3xl">
               <h2 className="text-xl font-semibold tracking-tight text-ink">{DIMENSION_LABEL[dim]}</h2>
-              <p className="mt-1.5 text-[15px] leading-relaxed text-ink-soft">
-                {state.isLatest ? model.summaries[dim] : `Showing the record as it stood on ${longDate(state.at.date)}. Charts mark that date with a dotted line.`}
-              </p>
+              {!state.isLatest && <p className="mt-1.5 text-[15px] leading-relaxed text-ink-soft">As it stood on {longDate(state.at.date)}. Charts mark that date with a dotted line.</p>}
             </div>
             {dim !== "rotation" && dim !== "vegetation" && <Segmented label="Chart period" value={span} onChange={setSpan} options={[{ value: 60, label: "60 days" }, { value: 120, label: "120 days" }, { value: 240, label: "All" }]} />}
           </div>
@@ -78,7 +76,7 @@ function Body({ model, snapshot }: { model: FieldModel; snapshot: NasaSnapshot |
         </div>
       </Card>
 
-      <Section title={`How ${DIMENSION_LABEL[dim].toLowerCase()} relates to the rest of the field`} description="Links found between the dimensions in this field's own record.">
+      <Section title={`How ${DIMENSION_LABEL[dim].toLowerCase()} relates to the rest`} info="Correlations found within this field's own record. They suggest where to look and do not establish cause.">
         <Relationships dim={dim} relationships={model.relationships} />
       </Section>
 
@@ -99,7 +97,7 @@ export function LivingFieldModel() {
   const ready = modelQ.data && modelQ.data.fieldId === field.id && snapQ.data !== undefined;
   return (
     <div>
-      <PageHeader title="Living Field Model" lead="What TERRA currently understands about this field, in five parts: water, soil, vegetation, climate and crop rotation. Each part separates what was measured from what was estimated." />
+      <PageHeader title="Living Field Model" lead="What TERRA knows about this field, in five parts." />
       {modelQ.error ? <ErrorState message={modelQ.error} /> : ready
         ? <Body key={field.id} model={modelQ.data!} snapshot={snapQ.data && snapQ.data.fieldId === field.id ? snapQ.data : null} />
         : <Loading />}

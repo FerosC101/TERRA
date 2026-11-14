@@ -14,7 +14,7 @@ import { getDiscoveries } from "@/services/discoveryService";
 import { getObservations } from "@/services/fieldSensorService";
 import type { Discovery } from "@/types";
 import { InvestigationSteps } from "./InvestigationSteps";
-import { Evidence, StatusBadge } from "./shared";
+import { CategoryIcon, Evidence, StatusBadge } from "./shared";
 
 /** The charts that support each kind of discovery. One question per chart. */
 const CHARTS: Record<Discovery["kind"], { title: string; unit: string; digits: number; days: number; series: SeriesDef[] }[]> = {
@@ -93,13 +93,16 @@ export function DiscoveryDetail({ id }: { id: string }) {
   return (
     <div>
       {back}
-      <header className="mb-8 max-w-3xl">
+      <header className="mb-8 flex max-w-3xl gap-5">
+        <CategoryIcon category={d.category} resolved={resolved} size="lg" />
+        <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-2.5 text-[13px] text-muted">
           <StatusBadge status={d.status} />
           <span>{d.category} · {field.name} · detected {longDate(d.detectedOn)}</span>
         </div>
         <h1 className="mt-3 text-[26px] font-semibold leading-tight tracking-tight text-ink sm:text-[28px]">{d.title}</h1>
         <p className="mt-2 text-[16px] leading-relaxed text-ink-soft">{d.summary}</p>
+        </div>
       </header>
 
       <Card className="mb-10 p-5 sm:p-6">
@@ -108,7 +111,7 @@ export function DiscoveryDetail({ id }: { id: string }) {
       </Card>
 
       <div className="space-y-12">
-        <Section title="What TERRA observed" description="The measurements behind this discovery, each with its source and date.">
+        <Section title="What TERRA observed" info="The measurements behind this discovery, each with its source and date.">
           <div className="overflow-x-auto">
             <table className={`${TABLE} min-w-[560px]`}>
               <thead><tr><th className={TH}>Observation</th><th className={TH}>Value</th><th className={TH}>Source</th><th className={TH}>Date</th></tr></thead>
@@ -127,7 +130,7 @@ export function DiscoveryDetail({ id }: { id: string }) {
         </Section>
 
         <Section title="What it may mean" actions={<Badge tone={resolved ? "neutral" : "warning"}>{resolved ? "Explained" : "Unconfirmed"}</Badge>}
-          description={resolved ? "Follow-up data has tested the explanation below." : "These are possible explanations. None has been confirmed yet."}>
+          info={resolved ? "Follow-up data has tested the explanation below." : "These are possible explanations. None has been confirmed yet."}>
           <div className="grid gap-x-12 gap-y-6 lg:grid-cols-2">
             <div>
               <h3 className="text-sm font-medium text-ink">{resolved ? "Explanation" : "Most likely explanation"}</h3>
@@ -153,7 +156,7 @@ export function DiscoveryDetail({ id }: { id: string }) {
           )}
         </Section>
 
-        <Section title="Supporting evidence" description="How the measurements changed over time, and how the latest value compares with this field's own record.">
+        <Section title="Supporting evidence" info="How the measurements changed over time, and how the latest value compares with this field's own record.">
           <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_300px]">
             <div className="space-y-6">
               {CHARTS[d.kind].map((c) => (
@@ -183,7 +186,7 @@ export function DiscoveryDetail({ id }: { id: string }) {
           </div>
         </Section>
 
-        <Section title="What to investigate next" description="The observation most likely to reduce the uncertainty.">
+        <Section title="What to investigate next" info="The observation most likely to reduce the uncertainty.">
           <div className="max-w-3xl">
             <p className="text-[17px] font-medium leading-relaxed text-ink">{d.nextObservation.action}</p>
             <p className="mt-2 text-[15px] leading-relaxed text-ink-soft">{d.nextObservation.rationale}</p>

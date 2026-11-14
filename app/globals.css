@@ -90,38 +90,37 @@ input[type="checkbox"] {
   color: var(--faint);
 }
 
-/* Leaflet controls, matched to the light interface */
-.leaflet-container {
-  background: #eef1ea;
+/* MapLibre controls, matched to the light interface */
+.maplibregl-map {
   font-family: var(--font-sans);
-  border-radius: inherit;
 }
-.leaflet-control-attribution {
-  background: rgba(255, 255, 255, 0.85) !important;
-  color: var(--muted) !important;
+.maplibregl-ctrl-group {
+  border-radius: 10px !important;
+  box-shadow: var(--shadow-pop) !important;
+  overflow: hidden;
+}
+.maplibregl-ctrl-attrib {
   font-size: 10px;
+  background: rgba(255, 255, 255, 0.85) !important;
+  color: var(--muted);
 }
-.leaflet-control-attribution a {
+.maplibregl-ctrl-attrib a {
   color: var(--ink-soft) !important;
 }
-.leaflet-bar {
-  border: 1px solid var(--line-strong) !important;
-  box-shadow: var(--shadow-card) !important;
-}
-.leaflet-bar a {
-  background: var(--surface) !important;
+.maplibregl-ctrl-scale {
+  border-color: var(--ink-soft) !important;
   color: var(--ink) !important;
-  border-color: var(--line) !important;
+  background: rgba(255, 255, 255, 0.8) !important;
 }
-.leaflet-tooltip.terra-tip {
-  background: var(--surface);
+.terra-pop .maplibregl-popup-content {
+  padding: 6px 10px;
+  border-radius: 8px;
   border: 1px solid var(--line-strong);
   color: var(--ink);
   font-size: 12px;
-  border-radius: 6px;
   box-shadow: var(--shadow-pop);
 }
-.leaflet-tooltip.terra-tip::before {
+.terra-pop .maplibregl-popup-tip {
   display: none;
 }
 
@@ -144,6 +143,8 @@ input[type="checkbox"] {
   .no-print { display: none !important; }
   .print-break { break-before: page; }
   .print-avoid { break-inside: avoid; }
+  tr, figure, h3 { break-inside: avoid; }
+  h2, h3 { break-after: avoid; }
   main { padding: 0 !important; max-width: none !important; }
   @page { margin: 14mm; }
 }

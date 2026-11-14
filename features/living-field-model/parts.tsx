@@ -1,6 +1,7 @@
 import clsx from "clsx";
 import { SeriesChart } from "@/components/charts/SeriesChart";
 import { Badge, SourceTag, TABLE, TD, TH } from "@/components/ui";
+import { InfoTip } from "@/components/visual/InfoTip";
 import { SERIES } from "@/lib/chartTheme";
 import { longDate, shortDate } from "@/lib/dates";
 import { fmt, signed } from "@/lib/format";
@@ -9,12 +10,12 @@ import { strength } from "./state";
 
 export const DIMENSION_LABEL: Record<DimensionKey, string> = { water: "Water", soil: "Soil", vegetation: "Vegetation", climate: "Climate", rotation: "Crop rotation" };
 
-export function ChartBlock({ title, source, children }: { title: string; source: Provenance; children: React.ReactNode }) {
+export function ChartBlock({ title, source, info, children }: { title: string; source: Provenance; info?: React.ReactNode; children: React.ReactNode }) {
   return (
     <figure>
-      <figcaption className="mb-2 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-        <span className="text-sm font-medium text-ink">{title}</span>
-        <SourceTag kind={source} />
+      <figcaption className="mb-2 flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
+        <span className="flex items-center gap-1 text-sm font-medium text-ink">{title}{info && <InfoTip label={title}>{info}</InfoTip>}</span>
+        <SourceTag kind={source} short />
       </figcaption>
       {children}
     </figure>
@@ -32,10 +33,9 @@ export function Relationships({ dim, relationships }: { dim: DimensionKey; relat
           const s = strength(r.r);
           const other = r.from === dim ? r.to : r.from;
           return (
-            <li key={r.label} className="grid gap-x-6 gap-y-1 py-3.5 sm:grid-cols-[minmax(0,1fr)_300px]">
+            <li key={r.label} className="grid items-center gap-x-6 gap-y-1 py-3 sm:grid-cols-[minmax(0,1fr)_300px]">
               <div>
-                <p className="text-sm font-medium text-ink">{r.label} <span className="font-normal text-muted">· with {DIMENSION_LABEL[other].toLowerCase()}</span></p>
-                <p className="mt-0.5 text-[13px] leading-relaxed text-muted">{r.note}</p>
+                <p className="flex items-center gap-1 text-sm font-medium text-ink">{r.label} <span className="font-normal text-muted">· {DIMENSION_LABEL[other].toLowerCase()}</span><InfoTip label={r.label}>{r.note}</InfoTip></p>
               </div>
               <div className="flex items-center gap-2.5 sm:justify-end">
                 <span className="flex gap-0.5" aria-hidden>{[1, 2, 3].map((i) => <span key={i} className={clsx("h-1.5 w-4 rounded-full", i <= s.level ? "bg-violet" : "bg-line-strong")} />)}</span>
@@ -45,20 +45,24 @@ export function Relationships({ dim, relationships }: { dim: DimensionKey; relat
           );
         })}
       </ul>
-      <p className="mt-2 text-[13px] leading-relaxed text-muted">Relationships are correlations within this field&apos;s own record. They suggest where to look and do not establish cause.</p>
     </div>
   );
 }
 
 export function ProvenanceList({ items }: { items: { kind: Provenance; text: string }[] }) {
   return (
-    <ul className="space-y-2">
+    <details className="group">
+      <summary className="cursor-pointer list-none text-[13px] font-medium text-green marker:hidden hover:text-green-strong">
+        <span className="group-open:hidden">Show data sources</span><span className="hidden group-open:inline">Hide data sources</span>
+      </summary>
+    <ul className="mt-3 space-y-2">
       {items.map((it) => (
         <li key={it.text} className="grid gap-x-4 gap-y-0.5 text-[13px] leading-relaxed sm:grid-cols-[150px_minmax(0,1fr)]">
           <SourceTag kind={it.kind} /><span className="text-ink-soft">{it.text}</span>
         </li>
       ))}
     </ul>
+    </details>
   );
 }
 
@@ -78,7 +82,7 @@ export function NasaRecord({ snapshot }: { snapshot: NasaSnapshot }) {
         <h3 className="text-[15px] font-semibold text-ink">Retrieved NASA record</h3>
         <Badge tone="good">Real data</Badge>
       </div>
-      <p className="mt-1 max-w-3xl text-[13px] leading-relaxed text-muted">{longDate(snapshot.start)} to {longDate(snapshot.end)}. {snapshot.note}</p>
+      <p className="mt-1 flex max-w-3xl items-center gap-1 text-[13px] leading-relaxed text-muted">{longDate(snapshot.start)} to {longDate(snapshot.end)}<InfoTip label="retrieved NASA record">{snapshot.note}</InfoTip></p>
       <div className="mt-5 grid gap-6 lg:grid-cols-2">
         <ChartBlock title="Daily rainfall from two NASA products" source="satellite">
           <SeriesChart data={snapshot.records} xKey="date" xFormat={shortDate} unit="mm per day" height={200} ariaLabel="Daily rainfall from NASA POWER and GPM IMERG" series={[
@@ -91,7 +95,7 @@ export function NasaRecord({ snapshot }: { snapshot: NasaSnapshot }) {
             series={[{ key: "smapVwc", label: "SMAP, ~9 km", color: SERIES.blue, pointsOnly: true }]} />
         </ChartBlock>
       </div>
-      <p className="mt-3 text-[13px] leading-relaxed text-muted">SMAP passed over the area on {overpasses} of {snapshot.records.length} days. Days without an overpass are left empty: nothing is filled in or joined. The two rainfall products differ because they are independent estimates at different scales.</p>
+      <p className="mt-3 flex items-center gap-1 text-[13px] text-muted">SMAP overpasses: {overpasses} of {snapshot.records.length} days<InfoTip label="SMAP overpasses">Days without an overpass are left empty: nothing is filled in or joined. The two rainfall products differ because they are independent estimates at different scales.</InfoTip></p>
       <details className="group mt-4">
         <summary className="cursor-pointer text-sm font-medium text-green hover:text-green-strong">Show the daily records</summary>
         <div className="mt-3 overflow-x-auto">

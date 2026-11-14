@@ -5,9 +5,11 @@ import { Minus, Plus } from "lucide-react";
 import { Fragment, useMemo, useState } from "react";
 import { SeriesChart } from "@/components/charts/SeriesChart";
 import { Card, CardHeader, Segmented, SourceTag, Swatch, TABLE } from "@/components/ui";
+import { CropSequence } from "@/components/visual/Crop";
+import { InfoTip } from "@/components/visual/InfoTip";
 import { CROPS } from "@/data/crops";
 import { SERIES } from "@/lib/chartTheme";
-import { fmt, pct } from "@/lib/format";
+import { pct } from "@/lib/format";
 import type { Provenance, RotationEvaluation, RotationPlan } from "@/types";
 import { BETTER_HINT, CRITERIA, planColor, tradeoffs, type CriterionGroup } from "./shared";
 
@@ -29,7 +31,7 @@ export function Tradeoffs({ plans, evaluations }: Props) {
         return (
           <div key={p.id}>
             <p className="flex items-center gap-2 text-[15px] font-semibold text-ink"><Swatch color={planColor(p)} />{p.name}</p>
-            <p className="mt-0.5 text-[13px] text-muted">{p.crops.map((c) => CROPS[c].name).join(" → ")}</p>
+            <div className="mt-2"><CropSequence crops={p.crops} size="xs" /></div>
             <ul className="mt-3 space-y-1.5 text-sm leading-snug text-ink-soft">
               {t.gains.map((g) => <li key={g} className="flex gap-2"><Plus size={15} className="mt-0.5 shrink-0 text-green" aria-label="Gain:" />{g}</li>)}
               {t.costs.map((g) => <li key={g} className="flex gap-2"><Minus size={15} className="mt-0.5 shrink-0 text-amber" aria-label="Cost:" />{g}</li>)}
@@ -63,8 +65,7 @@ export function CriteriaTable({ plans, evaluations }: Props) {
                 return (
                   <tr key={c.key} className="border-b border-line">
                     <th scope="row" className="max-w-[300px] py-3 pr-4 text-left align-top font-normal">
-                      <span className="block font-medium text-ink">{c.label}</span>
-                      <span className="mt-0.5 block text-[13px] leading-snug text-muted">{c.help} <span className="text-faint">{BETTER_HINT[c.better ?? "none"]}.</span></span>
+                      <span className="flex items-center gap-1 font-medium text-ink">{c.label}<InfoTip label={c.label}>{c.help} {BETTER_HINT[c.better ?? "none"]}.</InfoTip></span>
                     </th>
                     {plans.map((p, i) => (
                       <td key={p.id} className="px-3 py-3 align-top">
@@ -105,22 +106,20 @@ function WaterCharts({ plans, evaluations, provenance = "model" }: Props) {
   return (
     <div className="grid gap-6 xl:grid-cols-2">
       <Card className="pb-3">
-        <CardHeader title="Does the field supply what the crops need?" description="Water demand over the whole rotation against what rain and stored soil water could meet." actions={<SourceTag kind={provenance} />} />
+        <CardHeader title="Water needed vs supplied" info="Water demand over the whole rotation against what rain and stored soil water could meet. The gap between each pair of bars is demand the field could not meet without irrigation." actions={<SourceTag kind={provenance} short />} />
         <div className="px-3 pt-4 sm:px-5">
           <SeriesChart data={waterRows} xKey="name" unit="mm over the whole rotation" digits={0} height={260} ariaLabel="Water demand and supply by rotation" series={[
             { key: "demand", label: "Estimated water demand", color: SERIES.blue, type: "bar" },
             { key: "met", label: "Met by rain and soil water", color: SERIES.green, type: "bar" },
           ]} />
         </div>
-        <p className="px-5 pt-2 text-[13px] leading-relaxed text-muted sm:px-6">The gap between each pair of bars is demand the field could not meet without irrigation.</p>
       </Card>
       <Card className="pb-3">
-        <CardHeader title="When would the soil run low on water?" description="Estimated water available to the crop in the root zone, through each rotation." actions={<SourceTag kind={provenance} />} />
+        <CardHeader title="Soil water through the rotation" info="Estimated water available to the crop in the root zone, in ten-day steps. S1, S2 and so on are seasons. Low points are when a crop is most likely to run short." actions={<SourceTag kind={provenance} short />} />
         <div className="px-3 pt-4 sm:px-5">
           <SeriesChart data={storageRows} xKey="label" unit="mm available in the root zone" digits={0} height={260} domain={[0, "auto"]} ariaLabel="Root-zone water storage through each rotation" xInterval="preserveStartEnd"
             series={plans.map((p) => ({ key: p.id, label: p.name, color: planColor(p) }))} />
         </div>
-        <p className="px-5 pt-2 text-[13px] leading-relaxed text-muted sm:px-6">Ten-day steps. S1, S2 and so on are seasons. Low points are when a crop is most likely to run short.</p>
       </Card>
     </div>
   );
@@ -161,7 +160,7 @@ function SeasonTable({ plans, evaluations }: Props) {
         </table>
       </div>
       {evaluation.notes.length > 0 && <ul className="mt-3 space-y-1 text-[13px] leading-relaxed text-amber">{evaluation.notes.map((n) => <li key={n}>{n}</li>)}</ul>}
-      <p className="mt-3 text-[13px] text-muted">All figures are model estimates in millimetres over each season. Rain is the {fmt(evaluation.indicators.rainMm)} mm that falls over the whole rotation, split by season.</p>
+      <p className="mt-3 text-[13px] text-muted">Model estimates, mm per season.</p>
     </div>
   );
 }

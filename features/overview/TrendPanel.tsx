@@ -51,16 +51,15 @@ export function TrendPanel({ observations }: { observations: DailyObservation[] 
 
   return (
     <Card>
-      <CardHeader title="Environmental trends" description={`${view.question} ${longDate(data[0].date)} to ${longDate(data[data.length - 1].date)}.`}
+      <CardHeader title="Environmental trends" description={`${shortDate(data[0].date)} to ${longDate(data[data.length - 1].date)}`} info={<><span className="font-medium text-ink">{view.question}</span> {view.note}</>}
         actions={<Segmented label="Time range" value={range} onChange={setRange} options={[{ value: 30, label: "30 days" }, { value: 90, label: "90 days" }, { value: 240, label: "All" }]} />} />
       <div className="px-5 pt-4 sm:px-6">
         <Segmented label="Measurement" value={metric} onChange={setMetric} options={(Object.keys(VIEWS) as MetricKey[]).map((k) => ({ value: k, label: VIEWS[k].label }))} />
       </div>
-      <div className="px-3 pb-2 pt-5 sm:px-5">
+      <div className="px-3 pb-4 pt-5 sm:px-5">
         <SeriesChart data={data} xKey="date" series={view.series} unit={view.unit} digits={view.digits} xFormat={shortDate} height={340}
           domain={metric === "vegetation" ? [0, 1] : undefined} ariaLabel={`${view.label} from ${longDate(data[0].date)} to ${longDate(data[data.length - 1].date)}`} />
       </div>
-      <p className="border-t border-line px-5 py-3.5 text-[13px] leading-relaxed text-muted sm:px-6">{view.note}</p>
     </Card>
   );
 }

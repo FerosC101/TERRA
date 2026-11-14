@@ -1,37 +1,48 @@
 "use client";
 
 import clsx from "clsx";
-import { ArrowRight, CalendarDays, MapPin, Ruler, Sprout } from "lucide-react";
+import { ArrowRight, CalendarDays, MapPin, Ruler } from "lucide-react";
 import Link from "next/link";
 import { useMemo } from "react";
 import { Badge, Card, ErrorState, LINK, Loading, Section } from "@/components/ui";
+import { CropImage } from "@/components/visual/Crop";
+import { GrowthBar } from "@/components/visual/GrowthBar";
 import { longDate, shortDate } from "@/lib/dates";
-import { buildActivity, summariseField, type ActivityItem } from "@/lib/fieldSummary";
+import { buildActivity, summariseField, type ActivityItem, type FieldSummary } from "@/lib/fieldSummary";
 import { fmt } from "@/lib/format";
 import { useApp } from "@/lib/store";
 import { useService } from "@/lib/useService";
 import { getDiscoveries } from "@/services/discoveryService";
 import { getObservations } from "@/services/fieldSensorService";
 import type { Discovery, Field } from "@/types";
-import { Evidence, severity, StatusBadge } from "../discovery/shared";
+import { CategoryIcon, Evidence, severity, StatusBadge } from "../discovery/shared";
+import { FieldStation } from "./FieldStation";
 import { KeyMeasurements } from "./KeyMeasurements";
 import { TrendPanel } from "./TrendPanel";
 
-function FieldHeader({ field, crop, updated }: { field: Field; crop: string; updated: string }) {
+function FieldHeader({ field, summary }: { field: Field; summary: FieldSummary }) {
   const facts = [
     { icon: MapPin, text: field.location },
-    { icon: Ruler, text: `${fmt(field.areaHa, 1)} hectares` },
-    { icon: Sprout, text: crop },
-    { icon: CalendarDays, text: `Updated ${longDate(updated)}` },
+    { icon: Ruler, text: `${fmt(field.areaHa, 1)} ha` },
+    { icon: CalendarDays, text: `Updated ${shortDate(summary.latest.date)}` },
   ];
   return (
-    <header className="mb-8">
-      <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-ink sm:text-[32px]">{field.name}</h1>
-      <ul className="mt-3 flex flex-wrap gap-x-6 gap-y-2 text-sm text-ink-soft">
-        {facts.map(({ icon: Icon, text }) => (
-          <li key={text} className="flex items-center gap-1.5"><Icon size={15} className="text-muted" aria-hidden />{text}</li>
-        ))}
-      </ul>
+    <header className="mb-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_380px] lg:items-end">
+      <div>
+        <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-ink sm:text-[32px]">{field.name}</h1>
+        <ul className="mt-2.5 flex flex-wrap gap-x-5 gap-y-1.5 text-sm text-ink-soft">
+          {facts.map(({ icon: Icon, text }) => (
+            <li key={text} className="flex items-center gap-1.5"><Icon size={15} className="text-muted" aria-hidden />{text}</li>
+          ))}
+        </ul>
+      </div>
+      <div className="flex items-center gap-4 rounded-xl border border-line bg-surface p-3 pr-5 shadow-card">
+        <CropImage id={summary.crop.id} size="md" />
+        <div className="min-w-0 flex-1">
+          <p className="text-sm text-ink"><span className="font-semibold">{summary.crop.name}</span> <span className="text-muted">· day {summary.dap} of ~{summary.duration}</span></p>
+          <div className="mt-2.5"><GrowthBar crop={summary.crop} day={summary.dap} /></div>
+        </div>
+      </div>
     </header>
   );
 }
@@ -51,25 +62,28 @@ function PrimaryInsight({ lead, openCount }: { lead: Discovery | undefined; open
   return (
     <Card className="overflow-hidden">
       <div className="grid lg:grid-cols-[minmax(0,1fr)_300px]">
-        <div className="p-6 sm:p-7">
+        <div className="flex gap-5 p-6 sm:p-7">
+          <span className="hidden sm:block"><CategoryIcon category={lead.category} size="lg" /></span>
+          <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2.5 text-[13px] text-muted">
             <Badge tone={severity(lead).tone}>{severity(lead).label}</Badge>
             <span>{lead.category} · detected {longDate(lead.detectedOn)}</span>
           </div>
-          <h2 className="mt-3 max-w-2xl text-[22px] font-semibold leading-snug tracking-tight text-ink">{lead.summary}</h2>
-          {lead.risk && <p className="mt-2.5 max-w-2xl text-[15px] leading-relaxed text-ink-soft"><span className="font-medium text-ink">Why it matters: </span>{lead.risk}</p>}
+          <h2 className="mt-2.5 max-w-2xl text-[22px] font-semibold leading-snug tracking-tight text-ink">{lead.summary}</h2>
+          {lead.risk && <p className="mt-2 max-w-2xl text-[15px] leading-relaxed text-ink-soft">{lead.risk}</p>}
           <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3">
             <Link href={`/discoveries/${lead.id}`} className="inline-flex items-center gap-1.5 rounded-lg bg-green px-4 py-2 text-sm font-medium text-white hover:bg-green-strong">
               Investigate <ArrowRight size={15} aria-hidden />
             </Link>
-            {openCount > 1 && <Link href="/discoveries" className={LINK}>{openCount - 1} other open {openCount - 1 === 1 ? "discovery" : "discoveries"}</Link>}
+            {openCount > 1 && <Link href="/discoveries" className={LINK}>+{openCount - 1} more</Link>}
+          </div>
           </div>
         </div>
         <div className="border-t border-line bg-sunken/60 p-6 lg:border-l lg:border-t-0">
-          <p className="text-[13px] font-medium text-muted">What to check next</p>
+          <p className="text-[13px] font-medium text-muted">Check next</p>
           <p className="mt-1.5 text-sm leading-relaxed text-ink">{lead.nextObservation.action}</p>
           <div className="mt-5">
-            <p className="mb-1.5 text-[13px] font-medium text-muted">Strength of the evidence</p>
+            <p className="mb-1.5 text-[13px] font-medium text-muted">Evidence</p>
             <Evidence value={lead.confidence} compact />
           </div>
         </div>
@@ -85,10 +99,11 @@ function RecentDiscoveries({ discoveries }: { discoveries: Discovery[] }) {
         <ul className="divide-y divide-line border-y border-line">
           {discoveries.slice(0, 4).map((d) => (
             <li key={d.id}>
-              <Link href={`/discoveries/${d.id}`} className="group flex items-center gap-4 py-3.5">
+              <Link href={`/discoveries/${d.id}`} className="group flex items-center gap-3.5 py-3">
+                <CategoryIcon category={d.category} resolved={d.status === "resolved"} />
                 <span className="min-w-0 flex-1">
                   <span className="block text-sm font-medium text-ink group-hover:text-green-strong">{d.title}</span>
-                  <span className="mt-0.5 block text-[13px] text-muted">{d.category} · {shortDate(d.detectedOn)} · {severity(d).label}</span>
+                  <span className="mt-0.5 block text-[13px] text-muted">{d.category} · {shortDate(d.detectedOn)}</span>
                 </span>
                 <StatusBadge status={d.status} />
                 <ArrowRight size={15} className="shrink-0 text-faint group-hover:text-green" aria-hidden />
@@ -137,15 +152,17 @@ export function Overview() {
   if (!obs || !summary) return <Loading />;
 
   const open = discoveries.filter((d) => d.status !== "resolved");
-  const stage = summary.stage === "pre" || summary.stage === "post" ? "" : ` · ${summary.stage} stage`;
 
   return (
     <div>
-      <FieldHeader field={field} crop={`${summary.crop.name}, day ${summary.dap} of about ${summary.duration}${stage}`} updated={summary.latest.date} />
+      <FieldHeader field={field} summary={summary} />
       <div className="space-y-10">
         <PrimaryInsight lead={open[0]} openCount={open.length} />
-        <Section title="Key measurements" description={`Latest readings for ${field.name}, with the change over the last 14 days.`}>
-          <KeyMeasurements summary={summary} />
+        <Section title="Key measurements" info="Latest readings, with the last 30 days as a sparkline and the change over 14 days. Each value states its source and date.">
+          <KeyMeasurements summary={summary} observations={obs} />
+        </Section>
+        <Section title="Field station" info="The sensor pod behind the field measurements above. Drag the model to look around it.">
+          <FieldStation field={field} latest={summary.latest} />
         </Section>
         <TrendPanel observations={obs} />
         <div className="grid gap-10 lg:grid-cols-2">

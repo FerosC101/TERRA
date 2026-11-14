@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import { CloudRain, Database, Droplets, Leaf } from "lucide-react";
 import { Badge } from "@/components/ui";
 import type { Discovery } from "@/types";
 
@@ -44,5 +45,17 @@ export function Evidence({ value, note, compact = false }: { value: number; note
       </div>
       {note && <p className="mt-2 text-[13px] leading-relaxed text-muted">{note}</p>}
     </div>
+  );
+}
+
+const CATEGORY_ICON = { Water: Droplets, Climate: CloudRain, Vegetation: Leaf, "Data quality": Database } as const;
+
+/** Category as an icon tile: amber while open, grey once resolved. */
+export function CategoryIcon({ category, resolved = false, size = "md" }: { category: Discovery["category"]; resolved?: boolean; size?: "md" | "lg" }) {
+  const Icon = CATEGORY_ICON[category];
+  return (
+    <span title={category} className={clsx("flex shrink-0 items-center justify-center", size === "lg" ? "h-14 w-14 rounded-2xl" : "h-9 w-9 rounded-xl", resolved ? "bg-sunken text-muted" : "bg-amber-soft text-amber")}>
+      <Icon size={size === "lg" ? 26 : 17} aria-hidden />
+    </span>
   );
 }

@@ -1,9 +1,10 @@
 "use client";
 
 import clsx from "clsx";
-import { Fragment, useState } from "react";
+import { useState } from "react";
 import { SeriesChart } from "@/components/charts/SeriesChart";
 import { Card, CardHeader, Disclosure, Segmented, SourceTag, Swatch, TABLE, TD, TH } from "@/components/ui";
+import { InfoTip } from "@/components/visual/InfoTip";
 import { CHART } from "@/lib/chartTheme";
 import { fmt } from "@/lib/format";
 import type { RotationEvaluation, RotationPlan, Scenario } from "@/types";
@@ -19,46 +20,46 @@ interface Props {
 
 const KEYS = Object.keys(OUTCOMES) as StressKey[];
 
-/** For each rotation: what it looks like historically, under the scenario, and the change between them. */
+/** One row per outcome, one column per rotation: the value under the scenario, and how far it moved from historical. */
 export function ChangeTable({ focus, plans, get }: Props) {
   const historical = focus.id === "historical";
   return (
     <div className="overflow-x-auto">
-      <table className={`${TABLE} min-w-[620px]`}>
+      <table className={`${TABLE} min-w-[560px]`}>
         <thead>
           <tr>
             <th className={TH}>Outcome</th>
-            <th className={TH}>Historical</th>
-            {!historical && <><th className={TH}>{focus.name}</th><th className={TH}>Change</th></>}
+            {plans.map((p) => <th key={p.id} className={TH}><span className="inline-flex items-center gap-2 font-semibold text-ink"><Swatch color={planColor(p)} />{p.name}</span></th>)}
           </tr>
         </thead>
         <tbody>
-          {plans.map((p) => (
-            <Fragment key={p.id}>
-              <tr><th colSpan={historical ? 2 : 4} scope="colgroup" className="pb-1 pt-5 text-left text-sm font-semibold text-ink"><span className="inline-flex items-center gap-2"><Swatch color={planColor(p)} />{p.name}</span></th></tr>
-              {KEYS.map((k) => {
-                const o = OUTCOMES[k];
-                const base = o.value(get("historical", p.id));
-                const now = o.value(get(focus.id, p.id));
-                const worse = o.worseWhen && (o.worseWhen === "higher" ? now > base : now < base);
-                const changed = o.format(now) !== o.format(base);
-                return (
-                  <tr key={k}>
-                    <td className={TD}><span className="text-ink">{o.label}</span><span className="block text-[13px] text-muted">{o.help}</span></td>
-                    <td className={`${TD} tabular`}>{o.format(base)}</td>
-                    {!historical && (
-                      <>
-                        <td className={`${TD} tabular font-medium text-ink`}>{o.format(now)}</td>
-                        <td className={clsx(TD, "tabular whitespace-nowrap", changed && worse && "font-medium text-amber")}>{changed ? o.delta(now, base) : "No change"}</td>
-                      </>
-                    )}
-                  </tr>
-                );
-              })}
-            </Fragment>
-          ))}
+          {KEYS.map((k) => {
+            const o = OUTCOMES[k];
+            return (
+              <tr key={k}>
+                <td className={TD}><span className="inline-flex items-center gap-1 text-ink">{o.label}<InfoTip label={o.label}>{o.help}</InfoTip></span></td>
+                {plans.map((p) => {
+                  const base = o.value(get("historical", p.id));
+                  const now = o.value(get(focus.id, p.id));
+                  const changed = o.format(now) !== o.format(base);
+                  const worse = o.worseWhen && (o.worseWhen === "higher" ? now > base : now < base);
+                  return (
+                    <td key={p.id} className={TD}>
+                      <span className="tabular font-medium text-ink">{o.format(now)}</span>
+                      {!historical && (
+                        <span className={clsx("tabular ml-2 text-[13px]", !changed ? "text-faint" : !o.worseWhen ? "text-ink-soft" : worse ? "font-medium text-amber" : "text-green-strong")}>
+                          {changed ? o.delta(now, base) : "same"}
+                        </span>
+                      )}
+                    </td>
+                  );
+                })}
+              </tr>
+            );
+          })}
         </tbody>
       </table>
+      {!historical && <p className="mt-2 text-[13px] text-muted">Change is against historical conditions: <span className="text-amber">amber</span> is worse, <span className="text-green-strong">green</span> is better.</p>}
     </div>
   );
 }
@@ -80,17 +81,16 @@ export function ScenarioCharts({ scenarios, focus, plans, get }: Props) {
 
   return (
     <div className="grid gap-6 xl:grid-cols-2">
-      <Card className="pb-3">
-        <CardHeader title="Which rotations hold up when conditions change?" actions={<SourceTag kind="simulated" />}
-          description={anyUnmet ? "Unmet crop water demand for each rotation under every scenario." : "Rain and stored water meet all crop demand in every scenario here, so this shows the lowest soil water each rotation reaches."} />
+      <Card className="pb-4">
+        <CardHeader title="Which rotations hold up?" actions={<SourceTag kind="simulated" short />}
+          info={anyUnmet ? "Unmet crop water demand for each rotation under every scenario. Low bars mean less exposure to dry conditions." : "Rain and stored water meet all crop demand in every scenario here, so this shows the lowest soil water each rotation reaches. Taller bars mean more water held in reserve."} />
         <div className="px-3 pt-4 sm:px-5">
           <SeriesChart data={compareRows} xKey="scenario" unit={anyUnmet ? "mm of unmet demand over the whole rotation" : "mm left in the root zone at the driest point"} digits={0} height={290} ariaLabel="Unmet water demand by scenario and rotation" xInterval={0}
             series={plans.map((p) => ({ key: p.id, label: p.name, color: planColor(p), type: "bar" as const }))} />
         </div>
-        <p className="px-5 pt-2 text-[13px] leading-relaxed text-muted sm:px-6">{anyUnmet ? "A rotation whose bars stay low across scenarios is less exposed to dry conditions." : "Taller bars mean more water held in reserve. A rotation whose bars stay tall is further from running short."}</p>
       </Card>
-      <Card className="pb-3">
-        <CardHeader title="When does the soil have less water to give?" description={`Estimated water in the root zone under ${focus.name.toLowerCase()}, against historical conditions.`}
+      <Card className="pb-4">
+        <CardHeader title="Soil water: scenario vs historical" info={`Estimated water in the root zone under ${focus.name.toLowerCase()} (solid) against historical conditions (dashed), in ten-day steps. Where the solid line sits well below the dashed one, crops have less stored water to draw on.`}
           actions={plans.length > 1 && plan ? <Segmented label="Rotation" value={plan.id} onChange={setPickedPlan} options={plans.map((p) => ({ value: p.id, label: p.name }))} /> : <SourceTag kind="simulated" />} />
         <div className="px-3 pt-4 sm:px-5">
           {plan && (
@@ -101,7 +101,6 @@ export function ScenarioCharts({ scenarios, focus, plans, get }: Props) {
               ]} />
           )}
         </div>
-        <p className="px-5 pt-2 text-[13px] leading-relaxed text-muted sm:px-6">Ten-day steps. Where the scenario line sits well below the dashed line, crops have less stored water to draw on.</p>
       </Card>
     </div>
   );

@@ -165,9 +165,14 @@ function Profile() {
   );
 }
 
+/** Pages that use the full content area edge to edge (the map). */
+const FULL_BLEED = ["/explorer"];
+
 export function AppShell({ children }: { children: React.ReactNode }) {
   const [drawer, setDrawer] = useState(false);
   const { field } = useApp();
+  const pathname = usePathname();
+  const fullBleed = FULL_BLEED.some((p) => pathname.startsWith(p));
   return (
     <div className="min-h-screen">
       <aside className="no-print fixed inset-y-0 left-0 z-30 hidden w-56 border-r border-line bg-surface lg:block">
@@ -199,7 +204,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <Profile />
           </div>
         </header>
-        <main className="mx-auto max-w-[1240px] px-4 py-8 sm:px-6 lg:px-10 lg:py-10">{children}</main>
+        <main className={fullBleed ? "relative" : "mx-auto max-w-[1240px] px-4 py-8 sm:px-6 lg:px-10 lg:py-10"}>{children}</main>
       </div>
     </div>
   );
