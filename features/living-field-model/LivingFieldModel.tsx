@@ -44,7 +44,7 @@ function Body({ model, states, snapshot }: { model: FieldModel; states: FieldSta
     <div className="space-y-10">
       {/* Overview: the five dimensions side by side */}
       <div>
-        <div role="tablist" aria-label="Field model dimensions" className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+        <div role="tablist" aria-label="Field model dimensions" data-tour="dimensions" className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
           {DIMENSIONS.map(({ key, icon: Icon }) => {
             const on = key === dim;
             return (
@@ -74,6 +74,7 @@ function Body({ model, states, snapshot }: { model: FieldModel; states: FieldSta
         </div>
       </div>
 
+      <div data-tour="field-scene">
       <FieldSimulationPanel
         field={field}
         state={state}
@@ -86,6 +87,7 @@ function Body({ model, states, snapshot }: { model: FieldModel; states: FieldSta
         dates={dates}
         playback={playback}
       />
+      </div>
 
       <Card className="p-5 sm:p-7">
         <div id="dimension-panel" role="tabpanel" aria-label={DIMENSION_LABEL[dim]}>

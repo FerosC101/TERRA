@@ -31,7 +31,7 @@ export function RotationLab() {
         actions={<Button onClick={resetRotations}><RotateCcw size={15} aria-hidden /> Reset to examples</Button>} />
 
       <div className="space-y-12">
-        <Section title="1. Build your rotations" info="Each row is one plan, read left to right. Tap a crop to change it; use the arrows to reorder seasons.">
+        <Section tour="rotation-build" title="1. Build your rotations" info="Each row is one plan, read left to right. Tap a crop to change it; use the arrows to reorder seasons.">
           <div className="mb-5 flex flex-wrap items-end gap-x-8 gap-y-4">
             <div>
               <p className="mb-1.5 text-[13px] text-ink-soft">Seasons per year</p>
@@ -53,7 +53,7 @@ export function RotationLab() {
           <RotationBuilder evaluations={evaluations} />
         </Section>
 
-        <Section title="2. Compare the plans" description={`${compared.length} of ${plans.length} plans · average climate${realSpan ? ` and real years ${realSpan}` : ""}`}
+        <Section tour="rotation-compare" title="2. Compare the plans" description={`${compared.length} of ${plans.length} plans · average climate${realSpan ? ` and real years ${realSpan}` : ""}`}
           info={`Model estimates from ${field.climate.basis === "retrieved" ? "the NASA POWER climatology for this area" : "an illustrative climatology"} and typical crop parameters. They compare plans with each other; they are not yield forecasts.`}
           actions={<Link href="/future-earth" className={LINK}>Test these under climate scenarios <ArrowRight size={15} aria-hidden /></Link>}>
           {all.error ? <ErrorState message={all.error} /> : !all.data ? <Loading label="Evaluating rotations" /> : compared.length === 0 ? (

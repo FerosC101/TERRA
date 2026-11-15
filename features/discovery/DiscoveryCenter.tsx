@@ -107,6 +107,7 @@ export function DiscoveryCenter() {
         </div>
       )}
 
+      <div data-tour="discovery-list">
       {shown.length === 0 ? (
         <EmptyState title={data.length === 0 ? `No discoveries for ${field.name}` : "No discoveries match this filter"}>
           {data.length === 0 ? "Recent observations sit within their usual range, so no detector rule is met." : "Choose a different filter to see the others."}
@@ -135,6 +136,7 @@ export function DiscoveryCenter() {
           )}
         </div>
       )}
+      </div>
 
       <Section title="How to read a discovery" className="mt-12">
         <ol className="grid gap-3 sm:grid-cols-3">

@@ -96,7 +96,7 @@ export function Reports() {
     <div>
       {header}
 
-      <fieldset className="no-print mb-6">
+      <fieldset className="no-print mb-6" data-tour="report-sections">
         <legend className="mb-2 text-[13px] font-medium text-ink-soft">Sections to include</legend>
         <div className="flex flex-wrap gap-x-5 gap-y-2">
           {SECTIONS.map((sec) => (

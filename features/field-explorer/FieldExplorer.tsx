@@ -230,7 +230,7 @@ export function FieldExplorer() {
         {/* Left: the place card, and details of what is selected */}
         <div className={clsx("pointer-events-none absolute left-3 top-3 z-10 flex flex-col gap-2", wide ? "w-[340px]" : "right-[64px]")}>
           <button type="button" onClick={() => { setSelection({ type: "field" }); setDetailOpen(selection.type !== "field" || !detailOpen); }}
-            aria-expanded={detailOpen && selection.type === "field"} aria-label={`${field.name}: field summary`}
+            aria-expanded={detailOpen && selection.type === "field"} aria-label={`${field.name}: field summary`} data-tour="place-card"
             className={clsx(GLASS, "pointer-events-auto flex items-start gap-3 rounded-2xl p-3 text-left")}>
             <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-green text-white"><MapPin size={17} aria-hidden /></span>
             <span className="min-w-0 flex-1">
@@ -250,7 +250,7 @@ export function FieldExplorer() {
         {!wide && detailCard && <div className="pointer-events-none absolute inset-x-3 bottom-3 z-10">{detailCard}</div>}
 
         {/* Right: one slim stack of map controls */}
-        <div className="absolute right-3 top-3 z-10 flex flex-col items-end gap-2">
+        <div className="absolute right-3 top-3 z-10 flex flex-col items-end gap-2" data-tour="map-controls">
           <div className={clsx(GLASS, "flex flex-col overflow-hidden rounded-xl")}>
             <button ref={styleButton} type="button" popoverTarget="map-style" aria-label="Map style and layers" title="Map style and layers" className={STACK_BTN}>
               <Layers size={18} aria-hidden />
@@ -316,7 +316,7 @@ export function FieldExplorer() {
 
         {/* Bottom left: a compact key, only for what is on the map */}
         {(wide || !detailCard) && (
-          <div className={clsx(GLASS, "absolute bottom-3 left-3 z-10 flex max-w-[calc(100%-1.5rem)] flex-wrap items-center gap-x-3 gap-y-1 rounded-2xl px-3.5 py-1.5 sm:rounded-full text-[11.5px] text-ink-soft sm:max-w-[640px]")}>
+          <div data-tour="map-key" className={clsx(GLASS, "absolute bottom-3 left-3 z-10 flex max-w-[calc(100%-1.5rem)] flex-wrap items-center gap-x-3 gap-y-1 rounded-2xl px-3.5 py-1.5 sm:rounded-full text-[11.5px] text-ink-soft sm:max-w-[640px]")}>
             {tileError ? (
               <span className="inline-flex items-center gap-1 text-amber"><TriangleAlert size={12} aria-hidden /> Imagery could not load; showing the map</span>
             ) : effectiveBase !== "map" && (

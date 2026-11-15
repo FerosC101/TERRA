@@ -215,11 +215,11 @@ export function Overview() {
       <PageHeader field={field} summary={summary} />
       <div className="space-y-10">
         <div className="grid gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2"><NeedsAttention open={open} /></div>
+          <div className="lg:col-span-2" data-tour="attention"><NeedsAttention open={open} /></div>
           <CropCard field={field} summary={summary} />
         </div>
 
-        <Section title="Conditions now" description={`Latest readings, ${longDate(summary.latest.date)}. Lines show the last 30 days.`}
+        <Section tour="conditions" title="Conditions now" description={`Latest readings, ${longDate(summary.latest.date)}. Lines show the last 30 days.`}
           info="Each value states its source. Changes are over the last 14 days unless stated.">
           <KeyMeasurements field={field} summary={summary} observations={obs} />
         </Section>
@@ -227,7 +227,7 @@ export function Overview() {
         <TrendPanel observations={obs} />
 
         <div className="grid gap-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
-          <FieldStation field={field} latest={summary.latest} />
+          <div className="min-w-0" data-tour="station"><FieldStation field={field} latest={summary.latest} /></div>
           <Activity items={activity} discoveries={discoveries} />
         </div>
       </div>

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Logo } from "@/components/brand/Logo";
+import { TourButton, TourProvider } from "@/components/tour/GuidedTour";
 import { CropImage } from "@/components/visual/Crop";
 import { CROPS } from "@/data/crops";
 import { recordEndDate } from "@/data/nasa/realRecords";
@@ -88,7 +89,7 @@ function FieldSelector() {
 
   return (
     <div className="relative min-w-0" ref={ref}>
-      <button type="button" onClick={() => setOpen(!open)} aria-haspopup="true" aria-expanded={open} aria-label={`Field: ${field.name}. Change field`}
+      <button type="button" onClick={() => setOpen(!open)} aria-haspopup="true" aria-expanded={open} aria-label={`Field: ${field.name}. Change field`} data-tour="field"
         className={clsx("group flex h-11 max-w-full items-center gap-2.5 rounded-xl border bg-surface py-1 pl-1 pr-2.5 text-left shadow-card transition-colors",
           open ? "border-green ring-2 ring-green/15" : "border-line hover:border-line-strong")}>
         <CropImage id={field.fallow ? "fallow" : field.currentCrop} size="xs" className="h-9! w-9! rounded-lg" />
@@ -146,7 +147,7 @@ function DataStatus() {
   const demo = status.mode === "demo";
   return (
     <div className="relative" ref={ref}>
-      <button type="button" onClick={() => setOpen(!open)} aria-expanded={open} aria-label={`Data status: ${status.label}`}
+      <button type="button" onClick={() => setOpen(!open)} aria-expanded={open} aria-label={`Data status: ${status.label}`} data-tour="data-status"
         className={clsx("flex h-9 items-center gap-2 rounded-lg px-2.5 text-[13px] font-medium", demo ? "bg-amber-soft text-amber hover:bg-amber-line/60" : "bg-green-soft text-green-strong")}>
         <Database size={14} aria-hidden />
         <span className="hidden md:inline">{status.label}</span>
@@ -227,6 +228,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const fullBleed = FULL_BLEED.some((p) => pathname.startsWith(p));
   if (isBare(pathname)) return <>{children}</>;
   return (
+    <TourProvider>
     <div className="min-h-screen">
       <aside className="no-print fixed inset-y-0 left-0 z-30 hidden w-56 border-r border-line bg-surface lg:block">
         <Sidebar />
@@ -251,6 +253,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </button>
           <FieldSelector />
           <div className="ml-auto flex items-center gap-1.5">
+            <TourButton />
             <DataStatus />
             <Notifications />
             <Profile />
@@ -259,5 +262,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <main className={fullBleed ? "relative" : "mx-auto max-w-[1240px] px-4 py-8 sm:px-6 lg:px-10 lg:py-10"}>{children}</main>
       </div>
     </div>
+    </TourProvider>
   );
 }

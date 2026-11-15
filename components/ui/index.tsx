@@ -27,9 +27,9 @@ export function PageHeader({ title, lead, actions, children }: { title: string; 
 }
 
 /** A titled region of a page. Separation comes from space and the heading, not a box. */
-export function Section({ title, description, info, actions, children, className }: { title: string; description?: React.ReactNode; info?: React.ReactNode; actions?: React.ReactNode; children: React.ReactNode; className?: string }) {
+export function Section({ title, description, info, actions, children, className, tour }: { title: string; description?: React.ReactNode; info?: React.ReactNode; actions?: React.ReactNode; children: React.ReactNode; className?: string; /** Anchor for the guided tour */ tour?: string }) {
   return (
-    <section className={clsx("print-avoid", className)}>
+    <section className={clsx("print-avoid", className)} data-tour={tour}>
       <div className="mb-4 flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
         <div className="min-w-0 max-w-2xl">
           <h2 className="flex items-center gap-1.5 text-[17px] font-semibold tracking-tight text-ink">{title}{info && <InfoTip label={title}>{info}</InfoTip>}</h2>
