@@ -22,6 +22,8 @@ Legend: ✅ done · 🟡 partly done · ⬜ to do · 🔒 blocked on data being 
 - [ ] ⬜ NDVI blind spot for slow stress (F-001)
 - [x] ✅ Discovery cards: `lib/science/discovery/cards.ts` builds `Discovery` from `AnomalyRecord`s; evidence keeps the data's provenance; `detectedOn` is the real detection date
 - [x] ✅ Connect to the app: `services/discoveryService.discoveriesFor` runs the engine on the demo record (`lib/adapters/demoSeries.ts`); `lib/science/detect.ts` removed. Shows the latest alarm per detector (demo records raise 22–25 onsets in 240 days, F-002). Detail charts mark the detection date; no markers on the Overview trend chart yet
+- [x] 🟡 Discovery Center states what it ran on (2026-11-15): `services/detectorStatusService.ts` reports each rule as applied to the field (calibrated POWER limits for real fields, fixed demo limits otherwise), its decided days and alarms in the record (`engine.ts` `runDiscoveryWithCoverage`), and why a rule cannot fire (no probe, no sensor, planting date after the record). Real fields now list every onset (16 at Lipa, incl. the 2024-04-15 90-day drought); rain cards state their window (14 or 90 days) and date; `runAt` = record end (`discoveryContext`, `services/discoveryService.ts`)
+- [x] ✅ All four rules run on real Lipa in the app (D-020): moisture divergence and source offset on the planned station's SIMULATED probes, NDVI with an ASSUMED calendar (Plot A's seasons); listed apart from real-data alarms, graded Tentative, never in experiments or reports. Real replacements still needed: a probe, the D-015 SMAP L4 calibration, a crop calendar for the AOI
 - [x] 🟡 Investigation flow: `lib/science/discovery/investigation.ts` (status + five stages). new → resolved on a logged reading or check answer; no "investigating" state yet (it needs multi-step checks, section 4)
 - [ ] ⬜ Run on two years of real Lipa data; record as E-005 (alarm rate, plausibility). Rain departure can run now (F-008: 22 onsets in 731 days). NDVI change now runs on MODIS (20 days decided, 0 alarms; depends on the assumed planting date, F-015, D-009). Moisture divergence waits for SMAP L4 daily means and the fallback (data downloaded), sensor offset for a ground sensor
 - [ ] ⬜ *Later (ML):* calibrate confidence from farmer-confirmed outcomes (needs real labels)
@@ -97,6 +99,7 @@ It's done when this chain works **in the app, on real Lipa data**:
 - [x] ✅ Build report (2026-11-15): Claude Doc "TERRA AI/ML — Build Report" and `docs/reports/TERRA-AI-ML-Build-Report.docx`, with the chain diagram and the four notebook graphs. Written before MODIS NDVI and the SoilGrids soil landed, so it does not cover them
 - [ ] ⬜ Old file names in the 14 Nov Word report (`docs/reports/TERRA-Discovery-Engine-Progress-Report.docx`)
 - [x] 🟡 NASA pitch deck: 7-slide content drafted in chat (technical and story versions, one real alarm followed through: 14 Jan 2024, rain at 17 % of normal). Not saved to a file; slides not built
+- [x] ✅ Rotation Lab shows the real-years result (D-014) as a table per plan and season (years short of N, median and driest-20 % shortfall), not as note text; `services/rotationService.ts` returns it as `realYears` (2026-11-15)
 - [x] ✅ Experiment "dirty" flag ignores the experiments' own output files (`scripts/discoveryHarness.ts`)
 
 ## Suggested order
