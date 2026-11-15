@@ -1,7 +1,9 @@
 import { FIELDS } from "@/data/fields";
 import { NASA_SNAPSHOTS } from "@/data/nasa";
+import { realRecord } from "@/data/nasa/realRecords";
 import { longDate } from "@/lib/dates";
 import type { DataSource } from "@/types";
+import type { SourceId } from "@/types/discovery-contract";
 
 /**
  * The data sources TERRA is designed around. `integration: "demo"` means this
@@ -85,6 +87,23 @@ const SNAPSHOT_PRODUCTS = ["power", "imerg", "smap"];
 
 /** Data sources with their status for one field. */
 export function sourcesForField(fieldId: string): DataSource[] {
+  const real = realRecord(fieldId);
+  if (real) {
+    // A field with a real record: the sources in that record are real; the station is planned or simulated, not measured.
+    const inRecord = new Set(real.flatMap((d) => d.values.map((v) => v.source)));
+    const span = `${longDate(real[0].date)} to ${longDate(real[real.length - 1].date)}`;
+    const station = FIELDS.find((f) => f.id === fieldId)?.station;
+    return DATA_SOURCES.map((src) => {
+      if (inRecord.has(src.id as SourceId)) return { ...src, integration: "snapshot", statusNote: `Real record bundled for ${span}.` };
+      if (src.id === "station") {
+        return { ...src, statusNote: station?.status === "planned"
+          ? "Not installed yet (planned site). The readings shown are simulated from the station's design, never measured."
+          : "No hardware connected. The readings shown are simulated from the station's design, never measured." };
+      }
+      if (src.integration === "live") return { ...src, statusNote: "Fetched live from NASA GIBS when the Field Explorer's NASA moisture view is opened." };
+      return { ...src, statusNote: "Not used for this field." };
+    });
+  }
   const snap = NASA_SNAPSHOTS[fieldId];
   return DATA_SOURCES.map((src) => {
     if (snap && SNAPSHOT_PRODUCTS.includes(src.id)) {

@@ -14,9 +14,14 @@ Current state of TERRA. Keep this short and true. Last reviewed: 2026-11-15.
   fallback, NDVI below-normal rule and SMAP L4 field model built and tested (D-015–D-017), limits pending the SMAP L4
   2015–2023 and MODIS 2001–2025 histories requested from AppEEARS. Reports: `docs/reports/TERRA-Data-Gathering-and-
   Cleaning.docx`, `docs/reports/TERRA-Model-Description-and-Results.docx` (`scripts/reports/*.py`).
+- UI integration of the model chain (plan: real NASA data → field state → anomaly → next check → rotation): the
+  Discovery Center reports each rule's limits, coverage and blocked reason (`services/detectorStatusService.ts`);
+  the Rotation Lab shows the real-years table (D-014). Real fields list every onset (16 at Lipa). All four rules run on Lipa: the
+  three without real input on simulated probes / an assumed calendar, listed apart and labelled (D-020). Open: Living Field Model
+  on real dates (Plot A session), links between stages, SMAP L4 comparison line.
 - No ML models exist yet. The UI's Discoveries come from the Discovery Engine (below), run on the demo record
   through `lib/adapters/demoSeries.ts` and worded by `lib/science/discovery/cards.ts`
-  (`services/discoveryService.discoveriesFor`, latest alarm per detector). `lib/science/detect.ts` was removed 2026-11-15.
+  (`services/discoveryService.discoveriesFor`: every onset on a real record, latest per detector on demo records). `lib/science/detect.ts` was removed 2026-11-15.
 - Living Field Model (D-007, `lib/science/fieldModel/state.ts`, served by `services/fieldModelService.ts`):
   a daily two-layer FAO-56 water balance (`lib/science/water/cropWater.ts`, eq. 74 and 84 checked against
   the FAO-56 images 2026-11-15) corrected by soil-moisture readings, with source, age and uncertainty per layer.

@@ -1,8 +1,9 @@
 import { CROPS } from "@/data/crops";
 import { fmt } from "@/lib/format";
+import { obsProvenance, type ObsKey } from "@/lib/provenance";
 import type { FieldState } from "@/lib/science/fieldModel/state";
 import { sum } from "@/lib/science/stats";
-import type { DailyObservation, DimensionKey, Field, FieldModel } from "@/types";
+import type { DailyObservation, DimensionKey, Field, FieldModel, Provenance } from "@/types";
 
 /** Root-zone water the crop can still use, mm (Living Field Model, D-007). */
 const availableMm = (s: FieldState) => s.water.tawMm - s.water.depletionMm;
@@ -43,6 +44,8 @@ export function modelStateAt(field: Field, model: FieldModel, states: FieldState
     capacityMm: living.water.tawMm,
     families,
     legumeSeasons: field.rotationHistory.filter((r) => CROPS[r.crop].legume).length,
+    /** Where a reading on this date came from: sensor, satellite, model, or the planned station's simulation. */
+    prov: (key: ObsKey): Provenance => obsProvenance(field, key, at),
   };
 }
 
@@ -52,7 +55,7 @@ export type ModelState = ReturnType<typeof modelStateAt>;
 export function headline(state: ModelState): Record<DimensionKey, { value: string; caption: string }> {
   return {
     water: { value: `${fmt(state.availableMm, 0)} mm`, caption: "Estimated water in the root zone" },
-    soil: { value: `${fmt(state.at.soilTempC, 1)} °C`, caption: "Soil temperature at 10 cm" },
+    soil: { value: `${fmt(state.at.soilTempC, 1)} °C`, caption: state.prov("soilTempC") === "simulated" ? "Soil temperature at 10 cm (simulated)" : "Soil temperature at 10 cm" },
     vegetation: { value: state.ndviAt ? fmt(state.ndviAt.ndvi, 2) : "Unavailable", caption: "Vegetation index (NDVI)" },
     climate: { value: `${fmt(state.rain30, 0)} mm`, caption: "Rain in the last 30 days" },
     rotation: { value: `${state.families.length} ${state.families.length === 1 ? "family" : "families"}`, caption: "Crop families grown" },

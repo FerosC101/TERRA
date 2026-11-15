@@ -16,10 +16,19 @@ const state = {
 
 describe("scene callouts", () => {
   it("labels field-record readings by their real source", () => {
+    // Lipa Cropland runs on a real record with no installed station: its probe readings are a simulation (D-019).
     const water = calloutsFor("water", buildFieldSceneState(field, state, "record"));
     const byId = Object.fromEntries(water.map((c) => [c.id, c]));
     expect(byId.storage.value).toBe("110 mm");
     expect(byId.storage.source).toBe("model");
+    expect(byId.vwc10.source).toBe("simulated");
+    const climate = Object.fromEntries(calloutsFor("climate", buildFieldSceneState(field, state, "record")).map((c) => [c.id, c]));
+    expect(climate.tmax.source).toBe("model"); // NASA POWER
+  });
+
+  it("keeps the station labels on a demo field", () => {
+    const demo = FIELDS.find((f) => f.role === "secondary")!;
+    const byId = Object.fromEntries(calloutsFor("water", buildFieldSceneState(demo, state, "record")).map((c) => [c.id, c]));
     expect(byId.vwc10.source).toBe("measurement");
   });
 

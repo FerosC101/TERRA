@@ -6,7 +6,9 @@ import Link from "next/link";
 import { Badge, Card, LINK, SourceTag } from "@/components/ui";
 import { InfoTip } from "@/components/visual/InfoTip";
 import { shortDate } from "@/lib/dates";
+import { hasRealRecord } from "@/data/nasa/realRecords";
 import { coord, fmt } from "@/lib/format";
+import { obsProvenance } from "@/lib/provenance";
 import type { DailyObservation, Field } from "@/types";
 
 const StationModel = dynamic(() => import("@/components/three/StationModel"), {
@@ -18,9 +20,10 @@ const StationModel = dynamic(() => import("@/components/three/StationModel"), {
 export function FieldStation({ field, latest }: { field: Field; latest: DailyObservation }) {
   const station = field.station;
   const simulated = station.status === "simulated";
+  const planned = station.status === "planned";
   const extra = [
     { label: "Bulk EC", value: fmt(latest.ecDsM, 2), unit: "dS/m" },
-    { label: "Rain that day", value: fmt(latest.rainMm, 1), unit: "mm" },
+    { label: "Rain that day", value: fmt(latest.rainMm, 1), unit: "mm", note: obsProvenance(field, "rainMm", latest) === "measurement" ? undefined : "NASA, not a gauge" },
   ];
 
   return (
@@ -36,8 +39,8 @@ export function FieldStation({ field, latest }: { field: Field; latest: DailyObs
           </h2>
           <p className="tabular mt-0.5 text-xs text-muted">{station.id} · {coord(station.position.lat, station.position.lng)}</p>
         </div>
-        <Badge tone={simulated ? "warning" : station.status === "online" ? "good" : "critical"}>
-          {simulated ? "Simulated" : station.status === "online" ? "Online" : "Offline"}
+        <Badge tone={simulated || planned ? "warning" : station.status === "online" ? "good" : "critical"}>
+          {planned ? "Planned · not installed" : simulated ? "Simulated" : station.status === "online" ? "Online" : "Offline"}
         </Badge>
       </div>
 
@@ -51,14 +54,16 @@ export function FieldStation({ field, latest }: { field: Field; latest: DailyObs
           <div key={r.label}>
             <dt className="text-xs text-muted">{r.label}</dt>
             <dd className="mt-0.5 flex items-baseline gap-1"><span className="tabular text-lg font-semibold text-ink">{r.value}</span><span className="text-xs text-muted">{r.unit}</span></dd>
+            {r.note && <dd className="text-[11px] text-faint">{r.note}</dd>}
           </div>
         ))}
       </dl>
 
       <div className="mt-auto flex flex-wrap items-center justify-between gap-x-4 gap-y-2 p-6 pt-4">
         <span className="text-xs text-muted">
-          <SourceTag kind="measurement" short detail={shortDate(latest.date)} />
-          {simulated && <span className="mt-0.5 block">Not connected yet: demo values</span>}
+          <SourceTag kind={obsProvenance(field, "ecDsM", latest)} short detail={shortDate(latest.date)} />
+          {planned && <span className="mt-0.5 block">{station.note ?? "Not installed yet."}</span>}
+          {simulated && <span className="mt-0.5 block">{hasRealRecord(field.id) ? "No device connected: simulated from the station's design" : "Not connected yet: demo values"}</span>}
         </span>
         <Link href="/explorer" className={LINK}>See it on the map <ArrowRight size={15} aria-hidden /></Link>
       </div>

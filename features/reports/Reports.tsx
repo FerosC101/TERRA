@@ -7,17 +7,19 @@ import { SeriesChart } from "@/components/charts/SeriesChart";
 import { Badge, Button, ErrorState, Loading, PageHeader, provenanceLabel, SourceTag, TABLE, TD, TH } from "@/components/ui";
 import { CropImage, CropSequence } from "@/components/visual/Crop";
 import { CROPS } from "@/data/crops";
+import { hasRealRecord } from "@/data/nasa/realRecords";
 import { HISTORICAL, SCENARIOS } from "@/data/scenarios";
 import { SERIES } from "@/lib/chartTheme";
 import { longDate, shortDate } from "@/lib/dates";
 import { summariseField } from "@/lib/fieldSummary";
 import { coord, fmt, pct, signed } from "@/lib/format";
+import { obsProvenance, type ObsKey } from "@/lib/provenance";
 import { useApp } from "@/lib/store";
 import { useService } from "@/lib/useService";
 import { simulateScenarios } from "@/services/climateScenarioService";
 import { getNasaSnapshot } from "@/services/nasaDataService";
 import { getReport } from "@/services/reportService";
-import type { DataSource } from "@/types";
+import type { DataSource, Provenance } from "@/types";
 import { evidenceLevel, STATUS_LABEL } from "../discovery/shared";
 import { CriteriaTable } from "../rotation-lab/Comparison";
 import { tradeoffs } from "../rotation-lab/shared";
@@ -77,11 +79,14 @@ export function Reports() {
   const allDemo = report.sources.every((src) => src.integration === "demo" || src.id === "smap-gibs");
   let n = 0;
 
-  const measurements: { label: string; value: string; change: string; kind: "measurement" | "satellite" | "model"; date: string }[] = [
-    { label: "Soil moisture, 10 cm", value: `${fmt(s.latest.surfaceVwc, 1)} %`, change: `${signed(s.surfaceChange14)} points in 14 days`, kind: "measurement", date: s.latest.date },
-    { label: "Soil moisture, 40 cm", value: `${fmt(s.latest.deepVwc, 1)} %`, change: `${signed(s.deepChange14)} points in 14 days`, kind: "measurement", date: s.latest.date },
-    { label: "Soil temperature, 10 cm", value: `${fmt(s.latest.soilTempC, 1)} °C`, change: `${signed(s.soilTempChange14)} °C in 14 days`, kind: "measurement", date: s.latest.date },
-    { label: `Rainfall, ${shortDate(s.rainPeriodStart)} to ${shortDate(s.latest.date)}`, value: `${fmt(s.rain14)} mm`, change: `${fmt((s.rain14 / Math.max(1, s.rainExpected14)) * 100)}% of the ${fmt(s.rainExpected14)} mm usual`, kind: "measurement", date: s.latest.date },
+  const real = hasRealRecord(report.field.id);
+  const prov = (key: ObsKey) => obsProvenance(report.field, key, s.latest);
+  const fallow = report.field.fallow && s.latest.date >= report.field.fallow.since ? report.field.fallow : null;
+  const measurements: { label: string; value: string; change: string; kind: Provenance; date: string }[] = [
+    { label: "Soil moisture, 10 cm", value: `${fmt(s.latest.surfaceVwc, 1)} %`, change: `${signed(s.surfaceChange14)} points in 14 days`, kind: prov("surfaceVwc"), date: s.latest.date },
+    { label: "Soil moisture, 40 cm", value: `${fmt(s.latest.deepVwc, 1)} %`, change: `${signed(s.deepChange14)} points in 14 days`, kind: prov("deepVwc"), date: s.latest.date },
+    { label: "Soil temperature, 10 cm", value: `${fmt(s.latest.soilTempC, 1)} °C`, change: `${signed(s.soilTempChange14)} °C in 14 days`, kind: prov("soilTempC"), date: s.latest.date },
+    { label: `Rainfall, ${shortDate(s.rainPeriodStart)} to ${shortDate(s.latest.date)}`, value: `${fmt(s.rain14)} mm`, change: `${fmt((s.rain14 / Math.max(1, s.rainExpected14)) * 100)}% of the ${fmt(s.rainExpected14)} mm usual`, kind: prov("rainMm"), date: s.latest.date },
     ...(s.lastNdvi ? [{ label: "Vegetation index (NDVI)", value: fmt(s.lastNdvi.ndvi, 2), change: `${signed(s.ndviChange, 2)} since the previous composite`, kind: "satellite" as const, date: s.lastNdvi.date }] : []),
     ...(s.lastSmap ? [{ label: "Regional surface moisture (SMAP)", value: `${fmt(s.lastSmap.smapVwc, 1)} %`, change: "~9 km area, not this field alone", kind: "satellite" as const, date: s.lastSmap.date }] : []),
     { label: "Water available in the root zone", value: `${fmt(s.latest.storageMm)} mm`, change: `of ${fmt(s.capacityMm)} mm capacity`, kind: "model", date: s.latest.date },
@@ -109,14 +114,16 @@ export function Reports() {
             <span className="text-[13px] text-muted">Generated {longDate(report.generatedOn)}</span>
           </div>
           <div className="mt-8 flex items-center gap-5">
-            <CropImage id={report.field.currentCrop} size="lg" />
+            <CropImage id={fallow ? "fallow" : report.field.currentCrop} size="lg" />
             <div>
               <h1 className="text-[30px] font-semibold leading-tight tracking-tight text-ink">{report.field.name}</h1>
               <p className="mt-1 text-[15px] text-muted">Field report · {report.field.location}</p>
             </div>
           </div>
           <p className="mt-5 rounded-lg border border-amber-line bg-amber-soft px-4 py-3 text-[13px] leading-relaxed text-ink-soft">
-            <strong className="font-medium text-ink">Demonstration report.</strong> The time series in this report were generated locally to demonstrate TERRA: no field station is connected.{allDemo ? " No NASA service was connected either." : " Records marked “Retrieved” in the data sources are real NASA values."} Do not use this report for a real farm decision.
+            {real
+              ? <><strong className="font-medium text-ink">Report on real NASA data, with a simulated station.</strong> Rain, temperature, evaporative demand, SMAP soil moisture and NDVI are real NASA values for {longDate(report.observations[0].date)} to {longDate(s.latest.date)}. No field station is installed: the 10 cm and 40 cm moisture, soil temperature and EC are simulated from its design and marked “Simulation”. No model is validated against field measurements yet. Do not use this report alone for a farm decision.</>
+              : <><strong className="font-medium text-ink">Demonstration report.</strong> The time series in this report were generated locally to demonstrate TERRA: no field station is connected.{allDemo ? " No NASA service was connected either." : " Records marked “Retrieved” in the data sources are real NASA values."} Do not use this report for a real farm decision.</>}
           </p>
         </header>
 
@@ -125,8 +132,9 @@ export function Reports() {
             <dl className="grid grid-cols-2 gap-x-8 gap-y-4 text-sm sm:grid-cols-3">
               {[
                 ["Location", report.field.location], ["Coordinates", coord(report.field.center.lat, report.field.center.lng)], ["Area", `${fmt(report.field.areaHa, 1)} hectares`],
-                ["Soil texture", report.field.soil.texture], ["Current crop", `${s.crop.name}, day ${s.dap} (${s.stage})`], ["Planted", longDate(report.field.plantedOn)],
-                ["Last observation", longDate(s.latest.date)], ["Field station", `${report.field.station.id}, simulated`], ["Time zone", report.field.timezone],
+                ["Soil texture", report.field.soil.texture], ["Current crop", fallow ? `Fallow since ${longDate(fallow.since)}; next planting ${fallow.next} (planned)` : s.dap < 0 ? `${s.crop.name}, not yet planted` : `${s.crop.name}, day ${s.dap} (${s.stage})`],
+                [fallow ? "Last planting" : s.dap < 0 ? "Planting (planned)" : "Planted", longDate(report.field.plantedOn)],
+                ["Last observation", longDate(s.latest.date)], ["Field station", `${report.field.station.id}, ${report.field.station.status === "planned" ? "planned, not installed" : "simulated"}`], ["Time zone", report.field.timezone],
               ].map(([k, v]) => (<div key={k}><dt className="text-[13px] text-muted">{k}</dt><dd className="tabular mt-0.5 font-medium text-ink">{v}</dd></div>))}
             </dl>
             <h3 className="mb-1 mt-7 text-sm font-semibold text-ink">Latest measurements</h3>

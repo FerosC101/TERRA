@@ -8,7 +8,7 @@ import type { LatLng } from "@/types";
  * ("docs/Data Pipeline/Lipa Plot A.geojson"). 173 m × 156 m ≈ 2.69 ha.
  *
  * It lies OUTSIDE the Lipa Cropland AOI: its centre is 3.3 km west of the AOI centroid (2.3 km beyond the AOI's
- * west edge). Not in data/fields.ts, so the app does not show it (adding it there is a UI decision).
+ * west edge). Shown in the app as the field "Plot A · Mang Edgar" (data/fields.ts, role "farm", D-019).
  *
  * Weather: the NASA pipeline has no record for Plot A. Scripts use the Lipa Cropland record
  * (`lipa_cropland_001`); its sources are much coarser than the 3.3 km offset (POWER 0.5° × 0.625°,

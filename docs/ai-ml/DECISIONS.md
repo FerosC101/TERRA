@@ -237,3 +237,21 @@ Decision: `data/nasa/realRecords.ts` holds a lossless compact copy of Lipa Cropl
 record.ts`, 340 KB, tested equal to a fresh build). For such a field, `discoveriesFor` and `livingFieldModel` run on it
 with `REAL_FIELD_SETTINGS`; the discovery page charts real series (`getRealSeries`). Panels built on station sensors
 (probes, soil temperature, EC) keep the demo series and its "simulated" labels; no real values are invented for them.
+
+## D-020 — Every Discovery Engine rule runs on a real field, on simulated or assumed inputs where real ones are missing
+Date: 2026-11-15 · Status: Accepted (user, the sole model builder: "use the synthetic data for the soil")
+Context: on Lipa's real record only rain departure could fire: no probe (moisture divergence, source offset) and no crop
+calendar for the AOI (NDVI change). The Discovery Center showed three rules as blocked.
+Decision: for the Discovery Engine only (`discoveryInput`, `services/discoveryService.ts`; settings in
+`data/simulatedInputs.ts`): (1) the planned station's SIMULATED 10/40 cm soil moisture (`lib/demo/stationModel.ts`,
+driven by real rain and modelled ETc) is added to the real FieldDays as station values, provenance "simulated"
+(`lib/adapters/simulatedStation.ts`); (2) Lipa Cropland's NDVI rule uses the Plot A farmer's seasons as an ASSUMED calendar.
+Rain departure is unchanged (real NASA POWER). Narrows D-019 (simulated station kept out of FieldDays) for the engine only.
+Guards: `realRecord()` and the Living Field Model never see these values (test in `discoveryService.test.ts`); every such
+card says "simulated"/"assumed" in its title and confidence note, is graded no higher than 0.4 (Tentative), and is listed
+apart from real-data alarms. The scripts behind E-005 and the model reports use `REAL_FIELD_SETTINGS` only, so these
+alarms never enter an experiment, finding or report.
+Limits: the alarms show the rules working on real weather, not facts about the field. Source offset compares SMAP L3
+with a bucket model, so its margin is an artefact of the simulation (and of SMAP L3's wet reading, F-016). The assumed
+calendar reverses F-015's caution for this display only: Plot A lies 3.3 km west, outside the AOI.
+Result on Lipa Cropland 2024–2025: 16 rain (real), 24 moisture divergence, 1 source offset, 1 NDVI (2024-12-09).

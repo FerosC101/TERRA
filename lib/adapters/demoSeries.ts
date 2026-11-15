@@ -49,10 +49,11 @@ export function seriesToFieldDays(obs: DailyObservation[], field: { id: string; 
       val("precipitation", "station", null, o.rainMm, "mm/day", "total", local),
       val("soil_temperature", "station", 10, o.soilTempC, "degC", "mean", local),
       val("bulk_ec", "station", 10, o.ecDsM, "dS/m", "mean", local),
-      val("precipitation", "imerg", null, o.rainImergMm, "mm/day", "total", utcDay),
       val("et0", "power", null, o.et0Mm, "mm/day", "total", utcDay),
       val("air_temperature_max", "power", null, o.tmaxC, "degC", "max", utcDay),
     ];
+    // The demo series always has an IMERG value; the order of values in a day does not matter to the engine.
+    if (o.rainImergMm !== null) values.push(val("precipitation", "imerg", null, o.rainImergMm, "mm/day", "total", utcDay));
     if (o.smapVwc !== null) {
       const overpass = localMidnight(o.date) + 6 * H;
       values.push(val("soil_moisture", "smap", null, o.smapVwc / 100, "m3/m3", "instant", [overpass, overpass]));

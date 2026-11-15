@@ -532,18 +532,31 @@ export function detectOnDay(days: FieldDay[], i: number, ctx: DiscoveryContext, 
  * its rule holds. A day the rule cannot evaluate keeps the previous state.
  */
 export function runDiscovery(days: FieldDay[], ctx: DiscoveryContext, detectors: DetectorSet = DEFAULT_DETECTORS): AnomalyRecord[] {
+  return runDiscoveryWithCoverage(days, ctx, detectors).records;
+}
+
+/** runDiscovery's alarms plus, per detector, how many days it could decide (alarm or "rule not met") vs "unknown". */
+export interface DiscoveryRun {
+  records: AnomalyRecord[];
+  decidedDays: Record<DiscoveryKind, number>;
+  totalDays: number;
+}
+
+export function runDiscoveryWithCoverage(days: FieldDay[], ctx: DiscoveryContext, detectors: DetectorSet = DEFAULT_DETECTORS): DiscoveryRun {
   validateDays(days, ctx.fieldId);
-  const out: AnomalyRecord[] = [];
+  const records: AnomalyRecord[] = [];
   const active = new Map<DiscoveryKind, boolean>();
+  const decidedDays = Object.fromEntries(Object.keys(detectors).map((k) => [k, 0])) as Record<DiscoveryKind, number>;
   for (let i = 0; i < days.length; i++) {
     for (const [kind, o] of outcomesOnDay(days, i, ctx, detectors)) {
       if (o === "unknown") continue;
+      decidedDays[kind]++;
       if (o === "no") active.set(kind, false);
       else {
-        if (!active.get(kind)) out.push(o);
+        if (!active.get(kind)) records.push(o);
         active.set(kind, true);
       }
     }
   }
-  return out;
+  return { records, decidedDays, totalDays: days.length };
 }

@@ -3,6 +3,7 @@ import { addDays, daysBetween, DEMO_TODAY, monthOf } from "@/lib/dates";
 import { clamp, round } from "@/lib/format";
 import { createRng, gaussian } from "@/lib/rng";
 import type { DailyObservation, Field, MonthlyAnomaly } from "@/types";
+import { STATION_START, stationEcDsM, stationSoilTempC, stepStationSoil, surfaceStress, type StationSoil } from "./stationModel";
 
 /**
  * Generates the demo observation record for a field.
@@ -28,12 +29,7 @@ export function generateSeries(field: Field): DailyObservation[] {
   const start = addDays(DEMO_TODAY, -(RECORD_DAYS - 1));
   const out: DailyObservation[] = [];
 
-  // Layer limits, % volumetric water content
-  const WILT = 12;
-  const FC = 34;
-  const SAT = 42;
-  let surface = 27;
-  let deep = 30;
+  let soil: StationSoil = STATION_START;
   const capacity = field.soil.awcMmPerM * field.soil.profileDepthM;
   let storage = capacity * 0.6;
   let lastNdvi = 0.24;
@@ -75,14 +71,10 @@ export function generateSeries(field: Field): DailyObservation[] {
     const kc = kcOnDay(active, dap);
     const etc = round(kc * et0, 2);
 
-    // Surface layer (0–15 cm): 1 mm of water ≈ 0.667 % VWC
-    const surfStress = clamp((surface - WILT) / (FC - WILT), 0, 1);
-    const infil = Math.min(rain, (SAT - surface) * 1.5);
-    const toDeep = rain - infil + Math.max(0, surface - FC) * 0.35 * 1.5;
-    surface = clamp(surface + (infil - 0.8 * etc * surfStress) * 0.667 - Math.max(0, surface - FC) * 0.35, WILT, SAT);
-    // Deep layer (30–70 cm): 1 mm ≈ 0.25 % VWC — responds slowly
-    const deepStress = clamp((deep - 16) / 12, 0, 1);
-    deep = clamp(deep + (toDeep * 0.6 - 0.12 * etc * deepStress) * 0.25 - Math.max(0, deep - 33) * 0.02, 16, 36);
+    // Two-layer station bucket (lib/demo/stationModel.ts)
+    const surfStress = surfaceStress(soil);
+    soil = stepStationSoil(soil, rain, etc);
+    const { surface, deep } = soil;
 
     // Root-zone storage: S_t = S_{t-1} + P − ETc·Ks − R − D
     const runoff = Math.max(0, rain - 30) * 0.3;
@@ -117,13 +109,13 @@ export function generateSeries(field: Field): DailyObservation[] {
       et0Mm: et0,
       etcMm: etc,
       tmaxC: tmax,
-      soilTempC: round(tmax - 5.2 + (1 - surfStress) * 1.8 + gaussian(rng) * 0.4, 1),
+      soilTempC: stationSoilTempC(tmax, surfStress, gaussian(rng)),
       surfaceVwc: surfaceObs,
       deepVwc: deepObs,
       smapVwc: smap,
       ndvi,
       lstC: lst,
-      ecDsM: round(0.32 + 0.011 * (surface - 20) + gaussian(rng) * 0.012, 2),
+      ecDsM: stationEcDsM(surface, gaussian(rng)),
       storageMm: round(storage, 1),
     });
   }

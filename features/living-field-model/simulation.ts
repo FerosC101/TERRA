@@ -1,5 +1,6 @@
 import { CROPS, kcOnDay, stageOnDay } from "@/data/crops";
-import type { CropId, Field } from "@/types";
+import { obsProvenance, type ObsKey } from "@/lib/provenance";
+import type { CropId, Field, Provenance } from "@/types";
 import type { ModelState } from "./state";
 
 export type SimulationPresetId =
@@ -151,6 +152,8 @@ export function buildFieldSceneState(
     ndviDate: s.ndviAt?.date ?? null,
     isSimulated: simulated,
     provenance: simulated ? ("simulated" as const) : ("model" as const),
+    /** Where each reading on this date came from (real NASA, model, or the planned station's simulation). */
+    sourceOf: (key: ObsKey): Provenance => obsProvenance(field, key, s.at),
     metrics: {
       ...values,
       capacityMm,

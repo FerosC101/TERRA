@@ -13,6 +13,8 @@ import { useService } from "@/lib/useService";
 import { getDiscoveries } from "@/services/discoveryService";
 import { getObservations } from "@/services/fieldSensorService";
 import { getRealSeries } from "@/services/nasaDataService";
+import { REAL_FIELD_SETTINGS } from "@/data/lipaModelConfig";
+import { recordEndDate } from "@/data/nasa/realRecords";
 import type { Discovery } from "@/types";
 import { InvestigationSteps } from "./InvestigationSteps";
 import { CategoryIcon, Evidence, StatusBadge } from "./shared";
@@ -72,6 +74,14 @@ const REAL_CHARTS: typeof CHARTS = {
   ],
 };
 
+/** Plot A: NDVI comes from HLS 30 m clear passes, not MODIS composites. */
+const REAL_CHARTS_HLS: typeof CHARTS = {
+  ...REAL_CHARTS,
+  "ndvi-change": [
+    { title: "Vegetation index, clear passes over the plot", unit: "NDVI (0 to 1, unitless)", digits: 2, days: 240, series: [{ key: "ndvi", label: "HLS NDVI, 30 m (Landsat + Sentinel-2), clear passes only", color: SERIES.blue, sparse: true }] },
+  ],
+};
+
 /** `days` of record ending two weeks after the detection date (or at the latest day), so the marker is in view. */
 function chartWindow<T extends { date: string }>(obs: T[], detectedOn: string, days: number): T[] {
   const i = obs.findIndex((o) => o.date === detectedOn);
@@ -88,7 +98,7 @@ function CheckAnswerForm({ d }: { d: Discovery }) {
       <p className="text-sm font-medium text-ink">What did the check show?</p>
       <div className="mt-3 flex flex-wrap gap-2">
         {answers.map((a) => (
-          <Button key={a} type="button" onClick={() => addFollowUp({ discoveryId: d.id, date: DEMO_TODAY, checkId: d.nextObservation.checkId, answer: a })}>{a}</Button>
+          <Button key={a} type="button" onClick={() => addFollowUp({ discoveryId: d.id, date: recordEndDate(d.fieldId, DEMO_TODAY), checkId: d.nextObservation.checkId, answer: a })}>{a}</Button>
         ))}
       </div>
     </div>
@@ -104,7 +114,7 @@ function FollowUpForm({ d }: { d: Discovery }) {
   const valid = surface !== "" && deep !== "" && s >= 0 && s <= 60 && dp >= 0 && dp <= 60;
   return (
     <form className="no-print mt-5 rounded-lg border border-line bg-sunken/60 p-4"
-      onSubmit={(e) => { e.preventDefault(); if (valid) addFollowUp({ discoveryId: d.id, date: DEMO_TODAY, checkId: d.nextObservation.checkId, surfaceVwc: s, deepVwc: dp }); }}>
+      onSubmit={(e) => { e.preventDefault(); if (valid) addFollowUp({ discoveryId: d.id, date: recordEndDate(d.fieldId, DEMO_TODAY), checkId: d.nextObservation.checkId, surfaceVwc: s, deepVwc: dp }); }}>
       <p className="text-sm font-medium text-ink">Log a follow-up measurement</p>
       <p className="mt-1 text-[13px] leading-relaxed text-muted">Enter a new reading at each depth (0 to 60%). TERRA compares the gap between them with the one it detected and updates the field model.</p>
       <div className="mt-3 flex flex-wrap items-end gap-3">
@@ -129,7 +139,7 @@ export function DiscoveryDetail({ id }: { id: string }) {
   if (discQ.error || obsQ.error || realQ.error) return <ErrorState message={discQ.error ?? obsQ.error ?? realQ.error ?? ""} />;
   if (!discQ.data || !obsQ.data || realQ.data === undefined) return <Loading />;
   const real = realQ.data;
-  const charts = real ? REAL_CHARTS : CHARTS;
+  const charts = real ? (REAL_FIELD_SETTINGS[field.id]?.ndviSource === "hls" ? REAL_CHARTS_HLS : REAL_CHARTS) : CHARTS;
   const chartRows: { date: string }[] = real ?? obsQ.data;
   const d = discQ.data.find((x) => x.id === id);
   const back = <Link href="/discoveries" className="no-print mb-5 inline-flex items-center gap-1.5 text-sm text-muted hover:text-ink"><ArrowLeft size={15} aria-hidden /> Discovery Center</Link>;

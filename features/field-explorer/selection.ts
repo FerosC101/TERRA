@@ -3,6 +3,7 @@ import { SMAP_CELL_HA, type MoistureReading, type NdviPixel } from "@/lib/demo/s
 import { addDays, longDate } from "@/lib/dates";
 import type { FieldSummary } from "@/lib/fieldSummary";
 import { fmt, signed } from "@/lib/format";
+import { obsProvenance } from "@/lib/provenance";
 import type { Discovery, Field, LatLng, Provenance } from "@/types";
 
 /** Everything the detail panel shows for whatever is selected on the map. */
@@ -34,15 +35,18 @@ export function describeSelection(selection: Selection, { field, summary, moistu
 
   if (selection.type === "station") {
     return {
-      title: field.station.name, type: "Field station", position: field.station.position, source: "measurement",
-      sourceName: `${field.station.id} · simulated, no hardware connected`, date: latest.date, coverage: "A single point in the field",
+      title: field.station.name, type: "Field station", position: field.station.position, source: obsProvenance(field, "surfaceVwc", latest),
+      sourceName: field.station.status === "planned"
+        ? `${field.station.id} · planned site, not installed; readings simulated from its design`
+        : `${field.station.id} · simulated, no hardware connected`,
+      date: latest.date, coverage: "A single point in the field",
       values: [
         { label: "Soil moisture, 10 cm", value: `${fmt(latest.surfaceVwc, 1)} %` },
         { label: "Soil moisture, 40 cm", value: `${fmt(latest.deepVwc, 1)} %` },
         { label: "Soil temperature, 10 cm", value: `${fmt(latest.soilTempC, 1)} °C` },
-        { label: "Rainfall that day", value: `${fmt(latest.rainMm, 1)} mm` },
+        { label: obsProvenance(field, "rainMm", latest) === "measurement" ? "Rainfall that day" : "Rainfall that day (NASA, not a gauge)", value: `${fmt(latest.rainMm, 1)} mm` },
       ],
-      note: "The station measures one point. Conditions elsewhere in the field can differ.",
+      note: field.station.note ?? "The station measures one point. Conditions elsewhere in the field can differ.",
     };
   }
 
