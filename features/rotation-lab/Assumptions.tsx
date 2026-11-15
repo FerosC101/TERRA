@@ -16,7 +16,7 @@ export function Assumptions({ field }: { field: Field }) {
         <p className="mt-2"><span className={TERM}>Soil-water balance:</span> <code className={CODE}>S(t) = S(t−1) + P − ETa − R − D</code>, in ten-day steps. P is average rainfall for the month, R is runoff, D is drainage once the soil is full, and ETa is ETc reduced when the soil is too dry.</p>
         <p className="mt-2"><span className={TERM}>Climate inputs:</span> {field.climate.source}.{field.climate.basis === "illustrative" ? " These figures were written for the demonstration and were not retrieved from NASA." : " Maximum temperature is the mean daily maximum, and ET0 is FAO-56 Penman-Monteith computed from the monthly means."}</p>
         <ul className="mt-2 list-disc space-y-1 pl-5">
-          <li>Root-zone capacity: {fmt(cap)} mm ({field.soil.awcMmPerM} mm per m × {field.soil.profileDepthM} m, typical for {field.soil.texture.toLowerCase()}). It starts {fmt(ASSUMPTIONS.initialStorageShare * 100)}% full.</li>
+          <li>Root-zone capacity: {fmt(cap)} mm ({field.soil.awcMmPerM} mm per m × {field.soil.profileDepthM} m, {field.soil.source === "soilgrids" ? "ISRIC SoilGrids model estimate" : `typical for ${field.soil.texture.toLowerCase()}`}). It starts {fmt(ASSUMPTIONS.initialStorageShare * 100)}% full.</li>
           <li>Runoff: {fmt(ASSUMPTIONS.runoffCoefficient * 100)}% of rain above {ASSUMPTIONS.runoffThresholdMm} mm in a ten-day step. A fixed assumption, not a slope- or soil-specific estimate.</li>
           <li>Water stress: crop use falls linearly once soil water drops below the crop&apos;s depletion fraction p.</li>
           <li>Between crops and during fallow, bare-soil evaporation uses Kc = {ASSUMPTIONS.bareSoilKc}.</li>

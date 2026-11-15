@@ -1,17 +1,48 @@
 import { generateAnomalies, generateSeries } from "@/lib/demo/series";
-import { detectDiscoveries } from "@/lib/science/detect";
+import { seriesToFieldDays } from "@/lib/adapters/demoSeries";
+import { DEMO_TODAY } from "@/lib/dates";
+import { toDiscovery } from "@/lib/science/discovery/cards";
+import { runDiscovery } from "@/lib/science/discovery/engine";
 import { pearson } from "@/lib/science/stats";
 import { CROPS } from "@/data/crops";
+import { REAL_FIELD_SETTINGS } from "@/data/lipaModelConfig";
+import { realRecord } from "@/data/nasa/realRecords";
 import { fmt } from "@/lib/format";
-import type { Discovery, FieldModel, FollowUp, Relationship } from "@/types";
+import type { DailyObservation, Discovery, Field, FieldModel, FollowUp, Relationship } from "@/types";
 import { request } from "./apiClient";
+import { livingFieldModel } from "./fieldModelService";
 import { mockField } from "./fieldSensorService";
+
+/**
+ * Runs the Discovery Engine on a field's record and words the latest alarm of each detector as a
+ * card, newest first. Earlier onsets are not shown: on demo records the moisture rule fires every
+ * ~15 days (F-002), which would flood the page.
+ * A field with a real record (data/nasa/realRecords.ts, e.g. Lipa Cropland) runs on that record with its
+ * calibrated settings (data/lipaModelConfig.ts) instead of the demo series.
+ */
+export function discoveriesFor(field: Field, obs: DailyObservation[], followUps: FollowUp[] = []): Discovery[] {
+  const real = realRecord(field.id);
+  const days = real ?? seriesToFieldDays(obs, field);
+  const records = runDiscovery(days, {
+    fieldId: field.id,
+    location: real ? field.center : field.station.position,
+    monthlyRainMm: field.climate.rainMm,
+    crop: CROPS[field.currentCrop],
+    plantedOn: field.plantedOn,
+    runAt: `${DEMO_TODAY}T00:00:00Z`,
+    ...(real ? REAL_FIELD_SETTINGS[field.id] : {}),
+  });
+  const latest = new Map(records.map((r) => [r.detector, r]));
+  return [...latest.values()]
+    .sort((a, b) => b.window.end.localeCompare(a.window.end))
+    .map((r) => toDiscovery(r, days, field, followUps));
+}
 
 /** GET /api/fields/{id}/discoveries */
 export function getDiscoveries(fieldId: string, followUps: FollowUp[] = []): Promise<Discovery[]> {
   return request(`/api/fields/${fieldId}/discoveries`, () => {
     const field = mockField(fieldId);
-    return detectDiscoveries(field, generateSeries(field), followUps);
+    return discoveriesFor(field, generateSeries(field), followUps);
   });
 }
 
@@ -47,7 +78,7 @@ export function mockFieldModel(fieldId: string): FieldModel {
 
   const lastNdvi = [...obs].reverse().find((o) => o.ndvi !== null);
   const rain30 = obs.slice(-30).reduce((a, o) => a + o.rainMm, 0);
-  const cap = field.soil.awcMmPerM * field.soil.profileDepthM;
+  const now = livingFieldModel(field, obs).at(-1)!.water;
   const families = new Set(field.rotationHistory.map((r) => CROPS[r.crop].family));
 
   return {
@@ -57,7 +88,7 @@ export function mockFieldModel(fieldId: string): FieldModel {
     anomalies: generateAnomalies(field),
     relationships,
     summaries: {
-      water: `Surface moisture is ${fmt(latest.surfaceVwc, 1)}% and moisture at 40 cm is ${fmt(latest.deepVwc, 1)}%. The model estimates ${fmt(latest.storageMm, 0)} mm of plant-available water in the root zone, of a possible ${fmt(cap, 0)} mm.`,
+      water: `Surface moisture is ${fmt(latest.surfaceVwc, 1)}% and moisture at 40 cm is ${fmt(latest.deepVwc, 1)}%. The field model estimates ${fmt(now.tawMm - now.depletionMm, 0)} mm of plant-available water in the root zone, of a possible ${fmt(now.tawMm, 0)} mm.`,
       soil: `${field.soil.texture}. Soil temperature at 10 cm is ${fmt(latest.soilTempC, 1)} °C and bulk EC is ${fmt(latest.ecDsM, 2)} dS/m. These describe current physical conditions at one point, not soil fertility.`,
       vegetation: lastNdvi ? `The latest 16-day NDVI composite is ${fmt(lastNdvi.ndvi, 2)}, for the period ending ${lastNdvi.date}. ${CROPS[field.currentCrop].name} is the current crop.` : "No vegetation composite is available yet.",
       climate: `${fmt(rain30, 0)} mm of rain fell in the last 30 days. Today's maximum air temperature was ${fmt(latest.tmaxC, 1)} °C.`,

@@ -8,6 +8,8 @@ import { longDate, shortDate } from "@/lib/dates";
 import { useApp } from "@/lib/store";
 import { useService } from "@/lib/useService";
 import { getFieldModel } from "@/services/discoveryService";
+import { getFieldState } from "@/services/fieldModelService";
+import type { FieldState } from "@/lib/science/fieldModel/state";
 import { getNasaSnapshot } from "@/services/nasaDataService";
 import type { DimensionKey, FieldModel, NasaSnapshot } from "@/types";
 import { DIMENSION_LABEL, Relationships } from "./parts";
@@ -22,14 +24,14 @@ const DIMENSIONS: { key: DimensionKey; icon: typeof Droplets }[] = [
   { key: "rotation", icon: Repeat },
 ];
 
-function Body({ model, snapshot }: { model: FieldModel; snapshot: NasaSnapshot | null }) {
+function Body({ model, states, snapshot }: { model: FieldModel; states: FieldState[]; snapshot: NasaSnapshot | null }) {
   const { field, plans } = useApp();
   const obs = model.observations;
   const [dim, setDim] = useState<DimensionKey>("water");
   const [idx, setIdx] = useState(obs.length - 1);
   const [span, setSpan] = useState<60 | 120 | 240>(120);
 
-  const state = useMemo(() => modelStateAt(field, model, idx, span), [field, model, idx, span]);
+  const state = useMemo(() => modelStateAt(field, model, states, idx, span), [field, model, states, idx, span]);
   const heads = headline(state);
   const props = { field, model, state };
 
@@ -93,15 +95,16 @@ function Body({ model, snapshot }: { model: FieldModel; snapshot: NasaSnapshot |
 }
 
 export function LivingFieldModel() {
-  const { field } = useApp();
+  const { field, followUps } = useApp();
   const modelQ = useService(`model:${field.id}`, () => getFieldModel(field.id));
+  const statesQ = useService(`state:${field.id}:${followUps.length}`, () => getFieldState(field.id, followUps));
   const snapQ = useService(`nasa:${field.id}`, () => getNasaSnapshot(field.id));
-  const ready = modelQ.data && modelQ.data.fieldId === field.id && snapQ.data !== undefined;
+  const ready = modelQ.data && modelQ.data.fieldId === field.id && statesQ.data && snapQ.data !== undefined;
   return (
     <div>
       <PageHeader title="Living Field Model" lead="What TERRA currently understands about this field, in five parts: water, soil, vegetation, climate and crop rotation. Each part separates what was measured from what was estimated." />
-      {modelQ.error ? <ErrorState message={modelQ.error} /> : ready
-        ? <Body key={field.id} model={modelQ.data!} snapshot={snapQ.data && snapQ.data.fieldId === field.id ? snapQ.data : null} />
+      {modelQ.error || statesQ.error ? <ErrorState message={modelQ.error ?? statesQ.error ?? ""} /> : ready
+        ? <Body key={field.id} model={modelQ.data!} states={statesQ.data!} snapshot={snapQ.data && snapQ.data.fieldId === field.id ? snapQ.data : null} />
         : <Loading />}
     </div>
   );

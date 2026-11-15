@@ -12,6 +12,7 @@ import { useApp } from "@/lib/store";
 import { useService } from "@/lib/useService";
 import { getDiscoveries } from "@/services/discoveryService";
 import { getObservations } from "@/services/fieldSensorService";
+import { getRealSeries } from "@/services/nasaDataService";
 import type { Discovery } from "@/types";
 import { InvestigationSteps } from "./InvestigationSteps";
 import { Evidence, StatusBadge } from "./shared";
@@ -42,6 +43,58 @@ const CHARTS: Record<Discovery["kind"], { title: string; unit: string; digits: n
   ],
 };
 
+/**
+ * Charts for a field that runs on a REAL record (no field station): every series is a NASA product, labelled with
+ * its kind and footprint. Keys are RealSeriesRow fields.
+ */
+const REAL_CHARTS: typeof CHARTS = {
+  "moisture-divergence": [
+    { title: "Soil moisture, topsoil and root zone (SMAP L4)", unit: "% volumetric water content", digits: 1, days: 60, series: [
+      { key: "smapL4SurfacePct", label: "SMAP L4 surface 0–5 cm (model, ~9 km)", color: SERIES.green },
+      { key: "smapL4RootPct", label: "SMAP L4 root zone 0–100 cm (model, ~9 km)", color: SERIES.amber },
+    ] },
+    { title: "Daily rainfall over the same period", unit: "mm per day", digits: 1, days: 60, series: [{ key: "rainPowerMm", label: "NASA POWER (model, ~50 km)", color: SERIES.green, type: "bar" }] },
+  ],
+  "rain-departure": [
+    { title: "Daily rainfall from two sources (no rain gauge at this field)", unit: "mm per day", digits: 1, days: 120, series: [
+      { key: "rainPowerMm", label: "NASA POWER (model, ~50 km): used by the alarm", color: SERIES.green, type: "bar" },
+      { key: "rainImergMm", label: "GPM IMERG (satellite, ~10 km)", color: SERIES.blue },
+    ] },
+  ],
+  "ndvi-change": [
+    { title: "Vegetation index composites", unit: "NDVI (0 to 1, unitless)", digits: 2, days: 240, series: [{ key: "ndvi", label: "MODIS NDVI, 16-day composite (250 m)", color: SERIES.blue, sparse: true }] },
+  ],
+  "sensor-offset": [
+    { title: "Surface moisture from two satellite products", unit: "% volumetric water content", digits: 1, days: 120, series: [
+      { key: "smapL4SurfacePct", label: "SMAP L4 surface (model)", color: SERIES.green },
+      { key: "smapL3Pct", label: "SMAP L3 (satellite retrieval)", color: SERIES.blue, sparse: true },
+    ] },
+  ],
+};
+
+/** `days` of record ending two weeks after the detection date (or at the latest day), so the marker is in view. */
+function chartWindow<T extends { date: string }>(obs: T[], detectedOn: string, days: number): T[] {
+  const i = obs.findIndex((o) => o.date === detectedOn);
+  const end = i < 0 ? obs.length : Math.min(obs.length, i + 15);
+  return obs.slice(Math.max(0, end - days), end);
+}
+
+function CheckAnswerForm({ d }: { d: Discovery }) {
+  const { addFollowUp } = useApp();
+  const answers = d.nextObservation.answers ?? [];
+  if (!answers.length) return null;
+  return (
+    <div className="no-print mt-5 rounded-lg border border-line bg-sunken/60 p-4">
+      <p className="text-sm font-medium text-ink">What did the check show?</p>
+      <div className="mt-3 flex flex-wrap gap-2">
+        {answers.map((a) => (
+          <Button key={a} type="button" onClick={() => addFollowUp({ discoveryId: d.id, date: DEMO_TODAY, checkId: d.nextObservation.checkId, answer: a })}>{a}</Button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function FollowUpForm({ d }: { d: Discovery }) {
   const { addFollowUp } = useApp();
   const [surface, setSurface] = useState("");
@@ -51,7 +104,7 @@ function FollowUpForm({ d }: { d: Discovery }) {
   const valid = surface !== "" && deep !== "" && s >= 0 && s <= 60 && dp >= 0 && dp <= 60;
   return (
     <form className="no-print mt-5 rounded-lg border border-line bg-sunken/60 p-4"
-      onSubmit={(e) => { e.preventDefault(); if (valid) addFollowUp({ discoveryId: d.id, date: DEMO_TODAY, surfaceVwc: s, deepVwc: dp }); }}>
+      onSubmit={(e) => { e.preventDefault(); if (valid) addFollowUp({ discoveryId: d.id, date: DEMO_TODAY, checkId: d.nextObservation.checkId, surfaceVwc: s, deepVwc: dp }); }}>
       <p className="text-sm font-medium text-ink">Log a follow-up measurement</p>
       <p className="mt-1 text-[13px] leading-relaxed text-muted">Enter a new reading at each depth (0 to 60%). TERRA compares the gap between them with the one it detected and updates the field model.</p>
       <div className="mt-3 flex flex-wrap items-end gap-3">
@@ -71,9 +124,13 @@ export function DiscoveryDetail({ id }: { id: string }) {
   const { field, followUps, clearFollowUps } = useApp();
   const discQ = useService(`disc:${field.id}:${followUps.length}`, () => getDiscoveries(field.id, followUps));
   const obsQ = useService(`obs:${field.id}`, () => getObservations(field.id));
+  const realQ = useService(`real:${field.id}`, () => getRealSeries(field.id));
 
-  if (discQ.error || obsQ.error) return <ErrorState message={discQ.error ?? obsQ.error ?? ""} />;
-  if (!discQ.data || !obsQ.data) return <Loading />;
+  if (discQ.error || obsQ.error || realQ.error) return <ErrorState message={discQ.error ?? obsQ.error ?? realQ.error ?? ""} />;
+  if (!discQ.data || !obsQ.data || realQ.data === undefined) return <Loading />;
+  const real = realQ.data;
+  const charts = real ? REAL_CHARTS : CHARTS;
+  const chartRows: { date: string }[] = real ?? obsQ.data;
   const d = discQ.data.find((x) => x.id === id);
   const back = <Link href="/discoveries" className="no-print mb-5 inline-flex items-center gap-1.5 text-sm text-muted hover:text-ink"><ArrowLeft size={15} aria-hidden /> Discovery Center</Link>;
 
@@ -156,10 +213,10 @@ export function DiscoveryDetail({ id }: { id: string }) {
         <Section title="Supporting evidence" description="How the measurements changed over time, and how the latest value compares with this field's own record.">
           <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_300px]">
             <div className="space-y-6">
-              {CHARTS[d.kind].map((c) => (
+              {charts[d.kind].map((c) => (
                 <Card key={c.title} className="p-5 sm:p-6">
                   <h3 className="mb-3 text-[15px] font-semibold text-ink">{c.title}</h3>
-                  <SeriesChart data={obsQ.data!.slice(-c.days)} xKey="date" series={c.series} unit={c.unit} digits={c.digits} xFormat={shortDate}
+                  <SeriesChart data={chartWindow(chartRows, d.detectedOn, c.days)} xKey="date" series={c.series} unit={c.unit} digits={c.digits} xFormat={shortDate}
                     height={c.series[0].type === "bar" && c.series.length === 1 ? 180 : 260} markerX={d.detectedOn} markerLabel="Detected" ariaLabel={c.title} />
                 </Card>
               ))}
@@ -187,7 +244,7 @@ export function DiscoveryDetail({ id }: { id: string }) {
           <div className="max-w-3xl">
             <p className="text-[17px] font-medium leading-relaxed text-ink">{d.nextObservation.action}</p>
             <p className="mt-2 text-[15px] leading-relaxed text-ink-soft">{d.nextObservation.rationale}</p>
-            {d.kind === "moisture-divergence" && !hasFollowUp && <FollowUpForm d={d} />}
+            {!hasFollowUp && (d.kind === "moisture-divergence" ? <FollowUpForm d={d} /> : <CheckAnswerForm d={d} />)}
             <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2">
               <Link href="/explorer" className={LINK}>See the location in Field Explorer <ArrowRight size={15} aria-hidden /></Link>
               {hasFollowUp && (
