@@ -309,7 +309,8 @@ export function Landing() {
             <span className="font-semibold tracking-[0.14em]">TERRA</span>
           </div>
           <p className="max-w-xl sm:text-right">
-            Demonstration build. Field readings are demo data; the NASA soil-moisture map is live from NASA GIBS.
+            Lipa Cropland runs on its real 2024–2025 NASA record; station readings and the other fields are demo data, labelled
+            as such. The NASA soil-moisture map is live from NASA GIBS.
             Data: NASA SMAP, GPM IMERG, MODIS and POWER. Imagery © Esri. Map data © OpenStreetMap contributors.
             <span className="mt-2 block">
               Use of AI: parts of the code, the hardware design and renders, the crop images and the mockups were made with

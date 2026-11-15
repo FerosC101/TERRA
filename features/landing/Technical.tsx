@@ -529,8 +529,9 @@ export function ModelResults() {
         </div>
 
         <p className="terra-reveal mt-6 max-w-3xl text-[13px] leading-relaxed text-muted">
-          Source: the AI/ML workstream&apos;s report &ldquo;{REPORT.title}&rdquo; and its rain-departure section, built {REPORT.built}. These calibrated
-          models are not yet part of this web build: the platform&apos;s pages still show demo readings for Lipa, labelled as such.
+          Source: the AI/ML workstream&apos;s report &ldquo;{REPORT.title}&rdquo; and its rain-departure section, built {REPORT.built}. In the platform, Lipa
+          Cropland now runs on its real 2024–2025 NASA record with these calibrated settings; station-only panels and the other
+          demonstration fields still use labelled demo data.
         </p>
       </div>
     </section>

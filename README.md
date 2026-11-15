@@ -143,8 +143,9 @@ from Lipa's own history instead of a guess. From its model report (15 November 2
 | **48 days** | Crop water stress in the 2024 dry season, agreeing with the farmer's report of drought in February–March 2024 |
 | **10 of 24** | Years in which dry-season corn ran short of water, where the average-climate run showed no shortfall at all |
 
-Three events show agreement, not an accuracy rate; no ground sensor exists yet to validate against. These
-calibrated models are not yet merged into the web app, whose pages still show demo readings. Earlier synthetic
+Three events show agreement, not an accuracy rate; no ground sensor exists yet to validate against. Lipa Cropland
+now runs these calibrated models on its real 2024–2025 record in the app: the Discovery Center lists every onset on the real
+record, and the Rotation Lab adds the real-years table. Earlier synthetic
 experiments (E-001 to E-004) and findings are in [`docs/ai-ml/`](docs/ai-ml/).
 
 ## Run it
@@ -175,11 +176,12 @@ coordinates and records. No observation is ever shared between fields.
 | Lipa NASA record, 1–15 Jan 2024 (`data/nasa/`) | **Real.** POWER, GPM IMERG and SMAP values exported from the pipeline's `terra_daily_merged.json`. Shown in Living Field Model → Climate. Days without a SMAP overpass stay empty. |
 | NASA moisture map in the Field Explorer | **Real, live.** NASA SMAP L4 surface soil moisture tiles from NASA GIBS. A model analysis that assimilates satellite data, 9 km cells; shown as a picture only. |
 | Satellite base map | Real Esri World Imagery, labelled as an archive mosaic, not a current observation. |
-| Daily station and satellite time series | **Demo.** Generated deterministically in `lib/demo/series.ts`, copying the sampling and scale of the real products. |
+| Lipa NASA record, 2024–2025 (`data/nasa/realRecords.ts`) | **Real.** POWER, IMERG, SMAP L3/L4 and MODIS NDVI. Lipa's discoveries run on it with the calibrated settings in `data/lipaModelConfig.ts`, and the discovery page charts its real series. |
+| Station-only readings (probes, soil temperature, EC) and the other fields' series | **Demo.** Generated deterministically in `lib/demo/series.ts`, copying the sampling and scale of the real products. |
 | Probe points, MODIS pixels, SMAP cell on the map | **Demo.** Generated in `lib/demo/spatial.ts`. |
 | Climate of the two secondary fields | **Illustrative.** Written for the demo. |
 | Rotation and scenario results | Real calculations (`lib/science/waterBalance.ts`) with indicative FAO-56 style crop parameters, not calibrated to a field. |
-| Discoveries | Four fixed-threshold rules in `lib/science/detect.ts`; confidence shown as three plain levels, never a percentage. |
+| Discoveries | The Discovery Engine (`lib/science/discovery/`). The Discovery Center shows each rule's limits, coverage and, where a rule has no real input at a field, why it cannot alarm. Confidence is shown as three plain levels, never a percentage. |
 
 **Record audit.** Every observation series passes `lib/data/quality.ts` before a page sees it, whether it came from
 the demo generator or a backend: rows sorted, duplicate dates removed, physically impossible values become gaps

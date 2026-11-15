@@ -5,7 +5,7 @@
  *   - docs/TERRA-Model-Description-and-Results.docx ("TERRA — Models: Description, Structure, Operation and
  *     Results", revised on real Lipa data, built 2026-11-15 from commit e5fa04a + uncommitted changes)
  *   - docs/TERRA-Rain-Departure.docx (rain-departure model section, same build)
- * The calibrated models those reports describe are not part of this web build yet. Keep this file in step
+ * Lipa Cropland runs these calibrated models on its real record in the app (docs/ai-ml/CONTEXT.md). Keep this file in step
  * with the reports; do not add a value that is not in them.
  */
 
