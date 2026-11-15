@@ -1,8 +1,8 @@
 import { FIELDS } from "@/data/fields";
-import { generateSeries } from "@/lib/demo/series";
 import { auditObservations } from "@/lib/data/quality";
 import type { DailyObservation, Field, QualityReport } from "@/types";
 import { request } from "./apiClient";
+import { fieldObservations } from "./observationSource";
 
 export function mockField(id: string): Field {
   const field = FIELDS.find((f) => f.id === id);
@@ -20,12 +20,12 @@ export function getFields(): Promise<Field[]> {
  * Every response, mocked or fetched, passes the record audit before it is returned.
  */
 export async function getObservations(fieldId: string): Promise<DailyObservation[]> {
-  const raw = await request(`/api/fields/${fieldId}/observations`, () => generateSeries(mockField(fieldId)));
+  const raw = await request(`/api/fields/${fieldId}/observations`, () => fieldObservations(mockField(fieldId)));
   return auditObservations(raw).rows;
 }
 
 /** What the record audit found for this field: duplicates, impossible values, extremes and gaps. */
 export async function getDataQuality(fieldId: string): Promise<QualityReport> {
-  const raw = await request(`/api/fields/${fieldId}/observations`, () => generateSeries(mockField(fieldId)));
+  const raw = await request(`/api/fields/${fieldId}/observations`, () => fieldObservations(mockField(fieldId)));
   return auditObservations(raw).report;
 }

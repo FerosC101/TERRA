@@ -1,3 +1,5 @@
+import { LIPA_PLOT_A_SEASONS } from "@/data/cropCalendar";
+import { LIPA_PLOT_A } from "@/data/lipaPlotA";
 import type { Field, LatLng, MonthlyClimate } from "@/types";
 
 /** Offsets a coordinate by metres east / north. */
@@ -73,6 +75,21 @@ const LIPA_BOUNDARY: LatLng[] = [
   [121.186069, 13.98934], [121.184397, 13.988404], [121.183664, 13.98934],
 ].map(([lng, lat]) => ({ lat, lng }));
 
+/**
+ * Plot A as the APP DRAWS IT: the farm's real outline, four corners given by the ML engineer on 2026-11-15
+ * (Google Maps, not GPS). Display only. The data were fetched for the earlier pin (LIPA_PLOT_A in
+ * data/lipaPlotA.ts, ~320 m south, 2.69 ha), which is kept unchanged on purpose:
+ * - rain, weather (POWER ~50 km, IMERG ~10 km) and SMAP L4 (~9 km) cells are far larger than the shift;
+ * - HLS NDVI (30 m pixels inside the old outline) and SoilGrids (one 250 m cell at the old centre) describe the old pin,
+ *   NOT this outline. Re-fetch both for this outline before treating them as the farm's own values.
+ */
+const PLOT_A_DISPLAY_BOUNDARY: LatLng[] = [
+  { lat: 13.986249, lng: 121.154524 }, { lat: 13.98577, lng: 121.153301 },
+  { lat: 13.986936, lng: 121.152936 }, { lat: 13.987748, lng: 121.153752 },
+];
+/** Mean of the four corners. */
+const PLOT_A_DISPLAY_CENTER: LatLng = { lat: 13.986676, lng: 121.153628 };
+
 const riverside: LatLng = { lat: 17.1296, lng: 121.8831 };
 const uplandC: LatLng = { lat: 8.1250, lng: 125.0850 };
 
@@ -127,6 +144,48 @@ export const FIELDS: Field[] = [
     climate: LIPA_POWER,
     demoPattern: "dry-spell",
     seed: 4107,
+  },
+  {
+    // Plot A (data/lipaPlotA.ts): Mang Edgar's corn plot, 3.3 km west of Lipa Cropland. Real farm facts come from the
+    // farmer interview (data/cropCalendar.ts); the models run on its real NASA record (data/nasa/realRecords.ts).
+    id: LIPA_PLOT_A.id,
+    name: "Plot A · Mang Edgar",
+    farm: "Farmer's plot (interviewed corn farmer)",
+    location: "Barangay Pusil, Lipa City, Batangas, Philippines",
+    role: "farm",
+    timezone: LIPA_PLOT_A.timezone,
+    // Drawn at the farm's real outline (display only, see PLOT_A_DISPLAY_BOUNDARY); the data use LIPA_PLOT_A's pin.
+    center: PLOT_A_DISPLAY_CENTER,
+    boundary: PLOT_A_DISPLAY_BOUNDARY,
+    areaHa: 2.07, // area of the drawn outline (geodesic, from the four corners)
+    // The next crop he plans (corn); the last reported planting. Nothing is planted now: see `fallow`.
+    currentCrop: "corn",
+    plantedOn: "2025-06-05",
+    fallow: { since: "2025-09-15", next: "late Nov–early Dec 2026" },
+    soil: {
+      texture: "Clay loam",
+      // ISRIC SoilGrids 2.0, one cell at the plot centre: (FC 0.311 − WP 0.235) × 1000 = 76 mm per m, as
+      // LIPA_PLOT_A_SOILGRIDS_SOIL (data/soils.ts). Texture class from SoilGrids clay 36–39 %, sand 31–33 %, silt 29–31 %.
+      awcMmPerM: 76,
+      profileDepthM: 1,
+      source: "soilgrids",
+      note: "ISRIC SoilGrids 2.0 estimate for this plot (250 m model, not a laboratory test): clay 36–39 %, water held between field capacity and wilting point about 76 mm per metre.",
+    },
+    station: {
+      id: "TS-01-A",
+      name: "TERRA Station 01 · planned site",
+      position: PLOT_A_DISPLAY_CENTER,
+      status: "planned",
+      sensors: STATION_SENSORS,
+      note: "Not installed. The farmer agreed in principle; the exact spot will be chosen with him (and the landowner's permission). Readings shown are simulated from the station's design.",
+    },
+    points: [],
+    rotationHistory: LIPA_PLOT_A_SEASONS.map((s) => ({
+      season: `${s.season} (${s.plantedReported} – ${s.harvestedReported})`, crop: s.crop, note: "Farmer-reported",
+    })),
+    climate: LIPA_POWER,
+    demoPattern: "steady",
+    seed: 5203,
   },
   {
     id: "riverside",

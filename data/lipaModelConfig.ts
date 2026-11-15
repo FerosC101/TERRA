@@ -1,6 +1,10 @@
+import { LIPA_PLOT_A_CROP_SEASONS } from "@/data/cropCalendar";
 import { LIPA_IMERG_NORMAL } from "@/data/nasa/lipaImergNormal";
 import { LIPA_POWER_RAIN_NORMAL } from "@/data/nasa/lipaPowerRain";
+import { LIPA_PLOT_A_SOILGRIDS_SOIL, LIPA_SOILGRIDS_SOIL } from "@/data/soils";
 import type { DiscoveryContext } from "@/lib/science/discovery/engine";
+import type { CropSeason } from "@/lib/science/season";
+import type { SoilParams } from "@/lib/science/water/soilWater";
 
 /**
  * Real-data settings of the Discovery Engine for Lipa (Lipa Cropland AOI and Plot A), in one place for the
@@ -21,4 +25,16 @@ export const LIPA_RAIN_SETTINGS: Pick<DiscoveryContext, "rainFallbackSource" | "
  */
 export const REAL_FIELD_SETTINGS: Record<string, Partial<DiscoveryContext>> = {
   "lipa-cropland": { ...LIPA_RAIN_SETTINGS },
+  // Plot A: the same rain normals (one POWER cell covers both sites), the farmer-reported corn seasons (growth stages
+  // and season gating), and NDVI from HLS 30 m over the plot (D-012).
+  "lipa-plot-a": { ...LIPA_RAIN_SETTINGS, seasons: LIPA_PLOT_A_CROP_SEASONS, ndviSource: "hls" },
+};
+
+/**
+ * Living Field Model inputs per field with a real record: its SoilGrids soil (data/soils.ts) and, where the farmer
+ * reported them, the real crop seasons. Without seasons the model uses the field's current crop and planting date.
+ */
+export const REAL_FIELD_MODEL: Record<string, { soil: Omit<SoilParams, "p">; seasons?: CropSeason[] }> = {
+  "lipa-cropland": { soil: LIPA_SOILGRIDS_SOIL },
+  "lipa-plot-a": { soil: LIPA_PLOT_A_SOILGRIDS_SOIL, seasons: LIPA_PLOT_A_CROP_SEASONS },
 };

@@ -6,7 +6,9 @@ import { shortDate } from "@/lib/dates";
 import type { FieldSummary } from "@/lib/fieldSummary";
 import { fmt, signed } from "@/lib/format";
 import { SERIES } from "@/lib/chartTheme";
-import type { DailyObservation, Provenance } from "@/types";
+import { REAL_FIELD_SETTINGS } from "@/data/lipaModelConfig";
+import { obsProvenance, type ObsKey } from "@/lib/provenance";
+import type { DailyObservation, Field, Provenance } from "@/types";
 
 function direction(change: number, threshold: number): "up" | "down" | "flat" {
   return change >= threshold ? "up" : change <= -threshold ? "down" : "flat";
@@ -53,26 +55,28 @@ function MeasurementTile({ t }: { t: Tile }) {
 }
 
 /** The five measurements a user needs first. Everything else lives one level down. */
-export function KeyMeasurements({ summary, observations }: { summary: FieldSummary; observations: DailyObservation[] }) {
+export function KeyMeasurements({ field, summary, observations }: { field: Field; summary: FieldSummary; observations: DailyObservation[] }) {
   const { latest } = summary;
   const observed = shortDate(latest.date);
   const last30 = observations.slice(-30);
   const ndvi = observations.filter((o) => o.ndvi !== null).slice(-8).map((o) => o.ndvi);
   const rainShare = summary.rainExpected14 ? summary.rain14 / summary.rainExpected14 : 1;
+  const src = (key: ObsKey) => obsProvenance(field, key, latest);
+  const ndviWhere = REAL_FIELD_SETTINGS[field.id]?.ndviSource === "hls" ? "NDVI, HLS 30 m" : "NDVI, 16-day";
 
   const tiles: Tile[] = [
     {
-      label: "Soil moisture", where: "Surface, 10 cm", value: fmt(latest.surfaceVwc, 1), unit: "%", source: "measurement", when: observed,
+      label: "Soil moisture", where: "Surface, 10 cm", value: fmt(latest.surfaceVwc, 1), unit: "%", source: src("surfaceVwc"), when: observed,
       spark: last30.map((o) => o.surfaceVwc),
       change: { direction: direction(summary.surfaceChange14, 1), text: `${signed(summary.surfaceChange14)} pts`, warn: summary.surfaceChange14 <= -5 },
     },
     {
-      label: "Soil moisture", where: "Deep, 40 cm", value: fmt(latest.deepVwc, 1), unit: "%", source: "measurement", when: observed,
+      label: "Soil moisture", where: "Deep, 40 cm", value: fmt(latest.deepVwc, 1), unit: "%", source: src("deepVwc"), when: observed,
       spark: last30.map((o) => o.deepVwc),
       change: { direction: direction(summary.deepChange14, 1), text: `${signed(summary.deepChange14)} pts` },
     },
     {
-      label: "Rain", where: "Last 14 days", value: fmt(summary.rain14, 0), unit: "mm", source: "measurement",
+      label: "Rain", where: "Last 14 days", value: fmt(summary.rain14, 0), unit: "mm", source: src("rainMm"),
       when: `${shortDate(summary.rainPeriodStart)} to ${observed}`, spark: last30.map((o) => o.rainMm),
       change: {
         direction: direction(rainShare - 1, 0.25), text: `${fmt(rainShare * 100)}% of usual`, warn: rainShare < 0.45 || rainShare > 1.7,
@@ -80,13 +84,13 @@ export function KeyMeasurements({ summary, observations }: { summary: FieldSumma
       },
     },
     {
-      label: "Soil temperature", where: "10 cm", value: fmt(latest.soilTempC, 1), unit: "°C", source: "measurement", when: observed,
+      label: "Soil temperature", where: "10 cm", value: fmt(latest.soilTempC, 1), unit: "°C", source: src("soilTempC"), when: observed,
       spark: last30.map((o) => o.soilTempC),
       change: { direction: direction(summary.soilTempChange14, 0.5), text: `${signed(summary.soilTempChange14)} °C` },
     },
     summary.lastNdvi
       ? {
-        label: "Vegetation", where: "NDVI, 16-day", value: fmt(summary.lastNdvi.ndvi, 2), source: "satellite",
+        label: "Vegetation", where: ndviWhere, value: fmt(summary.lastNdvi.ndvi, 2), source: "satellite",
         when: shortDate(summary.lastNdvi.date), spark: ndvi,
         change: { direction: direction(summary.ndviChange, 0.02), text: `${signed(summary.ndviChange, 2)} vs last`, warn: summary.ndviChange <= -0.03 },
       }

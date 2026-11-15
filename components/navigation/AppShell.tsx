@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from "react";
 import { Logo } from "@/components/brand/Logo";
 import { CropImage } from "@/components/visual/Crop";
 import { CROPS } from "@/data/crops";
+import { recordEndDate } from "@/data/nasa/realRecords";
 import { DEMO_TODAY, daysBetween, longDate, shortDate } from "@/lib/dates";
 import { fmt } from "@/lib/format";
 import { useApp } from "@/lib/store";
@@ -15,6 +16,9 @@ import { useService } from "@/lib/useService";
 import { getDiscoveries } from "@/services/discoveryService";
 import { getConnectionStatus } from "@/services/nasaDataService";
 import { NAV } from "./nav";
+
+/** Last day of a field's record: 31 Dec 2025 for the real Lipa records, DEMO_TODAY for demo fields. */
+const recordEnd = (fieldId: string) => recordEndDate(fieldId, DEMO_TODAY);
 
 function isActive(pathname: string, href: string) {
   return href === "/" ? pathname === "/" : pathname.startsWith(href);
@@ -87,7 +91,7 @@ function FieldSelector() {
       <button type="button" onClick={() => setOpen(!open)} aria-haspopup="true" aria-expanded={open} aria-label={`Field: ${field.name}. Change field`}
         className={clsx("group flex h-11 max-w-full items-center gap-2.5 rounded-xl border bg-surface py-1 pl-1 pr-2.5 text-left shadow-card transition-colors",
           open ? "border-green ring-2 ring-green/15" : "border-line hover:border-line-strong")}>
-        <CropImage id={field.currentCrop} size="xs" className="h-9! w-9! rounded-lg" />
+        <CropImage id={field.fallow ? "fallow" : field.currentCrop} size="xs" className="h-9! w-9! rounded-lg" />
         <span className="min-w-0">
           <span className="block truncate text-sm font-semibold leading-tight text-ink">{field.name}</span>
           <span className="hidden truncate text-xs leading-tight text-muted sm:block">{shortPlace(field.location)} · {fmt(field.areaHa, 1)} ha</span>
@@ -103,23 +107,24 @@ function FieldSelector() {
             {fields.map((f, i) => {
               const current = f.id === field.id;
               const crop = CROPS[f.currentCrop];
-              const day = daysBetween(f.plantedOn, DEMO_TODAY);
+              const day = daysBetween(f.plantedOn, recordEnd(f.id));
+              const badge = f.role === "primary" ? "Primary" : f.role === "farm" ? "Farm site" : "Demo";
               return (
                 <li key={f.id}>
                   <button ref={(n) => { options.current[i] = n; }} type="button" aria-current={current ? "true" : undefined}
                     onClick={() => { setFieldId(f.id); setOpen(false); }}
                     className={clsx("grid w-full grid-cols-[44px_minmax(0,1fr)_20px] items-center gap-3 rounded-lg p-2 text-left outline-none transition-colors",
                       current ? "bg-green-soft" : "hover:bg-sunken focus-visible:bg-sunken", "focus-visible:ring-2 focus-visible:ring-green/40")}>
-                    <CropImage id={f.currentCrop} size="xs" className="h-11! w-11! rounded-lg" />
+                    <CropImage id={f.fallow ? "fallow" : f.currentCrop} size="xs" className="h-11! w-11! rounded-lg" />
                     <span className="min-w-0">
                       <span className="flex items-center gap-2">
                         <span className="truncate text-sm font-semibold text-ink">{f.name}</span>
-                        <span className={clsx("shrink-0 rounded-full px-1.5 py-px text-[10.5px] font-medium", f.role === "primary" ? "bg-green/10 text-green-strong" : "bg-black/[0.05] text-muted")}>
-                          {f.role === "primary" ? "Primary" : "Demo"}
+                        <span className={clsx("shrink-0 rounded-full px-1.5 py-px text-[10.5px] font-medium", f.role === "secondary" ? "bg-black/[0.05] text-muted" : "bg-green/10 text-green-strong")}>
+                          {badge}
                         </span>
                       </span>
                       <span className="mt-0.5 block truncate text-xs text-muted">{shortPlace(f.location)} · {fmt(f.areaHa, 1)} ha</span>
-                      <span className="block truncate text-xs text-ink-soft">{crop.name}{day >= 0 ? `, day ${day}` : ""}</span>
+                      <span className="block truncate text-xs text-ink-soft">{f.fallow ? `Fallow · next planting ${f.fallow.next}` : `${crop.name}${day >= 0 ? `, day ${day}` : ""}`}</span>
                     </span>
                     <span className="flex justify-center">{current && <Check size={17} className="text-green" aria-hidden />}</span>
                   </button>
@@ -127,7 +132,7 @@ function FieldSelector() {
               );
             })}
           </ul>
-          <p className="mt-2 border-t border-line px-2 pt-2 text-[11px] leading-snug text-muted">Every page follows the field you choose. Demo fields use illustrative climate.</p>
+          <p className="mt-2 border-t border-line px-2 pt-2 text-[11px] leading-snug text-muted">Every page follows the field you choose. Lipa fields run on real NASA data (2024–2025) with a simulated station; demo fields use illustrative climate.</p>
         </div>
       )}
     </div>
@@ -135,6 +140,7 @@ function FieldSelector() {
 }
 
 function DataStatus() {
+  const { field } = useApp();
   const status = getConnectionStatus();
   const { open, setOpen, ref } = usePopover();
   const demo = status.mode === "demo";
@@ -149,7 +155,7 @@ function DataStatus() {
         <div className={clsx(POP, "right-0 w-80 max-w-[calc(100vw-2rem)] p-4")}>
           <div className="text-sm font-medium text-ink">{status.label}</div>
           <p className="mt-1.5 text-[13px] leading-relaxed text-ink-soft">{status.detail}</p>
-          <p className="mt-2 text-[13px] leading-relaxed text-muted">The record ends {longDate(DEMO_TODAY)}. Every value states whether it is a field measurement, a satellite estimate, a model output or a simulation.</p>
+          <p className="mt-2 text-[13px] leading-relaxed text-muted">The record ends {longDate(recordEnd(field.id))}. Every value states whether it is a field measurement, a satellite estimate, a model output or a simulation.</p>
         </div>
       )}
     </div>

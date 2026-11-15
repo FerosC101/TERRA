@@ -108,6 +108,29 @@ function NeedsAttention({ open }: { open: Discovery[] }) {
 
 function CropCard({ field, summary }: { field: Field; summary: FieldSummary }) {
   const harvest = addDays(field.plantedOn, summary.duration);
+  const fallow = field.fallow && summary.latest.date >= field.fallow.since ? field.fallow : null;
+  if (fallow || summary.dap < 0) {
+    // Nothing in the ground on the record's last day: fallow after a harvest, or a planting still ahead.
+    return (
+      <Card className="flex h-full flex-col justify-between gap-6 p-6">
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <p className="text-xs font-medium text-muted">Current crop</p>
+            <p className="mt-1 text-xl font-semibold leading-tight tracking-tight text-ink">{fallow ? "Fallow" : summary.crop.name}</p>
+            <p className="mt-1 text-sm text-ink-soft">{fallow ? `Last crop: ${summary.crop.name}, harvested ${shortDate(fallow.since)}` : "Not yet planted"}</p>
+          </div>
+          <CropImage id={fallow ? "fallow" : summary.crop.id} size="lg" />
+        </div>
+        <dl className="grid grid-cols-2 gap-3 border-t border-line pt-4 text-[13px]">
+          <div><dt className="text-xs text-muted">{fallow ? "Last harvest" : "As of"}</dt><dd className="tabular mt-0.5 font-medium text-ink">{shortDate(fallow ? fallow.since : summary.latest.date)}</dd></div>
+          <div>
+            <dt className="text-xs text-muted">Next planting (planned)</dt>
+            <dd className="mt-0.5 font-medium text-ink">{fallow ? fallow.next : shortDate(field.plantedOn)}</dd>
+          </div>
+        </dl>
+      </Card>
+    );
+  }
   return (
     <Card className="flex h-full flex-col justify-between gap-6 p-6">
       <div className="flex items-start justify-between gap-4">
@@ -198,7 +221,7 @@ export function Overview() {
 
         <Section title="Conditions now" description={`Latest readings, ${longDate(summary.latest.date)}. Lines show the last 30 days.`}
           info="Each value states its source. Changes are over the last 14 days unless stated.">
-          <KeyMeasurements summary={summary} observations={obs} />
+          <KeyMeasurements field={field} summary={summary} observations={obs} />
         </Section>
 
         <TrendPanel observations={obs} />

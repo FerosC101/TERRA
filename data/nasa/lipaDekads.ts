@@ -10,4 +10,6 @@ export const LIPA_POWER_DEKADS: Record<string, number[]> = dekads.years;
 /** Real dekad rain per field id; fields without one use the monthly climatology only. */
 export const DEKADS_BY_FIELD: Record<string, Record<string, number[]>> = {
   "lipa-cropland": LIPA_POWER_DEKADS,
+  // Plot A lies 3.3 km west, inside the same POWER cell (0.5° × 0.625°): the same series applies.
+  "lipa-plot-a": LIPA_POWER_DEKADS,
 };

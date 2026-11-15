@@ -78,9 +78,11 @@ export interface FieldStation {
   id: string;
   name: string;
   position: LatLng;
-  /** "simulated" = no physical station is connected in this build */
-  status: "simulated" | "online" | "offline";
+  /** "simulated" = no physical station is connected in this build; "planned" = a chosen site, device not installed yet */
+  status: "simulated" | "planned" | "online" | "offline";
   sensors: string[];
+  /** Shown with the station, e.g. where a planned device will go */
+  note?: string;
 }
 
 export interface ObservationPoint {
@@ -104,8 +106,8 @@ export interface Field {
   name: string;
   farm: string;
   location: string;
-  /** "primary" = the demonstration field shared with the data pipeline and hardware */
-  role: "primary" | "secondary";
+  /** "primary" = the demonstration field shared with the data pipeline and hardware; "farm" = a real farmer's plot */
+  role: "primary" | "farm" | "secondary";
   /** IANA time zone of the field. Observation dates are local calendar days. */
   timezone: string;
   /** location_id of this field in the TERRA NASA data pipeline, when it has one */
@@ -123,6 +125,8 @@ export interface Field {
   points: ObservationPoint[];
   rotationHistory: RotationRecord[];
   climate: MonthlyClimate;
+  /** Set when nothing is planted now: the last harvest date and the farmer's planned next planting (free text) */
+  fallow?: { since: string; next: string };
   /** Demo-only: shapes the generated record so each field tells a different story */
   demoPattern: "dry-spell" | "wet-spell" | "steady";
   seed: number;
@@ -132,8 +136,8 @@ export interface DailyObservation {
   date: string;
   /** Station rain gauge, mm */
   rainMm: number;
-  /** GPM IMERG-style gridded estimate, mm */
-  rainImergMm: number;
+  /** GPM IMERG-style gridded estimate, mm (null on real records after IMERG Final ends) */
+  rainImergMm: number | null;
   et0Mm: number;
   etcMm: number;
   tmaxC: number;
@@ -166,7 +170,7 @@ export interface RealSeriesRow {
   smapL4RootPct: number | null;
   /** SMAP L3 surface retrieval (satellite, 9 km), %, overpass days only */
   smapL3Pct: number | null;
-  /** MODIS NDVI composite (satellite, 250 m), on composite days only */
+  /** NDVI (satellite): MODIS 250 m composites, or HLS 30 m clear passes for Plot A; on observation days only */
   ndvi: number | null;
 }
 

@@ -60,16 +60,18 @@ export function calloutsFor(dim: DimensionKey, v: FieldSceneState): SceneCallout
   const m = v.metrics;
   // Every reading is a what-if once a scenario or override is applied
   const src = (kind: Provenance): Provenance => (v.isSimulated ? "simulated" : kind);
+  // Field readings: their real source on this date (a sensor, NASA data, a model, or the planned station's simulation)
+  const srcOf = (key: Parameters<typeof v.sourceOf>[0]): Provenance => (v.isSimulated ? "simulated" : v.sourceOf(key));
   const { probes, soilDepth, station, plot } = LAYOUT;
   const front = plot.front;
   const waterTop = -soilDepth + m.storageRatio * soilDepth;
   const height = canopyHeight(v.crop.id, v.crop.growthFactor);
   const shallow: SceneCallout = {
-    id: "vwc10", label: "Moisture at 10 cm", value: `${fmt(m.surfaceVwc, 1)} %`, source: src("measurement"),
+    id: "vwc10", label: "Moisture at 10 cm", value: `${fmt(m.surfaceVwc, 1)} %`, source: srcOf("surfaceVwc"),
     anchor: [probes.shallow.x, -probes.shallow.depth, front], offset: [-60, 70],
   };
   const deep: SceneCallout = {
-    id: "vwc40", label: "Moisture at 40 cm", value: `${fmt(m.deepVwc, 1)} %`, source: src("measurement"),
+    id: "vwc40", label: "Moisture at 40 cm", value: `${fmt(m.deepVwc, 1)} %`, source: srcOf("deepVwc"),
     anchor: [probes.deep.x, -probes.deep.depth, front], offset: [40, 80],
   };
   const etc: SceneCallout = {
@@ -79,7 +81,7 @@ export function calloutsFor(dim: DimensionKey, v: FieldSceneState): SceneCallout
   const heat: SceneCallout[] = v.crop.heatStress && v.crop.heatThresholdC !== null
     ? [{
       id: "heat", label: "Max air temperature", value: `${fmt(m.tmaxC, 1)} °C`, tone: "warn",
-      sub: `Above ${v.crop.name.toLowerCase()}'s ${v.crop.heatThresholdC} °C threshold`, source: src("measurement"),
+      sub: `Above ${v.crop.name.toLowerCase()}'s ${v.crop.heatThresholdC} °C threshold`, source: srcOf("tmaxC"),
       anchor: [-1.0, height * 0.6, 1.5], offset: [-120, 70],
     }]
     : [];
@@ -95,7 +97,7 @@ export function calloutsFor(dim: DimensionKey, v: FieldSceneState): SceneCallout
         { ...shallow, offset: [-40, -120] },
         { ...deep, offset: [-90, 90] },
         {
-          id: "rain", label: "Rain today", value: `${fmt(m.rainMm, 1)} mm`, source: src("measurement"),
+          id: "rain", label: "Rain today", value: `${fmt(m.rainMm, 1)} mm`, source: srcOf("rainMm"),
           anchor: [0.2, 0.02, -0.4], offset: [-40, -150],
         },
         etc,
@@ -103,11 +105,11 @@ export function calloutsFor(dim: DimensionKey, v: FieldSceneState): SceneCallout
     case "soil":
       return [
         {
-          id: "temp", label: "Soil temperature, 10 cm", value: `${fmt(m.soilTempC, 1)} °C`, source: src("measurement"),
+          id: "temp", label: "Soil temperature, 10 cm", value: `${fmt(m.soilTempC, 1)} °C`, source: srcOf("soilTempC"),
           anchor: [station.x + 1.3, -0.08, front], offset: [70, -90],
         },
         {
-          id: "ec", label: "Bulk electrical conductivity", value: `${fmt(m.ecDsM, 2)} dS/m`, source: src("measurement"),
+          id: "ec", label: "Bulk electrical conductivity", value: `${fmt(m.ecDsM, 2)} dS/m`, source: srcOf("ecDsM"),
           ...(v.soil.salinityAlert !== "none"
             ? { tone: "warn" as const, sub: "High: possible salinity, not lab-confirmed" }
             : { sub: "Within the usual range" }),
@@ -138,15 +140,15 @@ export function calloutsFor(dim: DimensionKey, v: FieldSceneState): SceneCallout
       const rainy = (m.rainMm ?? 0) >= RAIN_DAY_MM;
       return [
         {
-          id: "sky", label: "Today", value: rainy ? "Rain" : "Dry and sunny", sub: rainy ? "Rain gauge above 1 mm" : "Less than 1 mm of rain",
-          source: src("measurement"), anchor: rainy ? [-1.2, 4.2, -5] : LAYOUT.sun, offset: [-110, 10],
+          id: "sky", label: "Today", value: rainy ? "Rain" : "Dry and sunny", sub: rainy ? "Above 1 mm of rain" : "Less than 1 mm of rain",
+          source: srcOf("rainMm"), anchor: rainy ? [-1.2, 4.2, -5] : LAYOUT.sun, offset: [-110, 10],
         },
         {
-          id: "rain", label: "Rain", value: `${fmt(m.rainMm, 1)} mm`, source: src("measurement"),
+          id: "rain", label: "Rain", value: `${fmt(m.rainMm, 1)} mm`, source: srcOf("rainMm"),
           anchor: [1.4, 1.6, 0.2], offset: [80, -50],
         },
         {
-          id: "tmax", label: "Max air temperature", value: `${fmt(m.tmaxC, 1)} °C`, source: src("measurement"),
+          id: "tmax", label: "Max air temperature", value: `${fmt(m.tmaxC, 1)} °C`, source: srcOf("tmaxC"),
           ...(v.crop.heatStress ? { tone: "warn" as const, sub: "Above the crop's heat threshold" } : {}),
           anchor: [-1.4, 1.1, 0.4], offset: [-110, 20],
         },

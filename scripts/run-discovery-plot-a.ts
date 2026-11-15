@@ -9,32 +9,16 @@
  * - SMAP L4 at the plot centre when processed (data/external/smap_l4_plot_a/), else none;
  * - crop calendar: the farmer-reported seasons (data/cropCalendar.ts).
  */
-import { existsSync, readFileSync } from "node:fs";
 import { CROPS } from "@/data/crops";
 import { FIELDS } from "@/data/fields";
 import { LIPA_PLOT_A } from "@/data/lipaPlotA";
 import { LIPA_RAIN_SETTINGS } from "@/data/lipaModelConfig";
-import { hlsNdviToValues, parseHlsNdviCsv } from "@/lib/adapters/hlsNdvi";
-import { mergeValues } from "@/lib/adapters/modisNdvi";
-import { pipelineToFieldDays, type PipelineDailyRecord } from "@/lib/adapters/nasaPipeline";
 import { DEFAULT_DETECTORS, runDiscovery, type DiscoveryContext } from "@/lib/science/discovery/engine";
 import type { DiscoveryKind } from "@/types";
-import { loadSmapL4Values } from "./smapL4Lipa";
-import { loadSmapAcquisitionUtc } from "./smapTimes";
+import { buildPlotARecord } from "./plotARecord";
 
-const FILE = "docs/Data Pipeline/data/processed/terra_daily_merged.json";
-const HLS_CSV = "docs/Data Pipeline/data/external/hls_plot_a/hls_ndvi_plot_a.csv";
-const SMAP_L4_PLOT_A = "docs/Data Pipeline/data/external/smap_l4_plot_a/smap_l4_daily_lipa_plot_a.csv";
-const tz = LIPA_PLOT_A.timezone;
 const lipa = FIELDS.find((f) => f.id === "lipa-cropland")!;
-
-const weather = pipelineToFieldDays(JSON.parse(readFileSync(FILE, "utf8")) as PipelineDailyRecord[],
-  { fieldId: LIPA_PLOT_A.id, timeZone: tz, pipelineLocationId: LIPA_PLOT_A.weatherFromPipelineLocationId },
-  { smapAcquisitionUtc: loadSmapAcquisitionUtc() });
-const hls = existsSync(HLS_CSV) ? hlsNdviToValues(parseHlsNdviCsv(readFileSync(HLS_CSV, "utf8"))) : [];
-const withHls = mergeValues(weather, hls, tz);
-const l4 = loadSmapL4Values(tz, SMAP_L4_PLOT_A);
-const { days } = mergeValues(withHls.days, l4, tz);
+const { days, counts } = buildPlotARecord();
 
 const first = [...LIPA_PLOT_A.seasons].sort((a, b) => a.plantedOn.localeCompare(b.plantedOn))[0];
 const ctx: DiscoveryContext = {
@@ -51,8 +35,8 @@ const ctx: DiscoveryContext = {
 
 console.log(`Field: ${LIPA_PLOT_A.name}, ${LIPA_PLOT_A.areaHa} ha (${LIPA_PLOT_A.location})`);
 console.log(`${days.length} days, ${days[0].date} .. ${days.at(-1)!.date}; weather from ${LIPA_PLOT_A.weatherFromPipelineLocationId}`);
-console.log(`HLS NDVI: ${hls.length} overpass days with a plot value (${withHls.dropped} outside the record)`);
-console.log(l4.length ? `SMAP L4 (plot centre): ${l4.length / 2} days` : "SMAP L4 (plot centre): not processed yet");
+console.log(`HLS NDVI: ${counts.hls} overpass days with a plot value (${counts.hlsOutside} outside the record)`);
+console.log(counts.smapL4 ? `SMAP L4 (plot centre): ${counts.smapL4 / 2} days` : "SMAP L4 (plot centre): not processed yet");
 console.log(`Crop calendar: ${LIPA_PLOT_A.seasons.length} farmer-reported corn seasons\n`);
 
 console.log("Detector verdicts across all days (unknown = not enough data to decide):");

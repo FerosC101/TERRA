@@ -8,6 +8,7 @@ import { createPortal } from "react-dom";
 import { Card, Disclosure, Segmented, SourceTag } from "@/components/ui";
 import { InfoTip } from "@/components/visual/InfoTip";
 import { CROP_LIST } from "@/data/crops";
+import { hasRealRecord } from "@/data/nasa/realRecords";
 import { longDate, shortDate } from "@/lib/dates";
 import type { CropId, DimensionKey, Field } from "@/types";
 import { DIMENSION_LABEL } from "./parts";
@@ -85,7 +86,7 @@ export default function FieldSimulationPanel({ field, state, dim, onDim, idx, mi
             </InfoTip>
           </h2>
           <p className="mt-0.5 flex flex-wrap items-center gap-x-2 text-xs text-muted">
-            {view.isSimulated ? <SourceTag kind="simulated" detail={PRESETS[preset].label} /> : <span>Field record · demo data</span>}
+            {view.isSimulated ? <SourceTag kind="simulated" detail={PRESETS[preset].label} /> : <span>{hasRealRecord(field.id) ? "Field record · real NASA data, simulated station" : "Field record · demo data"}</span>}
             <span aria-hidden>·</span>
             <span className="tabular">{longDate(view.date)}</span>
             <span aria-hidden>·</span>

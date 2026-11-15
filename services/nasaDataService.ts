@@ -2,10 +2,10 @@ import { NASA_SNAPSHOTS } from "@/data/nasa";
 import { realRecord } from "@/data/nasa/realRecords";
 import { sourcesForField } from "@/data/sources";
 import { realSeriesRows } from "@/lib/adapters/realSeries";
-import { generateAnomalies } from "@/lib/demo/series";
 import type { DataSource, MonthlyAnomaly, NasaSnapshot, RealSeriesRow } from "@/types";
 import { IS_DEMO, request } from "./apiClient";
 import { mockField } from "./fieldSensorService";
+import { fieldAnomalies } from "./observationSource";
 
 /**
  * NASA Earth-observation access. No NASA endpoint is called for data values in this
@@ -50,5 +50,5 @@ export function getConnectionStatus(): ConnectionStatus {
 
 /** Monthly rainfall and temperature departures (POWER-style baseline) */
 export function getClimateAnomalies(fieldId: string): Promise<MonthlyAnomaly[]> {
-  return request(`/api/fields/${fieldId}/anomalies`, () => generateAnomalies(mockField(fieldId)));
+  return request(`/api/fields/${fieldId}/anomalies`, () => fieldAnomalies(mockField(fieldId)));
 }
