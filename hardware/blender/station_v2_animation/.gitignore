@@ -1,0 +1,11 @@
+frames/
+frames_branded/
+optix_cache/
+*.log
+*.blend1
+*.b64
+encode_smoke.mp4
+render_job.json
+render_progress.json
+TERRA_90s_4K.mp4
+__pycache__/
