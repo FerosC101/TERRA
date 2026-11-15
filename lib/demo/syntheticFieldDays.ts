@@ -20,7 +20,7 @@ import { clamp } from "@/lib/format";
 import { createRng, gaussian } from "@/lib/rng";
 import type { Crop, DiscoveryKind, MonthlyClimate } from "@/types";
 import type { AnyObservationValue, FieldDay } from "@/types/discovery-contract";
-import { soilStep, type SoilParams, type SoilState } from "./soilModel";
+import { canopyCover, soilStep, type SoilParams, type SoilState } from "./soilModel";
 
 export type InjectedEvent =
   /** Gauge and satellite rain forced to zero for `days` days from day index `startDay`. */
@@ -116,17 +116,6 @@ const DEEP_PER_MM = 0.0025;
  * Root zone 1.0 m matches the demo fields' profileDepthM in data/fields.ts (not a measured corn rooting depth).
  */
 const FAO_SOIL = { fc: 0.32, wp: 0.15, surfaceDepthM: 0.1, rootDepthM: 1.0, rewMm: 9, tewMm: 24.5 };
-
-/**
- * Canopy cover: 0 before and during the initial stage, rising linearly through development,
- * 1 through mid-season and late season, 0 after. Simplification of FAO-56 eq. 76 (UNVERIFIED).
- */
-function canopyCover(crop: Crop, dap: number): number {
-  const [ini, dev, mid, late] = crop.stages;
-  if (dap < ini) return 0;
-  if (dap < ini + dev) return (dap - ini) / dev;
-  return dap < ini + dev + mid + late ? 1 : 0;
-}
 
 const isoMs = (ms: number) => new Date(ms).toISOString().replace(".000Z", "Z");
 const utcMidnight = (date: string) => Date.parse(`${date}T00:00:00Z`);

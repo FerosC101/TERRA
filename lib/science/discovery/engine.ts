@@ -3,7 +3,7 @@
  * (types/discovery-contract.ts, proposed in docs/ai-ml/DECISIONS.md D-002) and returns
  * numeric AnomalyRecords.
  *
- * The four rules are ported from lib/science/detect.ts; thresholds live in
+ * The four rules are ported from the former lib/science/detect.ts (removed 2026-11-15, in git history); thresholds live in
  * data/discoveryRules.ts. They are fixed-threshold heuristics: the baseline any
  * statistical or ML detector must beat (mle-workflow). Thresholds are NOT
  * calibrated against real field data, and confidence values are heuristic.
@@ -14,8 +14,9 @@
  *   length (detect.ts divides by 30, which overstates February and understates
  *   31-day months).
  * - A missing gauge day makes the rain rules "unknown" instead of counting as 0 mm.
- * - Engine default (DEFAULT_DETECTORS, D-005): rain departure fills up to 2 missing gauge days with
- *   IMERG. BASELINE_DETECTORS keeps the strict detect.ts behaviour for experiments.
+ * - Engine default (DEFAULT_DETECTORS, D-005, D-006): rain departure fills up to 2 missing gauge days with
+ *   IMERG, and with no gauge at all uses IMERG against its own normal. BASELINE_DETECTORS keeps the
+ *   strict detect.ts behaviour for experiments.
  * - Each pattern is reported once at onset; days that cannot be evaluated
  *   (missing data) neither start nor end a pattern.
  */
@@ -23,6 +24,7 @@ import { stageOnDay } from "@/data/crops";
 import { DISCOVERY_RULES } from "@/data/discoveryRules";
 import { addDays, daysBetween } from "@/lib/dates";
 import { clamp } from "@/lib/format";
+import { seasonOn, type CropSeason } from "@/lib/science/season";
 import { mean, sum, zScore } from "@/lib/science/stats";
 import type { Crop, DiscoveryKind, LatLng } from "@/types";
 import type { AnomalyRecord, AnomalySignal, FieldDay, SourceId, Variable } from "@/types/discovery-contract";
@@ -38,15 +40,72 @@ export const DEEP_CM = 40;
 
 const RULES = DISCOVERY_RULES;
 
+/** Mean monthly rainfall from one source, mm, Jan..Dec, and where it came from (product, years). */
+export interface RainNormal {
+  monthlyMm: number[];
+  basis: string;
+  /**
+   * Optional per-month limits for the 14-day ratio (index = month of the window's last day), calibrated on the
+   * source's own history (D-013). Without them the fallback uses the fixed DISCOVERY_RULES.rainDeparture limits.
+   */
+  lowRatioByMonth?: number[];
+  highRatioByMonth?: number[];
+  thresholdBasis?: string;
+  /**
+   * Optional season-scale drought check (D-013): the `longWindowDays` total vs the normal, flagged when the ratio
+   * is below `longLowRatioByMonth[month of the last day]`. Catches droughts that build up over months in seasons
+   * that are dry anyway, where every 14-day window can stay within its limits.
+   */
+  longWindowDays?: number;
+  longLowRatioByMonth?: number[];
+}
+
+/**
+ * Moisture-divergence settings for a field without probes (D-015): a layered product (SMAP L4) with the topsoil
+ * and root-zone depths it is stored under, and per-month limits from the field's own history (index = month of
+ * the window's last day): the topsoil must fall by at least minSurfaceDropByMonth in 14 days while the root zone
+ * moves by at most maxDeepChangeByMonth.
+ */
+export interface MoistureFallback {
+  source: SourceId;
+  surfaceDepthCm: number;
+  deepDepthCm: number;
+  minSurfaceDropByMonth: number[];
+  maxDeepChangeByMonth: number[];
+  basis: string;
+}
+
 export interface DiscoveryContext {
   fieldId: string;
   /** Where point detections are placed (the station position). */
   location: LatLng;
-  /** Mean monthly rainfall, mm, Jan..Dec: the rain-departure baseline. */
+  /** Mean monthly rainfall, mm, Jan..Dec: the rain-departure baseline for the station gauge. */
   monthlyRainMm: number[];
+  /**
+   * Normals for satellite rain sources (D-006). A satellite total is compared only with the normal
+   * of the same source; without one the satellite fallback stays "unknown".
+   */
+  rainNormals?: Partial<Record<SourceId, RainNormal>>;
+  /** Source the no-gauge rain fallback uses for this field (default DISCOVERY_RULES.rainSatelliteFallback.source; D-013). */
+  rainFallbackSource?: SourceId;
   /** Crop in the ground, for growth-stage gating of the NDVI rule. */
   crop: Crop;
   plantedOn: string;
+  /**
+   * Several cropping seasons (e.g. a real crop calendar). When given, the NDVI rule uses the season the
+   * day belongs to (latest planting on or before it) instead of `crop`/`plantedOn`.
+   */
+  seasons?: CropSeason[];
+  /** NDVI source the NDVI rule reads (default "modis"); "hls" for a plot smaller than a MODIS pixel (D-012). */
+  ndviSource?: SourceId;
+  /** Soil-moisture source and calibrated limits used when the field has no station probes (D-015). */
+  moistureFallback?: MoistureFallback;
+  /**
+   * NDVI normal for a field without a crop calendar (D-016): the low limit (e.g. 10th percentile of past years) per
+   * day of year of the composite's placement day. When given, the NDVI rule flags a composite below its date's limit
+   * instead of a drop during the crop's growth stages.
+   */
+  ndviNormal?: { lowByDayOfYear: Record<number, number>; basis: string };
   /** When the engine runs, UTC ISO-8601; copied to each record's detectedAt. */
   runAt: string;
 }
@@ -250,24 +309,46 @@ export function rainWithImergFill(opts: { maxFilledDays: number }): Detector {
 
 /** NDVI drops between consecutive composites while the crop should be greening or holding. */
 function ndviChange(days: FieldDay[], ctx: DiscoveryContext): Outcome {
-  const ndvi = seriesOf(days, "ndvi", "modis", null);
+  const ndviSource = ctx.ndviSource ?? "modis";
+  const ndvi = seriesOf(days, "ndvi", ndviSource, null);
   const i = days.length - 1;
   const last = ndvi[i];
+  if (ctx.ndviNormal) return ndviBelowNormal(days, ctx, ndviSource, last);
   // Only a new composite can change the verdict; as in detect.ts, at least three composites are needed.
   if (last === null || ndvi.filter((v) => v !== null).length < 3) return "unknown";
   let p = i - 1;
   while (ndvi[p] === null) p--;
+  // Composites far apart (cloud gaps) say nothing about a sudden change (F-015).
+  if (daysBetween(days[p].date, days[i].date) > RULES.ndviChange.maxGapDays) return "unknown";
   const change = last - (ndvi[p] as number);
-  const stage = stageOnDay(ctx.crop, daysBetween(ctx.plantedOn, days[i].date));
+  const season = ctx.seasons ? seasonOn(ctx.seasons, days[i].date) : { crop: ctx.crop, plantedOn: ctx.plantedOn };
+  const stage = season ? stageOnDay(season.crop, daysBetween(season.plantedOn, days[i].date)) : "pre";
   if (!(change <= -RULES.ndviChange.minDrop + EPS && (stage === "development" || stage === "mid-season"))) return "no";
 
   return record(ctx, "ndvi-change", { start: days[p].date, end: days[i].date }, {
-    signals: [{ variable: "ndvi", source: "modis", depthCm: null, statistic: "change", observed: change, baseline: 0,
+    signals: [{ variable: "ndvi", source: ndviSource, depthCm: null, statistic: "change", observed: change, baseline: 0,
       baselineKind: "rule", unit: "dimensionless", zScore: null, rule: `change <= -${RULES.ndviChange.minDrop} during development or mid-season` }],
-    coverage: [{ variable: "ndvi", source: "modis", daysWithData: 2, daysInWindow: i - p + 1 }],
+    coverage: [{ variable: "ndvi", source: ndviSource, daysWithData: 2, daysInWindow: i - p + 1 }],
     spatialSupport: "grid-cell",
     confidence: 0.4,
   });
+}
+
+/** D-016: a new composite below the field's own low limit for that day of year (no crop calendar needed). */
+function ndviBelowNormal(days: FieldDay[], ctx: DiscoveryContext, source: SourceId, last: number | null): Outcome {
+  if (last === null) return "unknown";
+  const date = days[days.length - 1].date;
+  const doy = daysBetween(`${date.slice(0, 4)}-01-01`, date) + 1;
+  const low = ctx.ndviNormal!.lowByDayOfYear[doy];
+  if (low === undefined) return "unknown";
+  if (!(last < low)) return "no";
+  return record(ctx, "ndvi-change", { start: date, end: date }, {
+    signals: [{ variable: "ndvi", source, depthCm: null, statistic: "mean", observed: last, baseline: low,
+      baselineKind: "climatology", unit: "dimensionless", zScore: null, rule: `NDVI < ${low} (${ctx.ndviNormal!.basis})` }],
+    coverage: [{ variable: "ndvi", source, daysWithData: 1, daysInWindow: 1 }],
+    spatialSupport: "grid-cell",
+    confidence: 0.4,
+  }, "below-normal");
 }
 
 /** SMAP and the 10 cm station probe differ by a steady margin: a scale/representativeness offset, not a fault. */
@@ -294,6 +375,77 @@ function sensorOffset(days: FieldDay[], ctx: DiscoveryContext): Outcome {
   });
 }
 
+/**
+ * D-006: rain departure without a field station. The gauge rule decides whenever its window has at
+ * least one usable gauge day. Only when it has none (no station, or a full outage) is the satellite
+ * `source` total compared with that source's own monthly normal (ctx.rainNormals). Same window and
+ * ratio thresholds as the gauge rule: UNVERIFIED for a ~11 km satellite total. Records are labelled
+ * `+satellite-fallback`, grid-cell support, 0 station days, lower confidence.
+ */
+export function rainWithSatelliteFallback(gaugeRule: Detector, defaultSource: SourceId): Detector {
+  return (days, ctx) => {
+    const verdict = gaugeRule(days, ctx);
+    const source = ctx.rainFallbackSource ?? defaultSource;
+    const { windowDays: w } = RULES.rainDeparture;
+    if (verdict !== "unknown" || days.length < w) return verdict;
+    const window = days.slice(-w);
+    if (seriesOf(window, "precipitation", "station", null).some((v) => v !== null)) return verdict;
+
+    const normal = ctx.rainNormals?.[source];
+    const sat = seriesOf(window, "precipitation", source, null);
+    if (!normal || sat.some((v) => v === null)) return "unknown"; // a missing day is not zero rain
+    const total = sum(sat as number[]);
+    const expected = sum(window.map((d) => normal.monthlyMm[Number(d.date.slice(5, 7)) - 1] / daysInMonth(d.date)));
+    const ratio = expected > 0 ? total / expected : 1;
+    const month = Number(days[days.length - 1].date.slice(5, 7)) - 1;
+    const lowRatio = normal.lowRatioByMonth?.[month] ?? RULES.rainDeparture.lowRatio;
+    const highRatio = normal.highRatioByMonth?.[month] ?? RULES.rainDeparture.highRatio;
+    if (!(ratio < lowRatio || ratio > highRatio)) {
+      return longWindowDrought(days, ctx, source, normal, month) ?? "no";
+    }
+
+    return record(ctx, "rain-departure", { start: window[0].date, end: days[days.length - 1].date }, {
+      signals: [{ variable: "precipitation", source, depthCm: null, statistic: "total", observed: total,
+        baseline: expected, baselineKind: "climatology", unit: "mm", zScore: null,
+        rule: `ratio < ${lowRatio} or ratio > ${highRatio}${normal.thresholdBasis ? ` (${normal.thresholdBasis})` : ""}; no gauge, ${source} vs its own normal (${normal.basis})` }],
+      coverage: [
+        { variable: "precipitation", source: "station", daysWithData: 0, daysInWindow: w },
+        { variable: "precipitation", source, daysWithData: w, daysInWindow: w },
+      ],
+      spatialSupport: "grid-cell",
+      confidence: RULES.rainSatelliteFallback.confidence,
+    }, "satellite-fallback");
+  };
+}
+
+/**
+ * Season-scale drought (D-013): the last `normal.longWindowDays` of the fallback source below the month's
+ * calibrated limit. Returns null when the normal has no long-window limits, the record is too short, or a day in
+ * the long window is missing (then the 14-day verdict stands).
+ */
+function longWindowDrought(days: FieldDay[], ctx: DiscoveryContext, source: SourceId, normal: RainNormal, month: number): AnomalyRecord | null {
+  const lw = normal.longWindowDays;
+  const limit = normal.longLowRatioByMonth?.[month];
+  if (!lw || limit === undefined || days.length < lw) return null;
+  const window = days.slice(-lw);
+  const vals = seriesOf(window, "precipitation", source, null);
+  if (vals.some((v) => v === null)) return null;
+  const total = sum(vals as number[]);
+  const expected = sum(window.map((d) => normal.monthlyMm[Number(d.date.slice(5, 7)) - 1] / daysInMonth(d.date)));
+  if (!(expected > 0 && total / expected < limit)) return null;
+  return record(ctx, "rain-departure", { start: window[0].date, end: days[days.length - 1].date }, {
+    signals: [{ variable: "precipitation", source, depthCm: null, statistic: "total", observed: total,
+      baseline: expected, baselineKind: "climatology", unit: "mm", zScore: null,
+      rule: `${lw}-day ratio < ${limit}${normal.thresholdBasis ? ` (${normal.thresholdBasis})` : ""}; no gauge, ${source} vs its own normal (${normal.basis})` }],
+    coverage: [
+      { variable: "precipitation", source: "station", daysWithData: 0, daysInWindow: lw },
+      { variable: "precipitation", source, daysWithData: lw, daysInWindow: lw },
+    ],
+    spatialSupport: "grid-cell",
+    confidence: RULES.rainSatelliteFallback.confidence,
+  }, "satellite-fallback");
+}
+
 /** One detector per alarm kind. Candidates (candidates.ts) are alternative detectors for the same kinds. */
 export type DetectorSet = Record<DiscoveryKind, Detector>;
 
@@ -312,11 +464,59 @@ function outcomesOnDay(days: FieldDay[], i: number, ctx: DiscoveryContext, detec
 
 /**
  * Engine default: the baseline rules, except rain departure, which fills up to
- * DISCOVERY_RULES.rainGapFill.maxFilledDays missing gauge days with IMERG (adopted after E-004, D-005).
+ * DISCOVERY_RULES.rainGapFill.maxFilledDays missing gauge days with IMERG (adopted after E-004, D-005)
+ * and, with no gauge at all in the window, falls back to IMERG against IMERG's own normal (D-006).
  */
+/**
+ * D-015: when no station probe has a value in the 14-day window, the moisture rule uses the field's layered
+ * soil-moisture product (SMAP L4) with limits calibrated on its own history. Station probes always come first.
+ */
+export function moistureWithL4Fallback(stationRule: Detector): Detector {
+  return (days, ctx) => {
+    const verdict = stationRule(days, ctx);
+    const fb = ctx.moistureFallback;
+    const w = RULES.moistureDivergence.windowDays;
+    const i = days.length - 1;
+    if (verdict !== "unknown" || !fb || i < w) return verdict;
+    const window = days.slice(i - w);
+    const anyProbe = [SURFACE_CM, DEEP_CM].some((z) => seriesOf(window, "soil_moisture", "station", z).some((v) => v !== null));
+    if (anyProbe) return verdict;
+    const s = seriesOf(days, "soil_moisture", fb.source, fb.surfaceDepthCm);
+    const d = seriesOf(days, "soil_moisture", fb.source, fb.deepDepthCm);
+    const [s0, s1, d0, d1] = [s[i - w], s[i], d[i - w], d[i]];
+    if (s0 === null || s1 === null || d0 === null || d1 === null) return "unknown";
+    const month = Number(days[i].date.slice(5, 7)) - 1;
+    const minDrop = fb.minSurfaceDropByMonth[month];
+    const maxDeep = fb.maxDeepChangeByMonth[month];
+    const surfChange = s1 - s0;
+    const deepChange = d1 - d0;
+    if (!(surfChange <= -minDrop + EPS && Math.abs(deepChange) <= maxDeep + EPS)) return "no";
+    const values = s.slice(i - w, i + 1);
+    return record(ctx, "moisture-divergence", { start: days[i - w].date, end: days[i].date }, {
+      signals: [
+        { variable: "soil_moisture", source: fb.source, depthCm: fb.surfaceDepthCm, statistic: "change", observed: surfChange,
+          baseline: -minDrop, baselineKind: "own-history", unit: "m3/m3", zScore: null,
+          rule: `change <= -${minDrop} (${fb.basis}); no probes` },
+        { variable: "soil_moisture", source: fb.source, depthCm: fb.deepDepthCm, statistic: "change", observed: deepChange,
+          baseline: 0, baselineKind: "rule", unit: "m3/m3", zScore: null, rule: `abs(change) <= ${maxDeep} (${fb.basis})` },
+      ],
+      coverage: [
+        { variable: "soil_moisture", source: "station", daysWithData: 0, daysInWindow: values.length },
+        { variable: "soil_moisture", source: fb.source, daysWithData: values.filter((v) => v !== null).length, daysInWindow: values.length },
+      ],
+      spatialSupport: "grid-cell",
+      confidence: RULES.rainSatelliteFallback.confidence,
+    }, "smap-l4-fallback");
+  };
+}
+
 export const DEFAULT_DETECTORS: DetectorSet = {
   ...BASELINE_DETECTORS,
-  "rain-departure": rainWithImergFill({ maxFilledDays: RULES.rainGapFill.maxFilledDays }),
+  "moisture-divergence": moistureWithL4Fallback(moistureDivergence),
+  "rain-departure": rainWithSatelliteFallback(
+    rainWithImergFill({ maxFilledDays: RULES.rainGapFill.maxFilledDays }),
+    RULES.rainSatelliteFallback.source,
+  ),
 };
 
 /** Every rule that holds on day i, using only days 0..i. */

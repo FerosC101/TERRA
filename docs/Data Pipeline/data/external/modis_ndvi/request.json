@@ -1,0 +1,139 @@
+{
+ "submitted_at_utc": "2026-11-15T01:22:00Z",
+ "git_commit": "e5fa04a6cf0f3cf9a55fef5835fb1330565c295c",
+ "api": "https://appeears.earthdatacloud.nasa.gov/api/task",
+ "body": {
+  "task_type": "area",
+  "task_name": "terra_lipa_modis_ndvi_2024_2025",
+  "params": {
+   "dates": [
+    {
+     "startDate": "12-01-2023",
+     "endDate": "12-31-2025"
+    }
+   ],
+   "layers": [
+    {
+     "product": "MOD13Q1.061",
+     "layer": "_250m_16_days_NDVI"
+    },
+    {
+     "product": "MOD13Q1.061",
+     "layer": "_250m_16_days_VI_Quality"
+    },
+    {
+     "product": "MOD13Q1.061",
+     "layer": "_250m_16_days_pixel_reliability"
+    },
+    {
+     "product": "MOD13Q1.061",
+     "layer": "_250m_16_days_composite_day_of_the_year"
+    },
+    {
+     "product": "MYD13Q1.061",
+     "layer": "_250m_16_days_NDVI"
+    },
+    {
+     "product": "MYD13Q1.061",
+     "layer": "_250m_16_days_VI_Quality"
+    },
+    {
+     "product": "MYD13Q1.061",
+     "layer": "_250m_16_days_pixel_reliability"
+    },
+    {
+     "product": "MYD13Q1.061",
+     "layer": "_250m_16_days_composite_day_of_the_year"
+    }
+   ],
+   "output": {
+    "format": {
+     "type": "geotiff"
+    },
+    "projection": "native"
+   },
+   "geo": {
+    "type": "FeatureCollection",
+    "features": [
+     {
+      "type": "Feature",
+      "properties": {
+       "name": "Lipa_Cropland_AOI"
+      },
+      "geometry": {
+       "type": "Polygon",
+       "coordinates": [
+        [
+         [
+          121.180302,
+          13.987887
+         ],
+         [
+          121.181271,
+          13.984303
+         ],
+         [
+          121.17961,
+          13.983545
+         ],
+         [
+          121.179512,
+          13.982984
+         ],
+         [
+          121.176299,
+          13.981375
+         ],
+         [
+          121.178408,
+          13.976575
+         ],
+         [
+          121.183187,
+          13.978996
+         ],
+         [
+          121.182508,
+          13.98123
+         ],
+         [
+          121.184092,
+          13.98201
+         ],
+         [
+          121.185371,
+          13.979918
+         ],
+         [
+          121.193002,
+          13.982692
+         ],
+         [
+          121.188807,
+          13.990451
+         ],
+         [
+          121.186069,
+          13.98934
+         ],
+         [
+          121.184397,
+          13.988404
+         ],
+         [
+          121.183664,
+          13.98934
+         ],
+         [
+          121.180302,
+          13.987887
+         ]
+        ]
+       ]
+      }
+     }
+    ]
+   }
+  }
+ }
+}

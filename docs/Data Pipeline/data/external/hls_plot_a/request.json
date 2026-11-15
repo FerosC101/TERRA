@@ -1,0 +1,84 @@
+{
+ "submitted_at_utc": "2026-11-15T03:44:15Z",
+ "git_commit": "e5fa04a6cf0f3cf9a55fef5835fb1330565c295c",
+ "api": "https://appeears.earthdatacloud.nasa.gov/api/task",
+ "body": {
+  "task_type": "area",
+  "task_name": "terra_lipa_plot_a_hls_ndvi_2024_2025",
+  "params": {
+   "dates": [
+    {
+     "startDate": "12-01-2023",
+     "endDate": "12-31-2025"
+    }
+   ],
+   "layers": [
+    {
+     "product": "HLSS30_VI.020",
+     "layer": "NDVI"
+    },
+    {
+     "product": "HLSL30_VI.020",
+     "layer": "NDVI"
+    },
+    {
+     "product": "HLSS30.020",
+     "layer": "Fmask"
+    },
+    {
+     "product": "HLSL30.020",
+     "layer": "Fmask"
+    }
+   ],
+   "output": {
+    "format": {
+     "type": "geotiff"
+    },
+    "projection": "native"
+   },
+   "geo": {
+    "type": "FeatureCollection",
+    "features": [
+     {
+      "type": "Feature",
+      "properties": {
+       "name": "Lipa_Plot_A",
+       "farmer": "Mang Edgar",
+       "barangay": "Pusil, Lipa City, Batangas",
+       "crop": "corn",
+       "geometry_source": "corners drawn on a map (not GPS), given by the ML engineer 2026-11-15",
+       "area_ha_approx": 2.69
+      },
+      "geometry": {
+       "type": "Polygon",
+       "coordinates": [
+        [
+         [
+          121.1531,
+          13.9831
+         ],
+         [
+          121.1547,
+          13.9831
+         ],
+         [
+          121.1547,
+          13.9845
+         ],
+         [
+          121.1531,
+          13.9845
+         ],
+         [
+          121.1531,
+          13.9831
+         ]
+        ]
+       ]
+      }
+     }
+    ]
+   }
+  }
+ }
+}

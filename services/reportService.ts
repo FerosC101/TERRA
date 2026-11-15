@@ -2,9 +2,9 @@ import { sourcesForField } from "@/data/sources";
 import { auditObservations } from "@/lib/data/quality";
 import { DEMO_TODAY } from "@/lib/dates";
 import { generateAnomalies, generateSeries } from "@/lib/demo/series";
-import { detectDiscoveries } from "@/lib/science/detect";
 import type { FieldReport, FollowUp } from "@/types";
 import { request } from "./apiClient";
+import { discoveriesFor } from "./discoveryService";
 import { mockField } from "./fieldSensorService";
 
 export function mockReport(fieldId: string, followUps: FollowUp[] = []): FieldReport {
@@ -16,7 +16,7 @@ export function mockReport(fieldId: string, followUps: FollowUp[] = []): FieldRe
     field,
     latest: observations[observations.length - 1],
     observations,
-    discoveries: detectDiscoveries(field, observations, followUps),
+    discoveries: discoveriesFor(field, observations, followUps),
     anomalies: generateAnomalies(field),
     sources: sourcesForField(fieldId),
     quality,

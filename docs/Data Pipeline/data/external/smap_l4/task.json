@@ -1,0 +1,110 @@
+{
+ "submit_response": {
+  "task_id": "27dbb65f-b091-4590-b4d1-1fe884c86130",
+  "status": "pending"
+ },
+ "task_info": {
+  "tier": 1,
+  "error": null,
+  "params": {
+   "dates": [
+    {
+     "endDate": "12-31-2025",
+     "startDate": "01-01-2024"
+    }
+   ],
+   "layers": [
+    {
+     "layer": "Geophysical_Data_sm_surface",
+     "product": "SPL4SMGP.008"
+    },
+    {
+     "layer": "Geophysical_Data_sm_rootzone",
+     "product": "SPL4SMGP.008"
+    }
+   ],
+   "coordinates": [
+    {
+     "id": "lipa_cropland_001_centroid",
+     "category": "lipa_cropland_001",
+     "latitude": 13.983842,
+     "longitude": 121.184648
+    }
+   ]
+  },
+  "status": "done",
+  "crashed": false,
+  "created": "2026-11-15T01:22:02.294724",
+  "task_id": "27dbb65f-b091-4590-b4d1-1fe884c86130",
+  "updated": "2026-11-15T03:16:44.214569",
+  "user_id": "<redacted>",
+  "attempts": 1,
+  "estimate": {
+   "request_size": 1462,
+   "request_tier": 0,
+   "request_memory": 1
+  },
+  "retry_at": null,
+  "completed": "2026-11-15T03:16:44.194296",
+  "has_swath": false,
+  "task_name": "terra_lipa_smap_l4_2024_2025",
+  "task_type": "point",
+  "api_version": "v1",
+  "svc_version": "3.137",
+  "web_version": null,
+  "cached_files": {},
+  "has_nsidc_daac": true,
+  "worker_version": "3.137",
+  "cluster_processing": true,
+  "expires_on": "2026-12-15T03:16:44.214569"
+ },
+ "bundle": {
+  "files": [
+   {
+    "sha256": "5fa3036431469fa18ef1cc527fa34285e157a439f1381e74e0b00181d8869020",
+    "file_id": "492336e8-44eb-477d-a229-353940127d65",
+    "file_name": "terra-lipa-smap-l4-2024-2025-SPL4SMGP-008-results.csv",
+    "file_size": 759120,
+    "file_type": "csv",
+    "s3_url": "s3://appeears-output/27dbb65f-b091-4590-b4d1-1fe884c86130/terra-lipa-smap-l4-2024-2025-SPL4SMGP-008-results.csv"
+   },
+   {
+    "sha256": "ffc166d572fe7b6622e2b0760c6a76d6caf58e6ef056276e32ac9fb30e43fc67",
+    "file_id": "033b6ead-2874-405f-93f0-e273dcb8192d",
+    "file_name": "terra-lipa-smap-l4-2024-2025-granule-list.txt",
+    "file_size": 853808,
+    "file_type": "txt",
+    "s3_url": "s3://appeears-output/27dbb65f-b091-4590-b4d1-1fe884c86130/terra-lipa-smap-l4-2024-2025-granule-list.txt"
+   },
+   {
+    "sha256": "10d4ba37643eaaf73372c80427f8d450dd9263d2782a62748a17bb114f72252c",
+    "file_id": "ca60f909-af75-428a-b833-f8e97a4f0c95",
+    "file_name": "terra-lipa-smap-l4-2024-2025-request.json",
+    "file_size": 951,
+    "file_type": "json",
+    "s3_url": "s3://appeears-output/27dbb65f-b091-4590-b4d1-1fe884c86130/terra-lipa-smap-l4-2024-2025-request.json"
+   },
+   {
+    "sha256": "1b1b79e80256de4df2929b2dbb586bd04ba25d717137e4c2d94179860bdfa57d",
+    "file_id": "eb6cc00c-07a9-4330-a833-5e4944fdb535",
+    "file_name": "terra-lipa-smap-l4-2024-2025-SPL4SMGP-008-metadata.xml",
+    "file_size": 16990,
+    "file_type": "xml",
+    "s3_url": "s3://appeears-output/27dbb65f-b091-4590-b4d1-1fe884c86130/terra-lipa-smap-l4-2024-2025-SPL4SMGP-008-metadata.xml"
+   },
+   {
+    "sha256": "d5a5088229f11f06339502c5ff4de72bf435866b2328312ea2db86fd0cdd08a1",
+    "file_id": "113a0828-d15d-4a31-8dbe-14255141cb21",
+    "file_name": "README.md",
+    "file_size": 30388,
+    "file_type": "txt",
+    "s3_url": "s3://appeears-output/27dbb65f-b091-4590-b4d1-1fe884c86130/README.md"
+   }
+  ],
+  "created": "2026-11-15T01:44:05.024292",
+  "task_id": "27dbb65f-b091-4590-b4d1-1fe884c86130",
+  "updated": "2026-11-15T03:07:16.228565",
+  "bundle_type": "point"
+ },
+ "downloaded_at_utc": "2026-11-15T03:17:40Z"
+}

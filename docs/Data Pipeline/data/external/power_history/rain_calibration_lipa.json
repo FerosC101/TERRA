@@ -1,0 +1,137 @@
+{
+ "script": "scripts/calibrate-rain-lipa.py",
+ "run_at_utc": "2026-11-15T05:11:53Z",
+ "git_commit": "e5fa04a6cf0f3cf9a55fef5835fb1330565c295c",
+ "source": "NASA POWER daily PRECTOTCORR, 121.185 E 13.984 N, 2001-01-01..2023-12-31 (power_daily_rain_lipa_2001_2023.csv)",
+ "window_days": 14,
+ "percentiles": [
+  5,
+  95
+ ],
+ "monthly_normal_mm": [
+  157.0,
+  136.7,
+  105.4,
+  95.8,
+  160.2,
+  241.2,
+  292.9,
+  234.1,
+  277.1,
+  341.4,
+  343.4,
+  375.8
+ ],
+ "low_ratio_by_month": [
+  0.23,
+  0.082,
+  0.099,
+  0.074,
+  0.112,
+  0.309,
+  0.352,
+  0.374,
+  0.296,
+  0.362,
+  0.352,
+  0.24
+ ],
+ "high_ratio_by_month": [
+  2.293,
+  2.328,
+  2.946,
+  3.49,
+  2.656,
+  1.929,
+  1.851,
+  1.993,
+  1.953,
+  2.027,
+  2.202,
+  2.112
+ ],
+ "long_window_days": 90,
+ "long_window_percentile": 10,
+ "long_low_ratio_by_month": [
+  0.606,
+  0.542,
+  0.379,
+  0.358,
+  0.368,
+  0.493,
+  0.651,
+  0.787,
+  0.767,
+  0.764,
+  0.731,
+  0.641
+ ],
+ "long_window_dry_share_2001_2023": {
+  "windows": 8311,
+  "dry_share": 0.1012
+ },
+ "driest_feb_apr_2001_2023_mm": [
+  [
+   2019,
+   68.9
+  ],
+  [
+   2010,
+   108.9
+  ],
+  [
+   2003,
+   111.6
+  ],
+  [
+   2014,
+   129.1
+  ],
+  [
+   2015,
+   139.9
+  ]
+ ],
+ "final_flagged_share_2001_2023": {
+  "windows": 8387,
+  "low_share": 0.0504,
+  "high_share": 0.0507,
+  "flagged_share": 0.1011
+ },
+ "old_fixed_flagged_share_2001_2023": {
+  "windows": 8387,
+  "low_share": 0.1918,
+  "high_share": 0.1126,
+  "flagged_share": 0.3044
+ },
+ "heldout": {
+  "fit_years": "2001-2018",
+  "test_years": "2019-2023",
+  "calibrated_on_fit_years": {
+   "windows": 6561,
+   "low_share": 0.0504,
+   "high_share": 0.0503,
+   "flagged_share": 0.1007
+  },
+  "calibrated_on_test_years": {
+   "windows": 1826,
+   "low_share": 0.0515,
+   "high_share": 0.1292,
+   "flagged_share": 0.1807
+  },
+  "old_fixed_on_test_years": {
+   "windows": 1826,
+   "low_share": 0.1386,
+   "high_share": 0.1988,
+   "flagged_share": 0.3373
+  },
+  "long_window_on_fit_years": {
+   "windows": 6485,
+   "dry_share": 0.0999
+  },
+  "long_window_on_test_years": {
+   "windows": 1826,
+   "dry_share": 0.0427
+  }
+ }
+}

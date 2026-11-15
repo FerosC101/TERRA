@@ -1,7 +1,9 @@
 import { NASA_SNAPSHOTS } from "@/data/nasa";
+import { realRecord } from "@/data/nasa/realRecords";
 import { sourcesForField } from "@/data/sources";
+import { realSeriesRows } from "@/lib/adapters/realSeries";
 import { generateAnomalies } from "@/lib/demo/series";
-import type { DataSource, MonthlyAnomaly, NasaSnapshot } from "@/types";
+import type { DataSource, MonthlyAnomaly, NasaSnapshot, RealSeriesRow } from "@/types";
 import { IS_DEMO, request } from "./apiClient";
 import { mockField } from "./fieldSensorService";
 
@@ -21,6 +23,17 @@ export function getDataSources(fieldId: string): Promise<DataSource[]> {
  */
 export function getNasaSnapshot(fieldId: string): Promise<NasaSnapshot | null> {
   return request(`/api/fields/${fieldId}/nasa-snapshot`, () => NASA_SNAPSHOTS[fieldId] ?? null);
+}
+
+/**
+ * Daily rows of the field's real record (NASA POWER, IMERG, SMAP L3/L4, MODIS NDVI) for evidence charts,
+ * or null for fields that run on demo data.
+ */
+export function getRealSeries(fieldId: string): Promise<RealSeriesRow[] | null> {
+  return request(`/api/fields/${fieldId}/real-series`, () => {
+    const days = realRecord(fieldId);
+    return days ? realSeriesRows(days) : null;
+  });
 }
 
 export interface ConnectionStatus {

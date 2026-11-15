@@ -12,7 +12,11 @@
     "experiment:e002": "tsx scripts/evaluate-discovery-e002.ts",
     "experiment:e003": "tsx scripts/evaluate-discovery-e003.ts",
     "experiment:e004": "tsx scripts/evaluate-discovery-e004.ts",
-    "postinstall": "node -e \"require('fs').mkdirSync('public/maplibre',{recursive:true});require('fs').copyFileSync('node_modules/maplibre-gl/dist/maplibre-gl-worker.mjs','public/maplibre/maplibre-gl-worker.mjs')\""
+    "discovery:lipa": "tsx scripts/run-discovery-lipa.ts",
+    "discovery:plot-a": "tsx scripts/run-discovery-plot-a.ts",
+    "water:lipa": "tsx scripts/run-water-lipa.ts",
+    "export:graphs": "tsx scripts/export-graphs.ts",
+    "postinstall":"node -e \"require('fs').mkdirSync('public/maplibre',{recursive:true});require('fs').copyFileSync('node_modules/maplibre-gl/dist/maplibre-gl-worker.mjs','public/maplibre/maplibre-gl-worker.mjs')\""
   },
   "dependencies": {
     "clsx": "^2.1.1",

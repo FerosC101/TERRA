@@ -117,7 +117,8 @@ export interface Field {
   plantedOn: string;
   /** The crop grown before the current one, if it falls inside the observation record */
   previousCrop?: { crop: CropId; plantedOn: string };
-  soil: { texture: string; awcMmPerM: number; profileDepthM: number; note: string };
+  /** `source` "soilgrids": ISRIC SoilGrids model estimate; absent: entered from a field record / typical for the texture. */
+  soil: { texture: string; awcMmPerM: number; profileDepthM: number; note: string; source?: "soilgrids" };
   station: FieldStation;
   points: ObservationPoint[];
   rotationHistory: RotationRecord[];
@@ -151,6 +152,22 @@ export interface DailyObservation {
   ecDsM: number;
   /** Modelled root-zone water storage, mm */
   storageMm: number;
+}
+
+/** One day of a field's REAL record, for evidence charts (lib/adapters/realSeries.ts). null = no value that day. */
+export interface RealSeriesRow {
+  date: string;
+  /** NASA POWER rain (model, ~50 km), mm */
+  rainPowerMm: number | null;
+  /** GPM IMERG Final rain (satellite, ~10 km), mm */
+  rainImergMm: number | null;
+  /** SMAP L4 surface 0–5 cm and root zone 0–100 cm (model, 9 km), % */
+  smapL4SurfacePct: number | null;
+  smapL4RootPct: number | null;
+  /** SMAP L3 surface retrieval (satellite, 9 km), %, overpass days only */
+  smapL3Pct: number | null;
+  /** MODIS NDVI composite (satellite, 250 m), on composite days only */
+  ndvi: number | null;
 }
 
 /** A physically impossible value, an extreme but valid event, or a structural problem in a record. */
@@ -244,18 +261,22 @@ export interface Discovery {
   interpretation: string;
   alternatives: string[];
   confirmed: string[];
-  nextObservation: { action: string; rationale: string };
+  /** The check ranked first by lib/science/nextObservation.ts, and the answers a person can report. */
+  nextObservation: { action: string; rationale: string; checkId?: string; answers?: string[] };
   comparison: { label: string; current: number; baseline: number; unit: string; zScore: number | null };
   stages: InvestigationStage[];
   location: LatLng;
   risk?: string;
 }
 
+/** What a person logged after a discovery: soil-moisture readings (%), or the answer to a field check. */
 export interface FollowUp {
   discoveryId: string;
   date: string;
-  surfaceVwc: number;
-  deepVwc: number;
+  checkId?: string;
+  surfaceVwc?: number;
+  deepVwc?: number;
+  answer?: string;
 }
 
 export interface Relationship {

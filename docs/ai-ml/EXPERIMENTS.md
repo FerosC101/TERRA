@@ -225,3 +225,43 @@ field-z again lowers false alarms, by less than in E-003 (6.5–24.7% vs 18–32
 short dry spells at higher uptake shares (7-day −0.12 at 0.30; −0.14 at 0.20 in E-003): a trade-off,
 not an improvement (→ F-005 revised). Limits: synthetic only; one soil, climate and crop; synthetic IMERG
 is the gauge rain plus noise, likely kinder than real IMERG.
+
+## E-005 — Revising the models on real Lipa data (calibration on history, test on 2024–2025)
+Date: 2026-11-15 · Status: Running (rain and rotation parts done; moisture, NDVI and field-model parts pre-registered below, not run)
+Question: Can each model be set from Lipa's own real history instead of guessed thresholds, and does it then behave
+sensibly on 2024–2025 against the real events we know of?
+Data: **Real only.** NASA POWER daily rain 2001–2023 (calibration) and 2024–2025 (pipeline); SMAP L4 2015-03-31..2023
+(calibration, requested) and 2024–2025; MODIS NDVI point time series 2001–2025 for the 42 AOI pixels (requested);
+farmer report (Plot A) and three dated events with opened sources (`data/lipaEvents.ts`). Split **by time**: limits are
+fitted on the history and judged on later years; a held-out check inside the history (fit early years, test later
+years) shows whether the flagged share stays near its design value.
+Setup: commit `e5fa04a` plus uncommitted working tree. Scripts: `scripts/calibrate-rain-lipa.py`,
+`scripts/build-power-dekads.py`; moisture/NDVI/field-model calibration scripts to follow. No random numbers.
+Baseline: the existing rules with their guessed thresholds (rain 0.45/1.7 on IMERG; moisture station-only; NDVI change
+with stage gating; field model with SMAP L3) and, for the rotation planner, its average-climate run.
+Metrics (fixed before running each part): share of windows/days flagged (calibration and held-out), alarms in 2024–2025,
+and whether each real event is matched (dry event: a dry alarm in or within 14 days after the window; wet: a wet alarm in
+it). Event counts are tiny (1 dry, 2 wet), so they are reported as matched / not matched, not as rates.
+Pre-registered rules for the parts not yet run:
+- Moisture (SMAP L4 fallback, D-015): per month, topsoil limit = 5th percentile of 14-day topsoil changes, root-zone limit
+  = median of |14-day root-zone changes|, from 2015-04..2023 (held-out check: fit 2015–2020, test 2021–2023). Pass: flagged
+  share on held-out years ≤ 10 %, and at least one alarm in the dry-event window (Feb–Mar 2024, +14 days).
+- NDVI (below-normal rule, D-016): per composite end day of year, 10th percentile of usable AOI composites 2001–2023
+  (held-out: fit 2001–2018, test 2019–2023). Pass: held-out flagged share ≤ 15 %; reported (not a pass condition): alarms in
+  February–May 2024.
+- Living Field Model (SMAP L4, D-017): L4 rescaled linearly from its 2015–2023 2nd–98th percentiles onto the soil's range
+  (topsoil: lower limit to FC; root zone: WP to FC). Leave-out test on 2024–2025: every 4th day's L4 readings are withheld
+  and predicted (state after the day's water step, before any correction). Pass: mean absolute error of the predicted
+  root zone below that of persistence (the last assimilated value). Also reported: share of days the topsoil sits at
+  field capacity, old (SMAP L3) vs new.
+Result (so far, copied from script output):
+- Rain (D-013): POWER 2001–2023, 14-day ratio, per-month 5th/95th percentile limits flag 10.1 % of windows (old fixed
+  0.45/1.7: 30.4 %). Held-out (fit 2001–2018, test 2019–2023): 18.1 % flagged (dry 5.2 %, wet 12.9 %) vs 33.7 % old.
+  90-day drought limit (10th percentile by month): 10.1 % of 2001–2023 windows, 4.3 % held-out. On 2024–2025:
+  flagged days 18.1 % (old IMERG rule 48.1 %), 16 onsets (old 22). Carina (22–25 Jul 2024): matched (onset 2024-07-23).
+  Kristine (22–25 Oct 2024): matched (onset 2024-10-24). El Niño dry event (Feb–Mar 2024): the 14-day rule misses it;
+  the 90-day check alarms on 2024-04-15 (window 2024-01-17..04-15), 15 days after the farmer-reported window → late.
+- Rotation planner (D-014): average climate gives zero deficit for every default rotation; on real 2001–2025 ten-day rain
+  the Dec–May corn season ran short in 10 of 24 years (driest 20 %: ≥ 66 mm), worst 2018-19, 2013-14, 2009-10; Dec 2023–
+  May 2024 ranks 6th of 24 (61 mm) and Dec 2024–May 2025 has no shortfall, matching the farmer's report.
+Conclusion: (to be written when all parts have run)

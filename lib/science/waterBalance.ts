@@ -33,6 +33,8 @@ export function evaluateRotation(
   settings: RotationSettings,
   priorities: Priorities,
   scenario: Scenario,
+  /** Optional real rain per ten-day step, indexed from the plan's first step (D-014); else the monthly climatology. */
+  rainByStep?: (planStep: number) => number | undefined,
 ): RotationEvaluation {
   const { stepDays } = ASSUMPTIONS;
   const stepsPerWindow = 36 / settings.seasonsPerYear;
@@ -71,7 +73,8 @@ export function evaluateRotation(
       const day = k * stepDays + stepDays / 2;
       const growing = !isFallow && day < duration;
 
-      const rain = (field.climate.rainMm[month] / 3) * (1 + scenario.rainChange);
+      const actual = rainByStep?.(index * stepsPerWindow + k);
+      const rain = (actual ?? field.climate.rainMm[month] / 3) * (1 + scenario.rainChange);
       const et0 = field.climate.et0MmDay[month] * stepDays * (1 + ASSUMPTIONS.et0PerDegree * scenario.tempChangeC);
       const kc = growing ? kcOnDay(crop, day) : ASSUMPTIONS.bareSoilKc;
       const etc = kc * et0;
@@ -191,3 +194,69 @@ export function priorityMatch(ind: RotationIndicators, w: Priorities): number {
   if (!weight) return 0;
   return round((parts.reduce((a, [x, v]) => a + x * v, 0) / weight) * 100, 0);
 }
+
+export interface SeasonRisk {
+  index: number;
+  cropId: RotationPlan["crops"][number];
+  windowLabel: string;
+  /** Deficit (mm) of this season in each historical start year. */
+  deficitByYear: { year: number; deficitMm: number }[];
+  /** Start years in which this season's deficit was above zero. */
+  yearsShort: number;
+  medianDeficitMm: number;
+  /** Deficit exceeded in the driest 20 % of years. */
+  dry20DeficitMm: number;
+}
+
+export interface RotationRisk {
+  planId: string;
+  startYears: number[];
+  seasons: SeasonRisk[];
+}
+
+/**
+ * Historical-years mode (D-014): runs the rotation once per start year on real ten-day rain (dekads: days 1–10,
+ * 11–20, 21–end, 36 per year, index 0 = 1–10 January), keeping ET0 and temperature from the monthly climatology.
+ * A start year is used only if the dekad series covers every step of the plan.
+ */
+export function rotationRisk(
+  plan: RotationPlan,
+  field: Field,
+  settings: RotationSettings,
+  priorities: Priorities,
+  dekadsByYear: Record<string, number[]>,
+): RotationRisk {
+  const stepsPerWindow = 36 / settings.seasonsPerYear;
+  const steps = plan.crops.length * stepsPerWindow;
+  const years = Object.keys(dekadsByYear).map(Number).sort((a, b) => a - b);
+  const series = (startYear: number): number[] | null => {
+    const out: number[] = [];
+    for (let k = 0; k < steps; k++) {
+      const abs = settings.startMonth * 3 + k;
+      const v = dekadsByYear[String(startYear + Math.floor(abs / 36))]?.[abs % 36];
+      if (v === undefined) return null;
+      out.push(v);
+    }
+    return out;
+  };
+  const runs = years.flatMap((y) => {
+    const s = series(y);
+    return s ? [{ year: y, r: evaluateRotation(plan, field, settings, priorities, HISTORICAL_CLIMATE, (k) => s[k]) }] : [];
+  });
+  const seasons: SeasonRisk[] = plan.crops.map((cropId, i) => {
+    const byYear = runs.map(({ year, r }) => ({ year, deficitMm: r.seasons[i].deficitMm }));
+    const sorted = byYear.map((d) => d.deficitMm).sort((a, b) => a - b);
+    const q = (p: number) => (sorted.length ? sorted[Math.min(sorted.length - 1, Math.ceil(p * sorted.length) - 1)] : 0);
+    return {
+      index: i, cropId, windowLabel: runs[0]?.r.seasons[i].windowLabel ?? "",
+      deficitByYear: byYear,
+      yearsShort: byYear.filter((d) => d.deficitMm > 0).length,
+      medianDeficitMm: q(0.5),
+      dry20DeficitMm: q(0.8),
+    };
+  });
+  return { planId: plan.id, startYears: runs.map((x) => x.year), seasons };
+}
+
+/** Scenario used by the historical-years mode: real rain, unchanged climate. */
+const HISTORICAL_CLIMATE: Scenario = { id: "historical-years", name: "Historical years", rainChange: 0, tempChangeC: 0, description: "Real ten-day rain of each year." };

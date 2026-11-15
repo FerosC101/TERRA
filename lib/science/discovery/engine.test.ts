@@ -6,7 +6,8 @@ import { FIELDS } from "@/data/fields";
 const CLIMATE = FIELDS.find((f) => f.id === "riverside")!.climate;
 import { generateSyntheticFieldDays } from "@/lib/demo/syntheticFieldDays";
 import type { AnyObservationValue } from "@/types/discovery-contract";
-import { BASELINE_DETECTORS, detectOnDay, runDiscovery } from "./engine";
+import { DISCOVERY_RULES } from "@/data/discoveryRules";
+import { BASELINE_DETECTORS, DEFAULT_DETECTORS, detectOnDay, runDiscovery } from "./engine";
 import { makeDays, TEST_CONTEXT as ctx, type DaySpec } from "./__tests__/fixtures";
 
 const START = "2026-06-01";
@@ -19,6 +20,43 @@ function divergenceDays(drop: number, deepEnd = 0.3): DaySpec[] {
     s40: i < 28 ? 0.3 : deepEnd,
   }));
 }
+
+describe("moisture-divergence SMAP L4 fallback (D-015)", () => {
+  const md = DEFAULT_DETECTORS["moisture-divergence"];
+  // June limits: surface must fall by ≥ 0.04 in 14 days, root zone may move ≤ 0.02.
+  const l4Ctx = { ...ctx, moistureFallback: { source: "smap_l4" as const, surfaceDepthCm: 5, deepDepthCm: 100,
+    minSurfaceDropByMonth: Array(12).fill(0.04), maxDeepChangeByMonth: Array(12).fill(0.02), basis: "test L4 history" } };
+  /** L4 surface 0.30 for days 0–14 then falling linearly by `drop` to day 28; root zone falls by `rootDrop`. */
+  const l4Days = (drop: number, rootDrop = 0): DaySpec[] => Array.from({ length: 29 }, (_, i) => ({
+    l4s: i <= 14 ? 0.3 : 0.3 - ((i - 14) * drop) / 14,
+    l4r: i <= 14 ? 0.3 : 0.3 - ((i - 14) * rootDrop) / 14,
+  }));
+
+  it("with no station probes, uses SMAP L4 layers and the month's calibrated limits; labelled as a fallback", () => {
+    const r = md(makeDays(START, l4Days(0.05)), l4Ctx);
+    if (typeof r === "string") throw new Error(`expected an alarm, got ${r}`);
+    expect(r.signals[0]).toMatchObject({ source: "smap_l4", depthCm: 5, statistic: "change" });
+    expect(r.signals[0].observed).toBeCloseTo(-0.05, 6);
+    expect(r.signals[1]).toMatchObject({ source: "smap_l4", depthCm: 100 });
+    expect(r.signals[0].rule).toContain("test L4 history");
+    expect(r.spatialSupport).toBe("grid-cell");
+    expect(r.detectorVersion).toMatch(/\+smap-l4-fallback$/);
+    expect(r.confidence).toBe(DISCOVERY_RULES.rainSatelliteFallback.confidence);
+  });
+
+  it("says no when the topsoil drop is within the usual range or the root zone also moves a lot", () => {
+    expect(md(makeDays(START, l4Days(0.03)), l4Ctx)).toBe("no");
+    expect(md(makeDays(START, l4Days(0.05, 0.03)), l4Ctx)).toBe("no");
+  });
+
+  it("stays unknown without the fallback settings, and keeps station probes first", () => {
+    expect(md(makeDays(START, l4Days(0.05)), ctx)).toBe("unknown");
+    const both = divergenceDays(0.06).map((s, i) => ({ ...s, ...l4Days(0)[i] }));
+    const r = md(makeDays(START, both), l4Ctx);
+    if (typeof r === "string") throw new Error(`expected an alarm, got ${r}`);
+    expect(r.signals[0].source).toBe("station");
+  });
+});
 
 describe("moisture-divergence", () => {
   it("fires when surface falls by at least 0.05 m3/m3 in 14 days while deep holds", () => {
@@ -137,6 +175,95 @@ describe("rain-departure", () => {
   });
 });
 
+describe("rain-departure satellite fallback (D-006)", () => {
+  const rain = DEFAULT_DETECTORS["rain-departure"];
+  /** IMERG normal of 300 mm every month → 140 mm expected over 14 June days. */
+  const satCtx = { ...ctx, rainNormals: { imerg: { monthlyMm: Array(12).fill(300), basis: "test IMERG normal" } } };
+  const imergOnly = (total: number): DaySpec[] => Array.from({ length: 14 }, (_, i) => ({ imerg: i === 0 ? total : 0 }));
+
+  it("with no gauge in the window, compares IMERG with IMERG's own normal and labels the alarm", () => {
+    const r = rain(makeDays(START, imergOnly(50)), satCtx);
+    if (typeof r === "string") throw new Error(`expected an alarm, got ${r}`);
+    expect(r.signals).toHaveLength(1);
+    expect(r.signals[0]).toMatchObject({ variable: "precipitation", source: "imerg", statistic: "total", observed: 50, baselineKind: "climatology", unit: "mm" });
+    expect(r.signals[0].baseline).toBeCloseTo(140, 6);
+    expect(r.signals[0].rule).toContain("test IMERG normal");
+    expect(r.spatialSupport).toBe("grid-cell");
+    expect(r.detectorVersion).toMatch(/\+satellite-fallback$/);
+    expect(r.coverage).toContainEqual({ variable: "precipitation", source: "station", daysWithData: 0, daysInWindow: 14 });
+    expect(r.confidence).toBe(DISCOVERY_RULES.rainSatelliteFallback.confidence);
+    expect(r.confidence).toBeLessThan(0.6);
+  });
+
+  it("stays unknown without a normal from the same source (never IMERG vs the station normal)", () => {
+    expect(rain(makeDays(START, imergOnly(50)), ctx)).toBe("unknown");
+  });
+
+  it("says no inside the normal range", () => {
+    expect(rain(makeDays(START, imergOnly(140)), satCtx)).toBe("no");
+  });
+
+  it("does not treat a missing satellite day as zero rain", () => {
+    const specs = imergOnly(50);
+    specs[4] = { imerg: null };
+    expect(rain(makeDays(START, specs), satCtx)).toBe("unknown");
+  });
+
+  it("keeps the station first: any usable gauge day leaves the decision to the gauge rule", () => {
+    const gappy = rainDays(50, 48);
+    for (let k = 1; k <= 5; k++) gappy[k] = { ...gappy[k], rain: null }; // 5 gaps > 2 fillable
+    expect(rain(makeDays(START, gappy), satCtx)).toBe("unknown");
+    const r = rain(makeDays(START, rainDays(50, 48)), satCtx);
+    if (typeof r === "string") throw new Error(`expected an alarm, got ${r}`);
+    expect(r.signals[0].source).toBe("station");
+    expect(r.detectorVersion).not.toMatch(/satellite-fallback/);
+  });
+
+  it("falls back when the station sent only missing values (a full outage)", () => {
+    const outage = imergOnly(50).map((s) => ({ ...s, rain: null }));
+    expect(typeof rain(makeDays(START, outage), satCtx)).toBe("object");
+  });
+  describe("calibrated per-month limits and a field's own fallback source (D-013)", () => {
+    // POWER normal 300 mm every month → 140 mm expected over 14 June days; June limits 0.2 and 2.5.
+    const low = Array(12).fill(0.2);
+    const high = Array(12).fill(2.5);
+    const powerCtx = {
+      ...ctx,
+      rainFallbackSource: "power" as const,
+      rainNormals: { power: { monthlyMm: Array(12).fill(300), basis: "test POWER normal", lowRatioByMonth: low, highRatioByMonth: high, thresholdBasis: "test p5/p95" } },
+    };
+    const powerOnly = (total: number): DaySpec[] => Array.from({ length: 14 }, (_, i) => ({ power: i === 0 ? total : 0 }));
+
+    it("uses the field's source and the window-end month's limits instead of the fixed 0.45 / 1.7", () => {
+      expect(rain(makeDays(START, powerOnly(50)), powerCtx)).toBe("no"); // ratio 0.36: below 0.45, above 0.2
+      const r = rain(makeDays(START, powerOnly(20)), powerCtx); // ratio 0.14 < 0.2
+      if (typeof r === "string") throw new Error(`expected an alarm, got ${r}`);
+      expect(r.signals[0]).toMatchObject({ source: "power", observed: 20 });
+      expect(r.signals[0].rule).toContain("ratio < 0.2 or ratio > 2.5");
+      expect(r.signals[0].rule).toContain("test p5/p95");
+      expect(rain(makeDays(START, powerOnly(300)), powerCtx)).toBe("no"); // ratio 2.14 < 2.5
+      expect(typeof rain(makeDays(START, powerOnly(400)), powerCtx)).toBe("object"); // ratio 2.86
+    });
+
+    it("flags a season-long drought with the 90-day window when every 14-day window is within limits", () => {
+      // 90 days at 40 % of normal, rain spread evenly: each 14-day ratio is 0.4 (> 0.2), the 90-day ratio 0.4 < 0.5.
+      const drought = { ...powerCtx, rainNormals: { power: { ...powerCtx.rainNormals.power, longLowRatioByMonth: Array(12).fill(0.5), longWindowDays: 90 } } };
+      const spread: DaySpec[] = Array.from({ length: 90 }, () => ({ power: (300 / 30) * 0.4 }));
+      const r = rain(makeDays("2026-03-01", spread), drought);
+      if (typeof r === "string") throw new Error(`expected an alarm, got ${r}`);
+      expect(r.window.start).toBe("2026-03-01");
+      expect(r.signals[0].rule).toContain("90-day ratio < 0.5");
+      expect(r.signals[0].observed).toBeCloseTo(360, 6);
+      expect(rain(makeDays("2026-03-01", spread), powerCtx)).toBe("no"); // no long limits: 14-day rule only
+    });
+
+    it("without per-month limits keeps the fixed thresholds (unchanged behaviour)", () => {
+      const fixed = { ...powerCtx, rainNormals: { power: { monthlyMm: Array(12).fill(300), basis: "fixed" } } };
+      expect(typeof rain(makeDays(START, powerOnly(50)), fixed)).toBe("object"); // 0.36 < 0.45
+    });
+  });
+});
+
 /** Composites on day 0, day `prev` and day `last`; planted 2026-06-01 with 10-day stages. */
 function ndviDays(prev: number, last: number, prevValue: number, lastValue: number, withFirst = true): DaySpec[] {
   return Array.from({ length: last + 1 }, (_, i) =>
@@ -167,6 +294,61 @@ describe("ndvi-change", () => {
   it("only evaluates on the day a new composite arrives", () => {
     const days = makeDays(START, [...ndviDays(5, 21, 0.5, 0.45), {}]);
     expect(of("ndvi-change", detectOnDay(days, 22, ctx))).toHaveLength(0);
+  });
+
+  // Planted 30 days after START, so day 45 is development (day 15 after planting).
+  const late = { ...ctx, plantedOn: "2026-07-01" };
+
+  it("is unknown when the previous composite is more than maxGapDays old (e.g. a cloud gap)", () => {
+    const gap = DISCOVERY_RULES.ndviChange.maxGapDays;
+    const days = makeDays(START, ndviDays(45 - gap - 1, 45, 0.5, 0.45));
+    expect(DEFAULT_DETECTORS["ndvi-change"](days, late)).toBe("unknown");
+  });
+
+  it("reads the NDVI source named in the context (e.g. HLS for a small plot); MODIS stays the default", () => {
+    const hlsDays = makeDays(START, ndviDays(5, 21, 0.5, 0.45)).map((d) => ({
+      ...d, values: d.values.map((v) => (v.variable === "ndvi" ? { ...v, source: "hls" as const } : v)),
+    }));
+    const [r] = of("ndvi-change", detectOnDay(hlsDays, 21, { ...ctx, ndviSource: "hls" }));
+    expect(r.signals[0]).toMatchObject({ variable: "ndvi", source: "hls" });
+    expect(r.coverage[0]).toMatchObject({ source: "hls" });
+    expect(DEFAULT_DETECTORS["ndvi-change"](hlsDays, ctx)).toBe("unknown"); // default reads MODIS: none here
+  });
+
+  describe("below-normal rule for a field without a crop calendar (D-016)", () => {
+    // Composites on day 0, 16 and 32 (2026-06-01, 06-17, 07-03). Normal's 10th percentile 0.5 for every day of year.
+    const lowByDoy = Object.fromEntries(Array.from({ length: 366 }, (_, k) => [k + 1, 0.5]));
+    const nCtx = { ...ctx, plantedOn: "2030-01-01", ndviNormal: { lowByDayOfYear: lowByDoy, basis: "test MODIS 2001–2023 p10" } };
+    const comp = (a: number, b: number, c: number): DaySpec[] => Array.from({ length: 33 }, (_, i) => (i === 0 ? { ndvi: a } : i === 16 ? { ndvi: b } : i === 32 ? { ndvi: c } : {}));
+
+    it("alarms when a new composite is below the 10th percentile of its date, whatever the crop stage", () => {
+      const [r] = of("ndvi-change", detectOnDay(makeDays(START, comp(0.7, 0.68, 0.45)), 32, nCtx));
+      expect(r.signals[0]).toMatchObject({ variable: "ndvi", source: "modis", statistic: "mean", observed: 0.45, baseline: 0.5, baselineKind: "climatology" });
+      expect(r.signals[0].rule).toContain("test MODIS 2001–2023 p10");
+    });
+
+    it("says no at or above the limit, even after a drop that the change rule would flag", () => {
+      expect(DEFAULT_DETECTORS["ndvi-change"](makeDays(START, comp(0.8, 0.8, 0.55)), nCtx)).toBe("no");
+    });
+
+    it("is unknown on a day of year the normal does not cover", () => {
+      const partial = { ...nCtx, ndviNormal: { lowByDayOfYear: { 1: 0.5 }, basis: "x" } };
+      expect(DEFAULT_DETECTORS["ndvi-change"](makeDays(START, comp(0.7, 0.68, 0.45)), partial)).toBe("unknown");
+    });
+  });
+
+  it("with several seasons, gates on the season the day belongs to", () => {
+    // Composites on days 0, 25, 45 (2026-06-01 + 45 = 2026-07-16); drop on day 45.
+    const days = makeDays(START, ndviDays(25, 45, 0.5, 0.45));
+    const s1 = { crop: ctx.crop, plantedOn: "2026-04-01" }; // day 45 is 106 days after: post-harvest
+    const s2 = { crop: ctx.crop, plantedOn: "2026-07-01" }; // day 45 is day 15: development
+    expect(of("ndvi-change", detectOnDay(days, 45, { ...ctx, seasons: [s1, s2] }))).toHaveLength(1);
+    expect(DEFAULT_DETECTORS["ndvi-change"](days, { ...ctx, seasons: [s1] })).toBe("no");
+  });
+
+  it("still compares composites exactly maxGapDays apart", () => {
+    const gap = DISCOVERY_RULES.ndviChange.maxGapDays;
+    expect(of("ndvi-change", detectOnDay(makeDays(START, ndviDays(45 - gap, 45, 0.5, 0.45)), 45, late))).toHaveLength(1);
   });
 });
 

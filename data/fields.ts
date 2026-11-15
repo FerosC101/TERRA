@@ -65,7 +65,7 @@ const LIPA_POWER: MonthlyClimate = {
  * and its centre is that polygon's centroid, so the web app, the pipeline and the
  * hardware station all refer to the same ground.
  */
-const lipa: LatLng = { lat: 13.983042, lng: 121.184648 };
+const lipa: LatLng = { lat: 13.983842, lng: 121.184648 };
 const LIPA_BOUNDARY: LatLng[] = [
   [121.180302, 13.987887], [121.181271, 13.984303], [121.17961, 13.983545], [121.179512, 13.982984],
   [121.176299, 13.981375], [121.178408, 13.976575], [121.183187, 13.978996], [121.182508, 13.98123],
@@ -93,10 +93,13 @@ export const FIELDS: Field[] = [
     currentCrop: "corn",
     plantedOn: "2026-08-30",
     soil: {
-      texture: "Loam",
-      awcMmPerM: 150,
+      texture: "Clay loam over clay",
+      // ISRIC SoilGrids 2.0 (model estimate, 20 cells over the AOI): (FC 0.321 − WP 0.238) × 1000 = 83 mm per m,
+      // the same values as LIPA_SOILGRIDS_SOIL (data/soils.ts). DATA-MANIFEST.md section 10.
+      awcMmPerM: 83,
       profileDepthM: 1,
-      note: "Texture from a field record entered for the demonstration. Available water capacity is a typical value for the texture class, not a laboratory result.",
+      source: "soilgrids",
+      note: "ISRIC SoilGrids 2.0 estimate for this area (250 m model, not a laboratory test): clay 39–45 %, water held between field capacity and wilting point about 83 mm per metre.",
     },
     station: {
       id: "TS-01",

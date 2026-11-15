@@ -1,0 +1,35 @@
+{
+ "submitted_at_utc": "2026-11-15T01:22:02Z",
+ "git_commit": "e5fa04a6cf0f3cf9a55fef5835fb1330565c295c",
+ "api": "https://appeears.earthdatacloud.nasa.gov/api/task",
+ "body": {
+  "task_type": "point",
+  "task_name": "terra_lipa_smap_l4_2024_2025",
+  "params": {
+   "dates": [
+    {
+     "startDate": "01-01-2024",
+     "endDate": "12-31-2025"
+    }
+   ],
+   "layers": [
+    {
+     "product": "SPL4SMGP.008",
+     "layer": "Geophysical_Data_sm_surface"
+    },
+    {
+     "product": "SPL4SMGP.008",
+     "layer": "Geophysical_Data_sm_rootzone"
+    }
+   ],
+   "coordinates": [
+    {
+     "id": "lipa_cropland_001_centroid",
+     "category": "lipa_cropland_001",
+     "latitude": 13.983842,
+     "longitude": 121.184648
+    }
+   ]
+  }
+ }
+}

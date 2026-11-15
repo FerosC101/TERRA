@@ -17,6 +17,9 @@ npm run experiment:discovery   # E-001 → experiments/E-001/results.json
 npm run experiment:e002        # E-002 → experiments/E-002/results.json
 npm run experiment:e003        # E-003 → experiments/E-003/results.json
 npm run experiment:e004        # E-004 → experiments/E-004/results.json
+npm run discovery:lipa         # engine on the real Lipa pipeline record (docs/Data Pipeline)
+npm run water:lipa             # daily crop water balance on the real Lipa weather (crop calendar assumed)
+npm run export:graphs          # CSVs for notebooks/terra-graphs.ipynb
 ```
 
 ## Context files
@@ -27,6 +30,7 @@ npm run experiment:e004        # E-004 → experiments/E-004/results.json
 | `docs/ai-ml/DECISIONS.md` | Design/method decisions and why | A choice is made that others must follow |
 | `docs/ai-ml/EXPERIMENTS.md` | ML/model experiments: plan, setup, results | An experiment is planned, run, or abandoned |
 | `docs/ai-ml/FINDINGS.md` | Evidence-backed findings with sources and status | Something is learned that changes what we believe |
+| `docs/ai-ml/TASKS.md` | Person 3 (AI/ML) checklist against the five deliverables | A task is finished, added, or unblocked |
 
 Keep entries short. Link between files by ID (`D-001`, `E-001`, `F-001`).
 
