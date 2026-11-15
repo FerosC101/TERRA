@@ -17,18 +17,25 @@ export const DATA_SOURCES: DataSource[] = [
     caveat: "One point does not describe the whole field. Bulk EC changes with moisture and temperature and is not a nutrient reading.",
   },
   {
-    id: "smap", name: "NASA SMAP", product: "SPL3SMP_E / SPL4SMGP",
+    id: "smap", name: "NASA SMAP", product: "SPL3SMP_E",
     variable: "Surface soil moisture (top ~5 cm)",
     spatialResolution: "~9 km grid", temporalResolution: "Every 2–3 days",
     kind: "satellite", integration: "demo",
-    caveat: "One grid cell is hundreds of times larger than a farm plot. It describes the surrounding landscape, not this field.",
+    caveat: "One grid cell is hundreds of times larger than a farm plot. It describes the surrounding landscape, not this field. Over Lipa, NASA flags every 2024–2025 retrieval as \"not recommended\".",
+  },
+  {
+    id: "smap_l4", name: "NASA SMAP L4", product: "SPL4SMGP",
+    variable: "Surface (0–5 cm) and root-zone (0–100 cm) soil moisture",
+    spatialResolution: "~9 km grid", temporalResolution: "3-hourly, used as daily means",
+    kind: "model", integration: "demo",
+    caveat: "A land-model estimate with SMAP brightness temperatures assimilated, not a measurement. One grid cell covers the surrounding landscape, not this field.",
   },
   {
     id: "imerg", name: "NASA GPM IMERG", product: "GPM_3IMERGDF",
     variable: "Precipitation",
     spatialResolution: "0.1° (~10 km)", temporalResolution: "Half-hourly, used as daily totals",
     kind: "satellite", integration: "demo",
-    caveat: "An area-average estimate. Local storms can differ substantially from the grid value.",
+    caveat: "An area-average estimate. Local storms can differ substantially from the grid value. The V07 Final daily product ends on 2025-09-30.",
   },
   {
     id: "modis", name: "NASA MODIS", product: "MOD13Q1",
@@ -36,6 +43,13 @@ export const DATA_SOURCES: DataSource[] = [
     spatialResolution: "250 m", temporalResolution: "16-day composite",
     kind: "satellite", integration: "demo",
     caveat: "Pixels at field edges mix in neighbouring land. Cloud can lower values in the wet season.",
+  },
+  {
+    id: "hls", name: "NASA HLS", product: "HLSS30_VI / HLSL30_VI v2.0",
+    variable: "NDVI vegetation index",
+    spatialResolution: "30 m", temporalResolution: "Every 2–5 days (Landsat + Sentinel-2), cloud permitting",
+    kind: "satellite", integration: "demo",
+    caveat: "Fine enough for a small plot, but clouds block most wet-season passes. Landsat and Sentinel-2 values on the same day can differ.",
   },
   {
     id: "ecostress", name: "NASA ECOSTRESS", product: "ECO_L2T_LSTE",

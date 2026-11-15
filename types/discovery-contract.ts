@@ -39,7 +39,7 @@ export type Variable = keyof VariableUnits;
 export type Unit = VariableUnits[Variable] | "mm";
 
 /** Matches the ids in data/sources.ts, plus `manual` for readings a person logs (follow-ups). */
-export type SourceId = "station" | "manual" | "smap" | "imerg" | "modis" | "ecostress" | "power";
+export type SourceId = "station" | "manual" | "smap" | "smap_l4" | "imerg" | "modis" | "hls" | "ecostress" | "power";
 
 /**
  * How the value summarises raw data: a daily mean, total or maximum of samples
@@ -63,7 +63,10 @@ export interface ObservationValue<V extends Variable> {
   /** null when quality is "invalid" or "missing". */
   value: number | null;
   unit: VariableUnits[V];
-  /** Sensor depth below the surface, cm. null when the product defines its own layer (see data/sources.ts). */
+  /**
+   * Sensor depth below the surface, cm. null when the product defines a single layer of its own (see data/sources.ts).
+   * For a product with several layers (SMAP L4), the bottom of the layer: 5 = 0–5 cm, 100 = 0–100 cm (D-011).
+   */
   depthCm: number | null;
   /** Physical sensor id, for station and manual readings. */
   sensorId?: string;

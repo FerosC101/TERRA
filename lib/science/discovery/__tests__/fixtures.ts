@@ -10,8 +10,12 @@ export interface DaySpec {
   s40?: number | null;
   rain?: number | null;
   imerg?: number | null;
+  power?: number | null;
   smap?: number | null;
   ndvi?: number | null;
+  /** SMAP L4 surface (0–5 cm, depthCm 5) and root zone (0–100 cm, depthCm 100), source smap_l4. */
+  l4s?: number | null;
+  l4r?: number | null;
 }
 
 function value(
@@ -25,7 +29,7 @@ function value(
 ): AnyObservationValue {
   return {
     variable, source, depthCm, unit, aggregation,
-    product: "test", provenance: source === "station" ? "measurement" : "satellite",
+    product: "test", provenance: source === "station" ? "measurement" : source === "power" || source === "smap_l4" ? "model" : "satellite",
     value: v, quality: v === null ? "missing" : "ok",
     period: { start: `${date}T00:00:00Z`, end: `${date}T12:00:00Z` },
   } as AnyObservationValue;
@@ -39,8 +43,11 @@ export function makeDays(start: string, specs: DaySpec[], fieldId = "test-field"
     if (s.s40 !== undefined) values.push(value(date, "soil_moisture", "station", 40, s.s40, "m3/m3", "mean"));
     if (s.rain !== undefined) values.push(value(date, "precipitation", "station", null, s.rain, "mm/day", "total"));
     if (s.imerg !== undefined) values.push(value(date, "precipitation", "imerg", null, s.imerg, "mm/day", "total"));
+    if (s.power !== undefined) values.push(value(date, "precipitation", "power", null, s.power, "mm/day", "total"));
     if (s.smap !== undefined) values.push(value(date, "soil_moisture", "smap", null, s.smap, "m3/m3", "instant"));
     if (s.ndvi !== undefined) values.push(value(date, "ndvi", "modis", null, s.ndvi, "dimensionless", "composite"));
+    if (s.l4s !== undefined) values.push(value(date, "soil_moisture", "smap_l4", 5, s.l4s, "m3/m3", "mean"));
+    if (s.l4r !== undefined) values.push(value(date, "soil_moisture", "smap_l4", 100, s.l4r, "m3/m3", "mean"));
     return { fieldId, date, values };
   });
 }
