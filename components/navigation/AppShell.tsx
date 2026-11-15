@@ -24,7 +24,7 @@ function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
   return (
     <div className="flex h-full flex-col">
-      <Link href="/" onClick={onNavigate} className="flex h-16 items-center px-5" aria-label="TERRA home"><Logo /></Link>
+      <Link href="/overview" onClick={onNavigate} className="flex h-16 items-center px-5" aria-label="TERRA overview"><Logo /></Link>
       <nav aria-label="Main" className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-3 py-2">
         {NAV.map((item) => {
           const active = isActive(pathname, item.href);
@@ -212,11 +212,14 @@ function Profile() {
 
 /** Pages that use the full content area edge to edge (the map). */
 const FULL_BLEED = ["/explorer"];
+/** Pages that bring their own layout, without the app's sidebar and header: the website at / */
+const isBare = (pathname: string) => pathname === "/";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const [drawer, setDrawer] = useState(false);
   const pathname = usePathname();
   const fullBleed = FULL_BLEED.some((p) => pathname.startsWith(p));
+  if (isBare(pathname)) return <>{children}</>;
   return (
     <div className="min-h-screen">
       <aside className="no-print fixed inset-y-0 left-0 z-30 hidden w-56 border-r border-line bg-surface lg:block">

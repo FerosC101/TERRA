@@ -150,6 +150,44 @@ input[type="checkbox"] {
   border-radius: 50%;
   background: var(--dot);
 }
+/* Animated TERRA mark (components/brand/LogoLoader.tsx) */
+.terra-logo-anim g { transform-box: fill-box; }
+.terra-logo-planet { animation: terra-planet 900ms cubic-bezier(0.22, 1, 0.36, 1) 100ms both; }
+.terra-logo-orbit { animation: terra-orbit 850ms cubic-bezier(0.65, 0, 0.35, 1) 550ms both; }
+.terra-logo-leafLow { transform-origin: 0% 100%; animation: terra-leaf 700ms cubic-bezier(0.34, 1.56, 0.64, 1) 1050ms both; }
+.terra-logo-leafHigh { transform-origin: 0% 100%; animation: terra-leaf 700ms cubic-bezier(0.34, 1.56, 0.64, 1) 1200ms both; }
+.terra-logo-letter { display: inline-block; animation: terra-letter 500ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+.terra-logo-tagline { animation: terra-fade 600ms ease-out 1800ms both; }
+.terra-logo-progress > span { transform-origin: left; animation: terra-progress 2400ms cubic-bezier(0.65, 0, 0.35, 1) both; }
+@keyframes terra-planet {
+  from { clip-path: circle(0% at 0% 100%); opacity: 0.4; }
+  to { clip-path: circle(150% at 0% 100%); opacity: 1; }
+}
+@keyframes terra-orbit {
+  from { clip-path: inset(0 100% 0 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
+@keyframes terra-leaf {
+  from { transform: scale(0) rotate(-12deg); opacity: 0; }
+  to { transform: scale(1) rotate(0); opacity: 1; }
+}
+@keyframes terra-letter {
+  from { transform: translateY(14px); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+@keyframes terra-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes terra-progress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@media (prefers-reduced-motion: reduce) {
+  .terra-logo-anim g, .terra-logo-letter, .terra-logo-tagline, .terra-logo-progress > span { animation: none; }
+}
+
+/* Landing page: sections fade up as they scroll into view */
+.terra-reveal { opacity: 0; transform: translateY(18px); transition: opacity 700ms ease-out, transform 700ms cubic-bezier(0.22, 1, 0.36, 1); }
+.terra-reveal.is-visible { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .terra-reveal { opacity: 1; transform: none; transition: none; }
+}
+
 /* Readouts that pop up inside the field environment scene */
 @keyframes terra-callout-in {
   from { opacity: 0; transform: translateY(6px) scale(0.92); }
