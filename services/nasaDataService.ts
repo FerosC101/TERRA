@@ -6,9 +6,10 @@ import { IS_DEMO, request } from "./apiClient";
 import { mockField } from "./fieldSensorService";
 
 /**
- * NASA Earth-observation access. In this build no NASA endpoint is called:
- * `getConnectionStatus` reports that plainly so the UI can never show a
- * simulated series as a live observation.
+ * NASA Earth-observation access. No NASA endpoint is called for data values in this
+ * build: `getConnectionStatus` reports that plainly so the UI can never show a
+ * simulated series as a live observation. (The Field Explorer's NASA moisture view
+ * loads map pictures live from NASA GIBS; see nasaGibsService.ts.)
  */
 export function getDataSources(fieldId: string): Promise<DataSource[]> {
   return request(`/api/fields/${fieldId}/sources`, () => sourcesForField(fieldId));

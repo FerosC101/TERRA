@@ -24,6 +24,13 @@ export const DATA_SOURCES: DataSource[] = [
     caveat: "One grid cell is hundreds of times larger than a farm plot. It describes the surrounding landscape, not this field.",
   },
   {
+    id: "smap-gibs", name: "NASA SMAP L4 map", product: "SPL4SMGP v8 via NASA GIBS (SMAP_L4_Analyzed_Surface_Soil_Moisture)",
+    variable: "Surface soil moisture, m³/m³ (map imagery only)",
+    spatialResolution: "9 km grid", temporalResolution: "Daily image (12:00 UTC analysis), published a few days late",
+    kind: "model", integration: "live",
+    caveat: "A model analysis that assimilates SMAP satellite observations, not a direct measurement. One 9 km cell covers the whole field and its surroundings. Shown as a picture on the map; no values enter TERRA's calculations.",
+  },
+  {
     id: "imerg", name: "NASA GPM IMERG", product: "GPM_3IMERGDF",
     variable: "Precipitation",
     spatialResolution: "0.1° (~10 km)", temporalResolution: "Half-hourly, used as daily totals",
@@ -72,6 +79,7 @@ export function sourcesForField(fieldId: string): DataSource[] {
     if (src.id === "power" && FIELDS.find((f) => f.id === fieldId)?.climate.basis === "retrieved") {
       return { ...src, integration: "snapshot", statusNote: "Monthly climatology retrieved from NASA POWER." };
     }
+    if (src.integration === "live") return { ...src, statusNote: "Fetched live from NASA GIBS when the Field Explorer's NASA moisture view is opened." };
     return { ...src, statusNote: src.id === "station" ? "No hardware connected. Demo values." : "Not connected. Demo values." };
   });
 }

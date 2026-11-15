@@ -1,47 +1,43 @@
 "use client";
 
+import clsx from "clsx";
+import { CloudSun, Droplets, Layers3, Leaf, Maximize2, Minimize2, Pause, Play, Repeat } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { Card, SourceTag } from "@/components/ui";
-import { CROPS } from "@/data/crops";
+import { Card, Disclosure, Segmented, SourceTag } from "@/components/ui";
+import { InfoTip } from "@/components/visual/InfoTip";
+import { CROP_LIST } from "@/data/crops";
+import { longDate, shortDate } from "@/lib/dates";
 import type { CropId, DimensionKey, Field } from "@/types";
+import { DIMENSION_LABEL } from "./parts";
+import type { SeasonPlayback } from "./playback";
+import { calloutsFor } from "./sceneCallouts";
+import { buildFieldSceneState, CONTROL_RANGES, PRESETS, type SimulationOverrides, type SimulationPresetId } from "./simulation";
 import type { ModelState } from "./state";
-import {
-  buildFieldSceneState,
-  CONTROL_RANGES,
-  PRESETS,
-  type SimulationOverrides,
-  type SimulationPresetId,
-} from "./simulation";
 
 const Scene = dynamic(() => import("@/components/three/FieldScene"), {
   ssr: false,
-  loading: () => (
-    <div className="h-[420px] p-6" role="status">
-      Loading field environment…
-    </div>
-  ),
+  loading: () => <div className="flex h-[clamp(400px,64vh,620px)] items-center justify-center bg-sunken text-sm text-muted" role="status">Loading field environment…</div>,
 });
 
-const DIMS: DimensionKey[] = [
-  "water",
-  "soil",
-  "vegetation",
-  "climate",
-  "rotation",
+const DIMS: { key: DimensionKey; icon: typeof Droplets; short: string }[] = [
+  { key: "water", icon: Droplets, short: "Water" },
+  { key: "soil", icon: Layers3, short: "Soil" },
+  { key: "vegetation", icon: Leaf, short: "Vegetation" },
+  { key: "climate", icon: CloudSun, short: "Climate" },
+  { key: "rotation", icon: Repeat, short: "Rotation" },
 ];
 
-export default function FieldSimulationPanel({
-  field,
-  state,
-  dim,
-  onDim,
-  idx,
-  minIndex,
-  maxIndex,
-  onDate,
-}: {
+const CONTROL_LABEL: Record<keyof typeof CONTROL_RANGES, string> = {
+  storageMm: "Root-zone water", surfaceVwc: "Moisture at 10 cm", deepVwc: "Moisture at 40 cm",
+  soilTempC: "Soil temperature", ecDsM: "Bulk EC", ndvi: "NDVI", rainMm: "Rain",
+  tmaxC: "Max air temperature", et0Mm: "Reference ET₀", dap: "Days after planting",
+};
+
+const OVERLAY = "pointer-events-auto rounded-xl border border-line bg-surface/92 shadow-pop backdrop-blur";
+
+export default function FieldSimulationPanel({ field, state, dim, onDim, idx, minIndex, maxIndex, onDate, dates, playback }: {
   field: Field;
   state: ModelState;
   dim: DimensionKey;
@@ -50,54 +46,24 @@ export default function FieldSimulationPanel({
   minIndex: number;
   maxIndex: number;
   onDate: (n: number) => void;
+  /** Observation dates, for the timeline labels */
+  dates: string[];
+  /** Season playback, shared with the page's date bar */
+  playback: SeasonPlayback;
 }) {
   const [preset, setPreset] = useState<SimulationPresetId>("record");
   const [overrides, setOverrides] = useState<SimulationOverrides>({});
-  const [follow, setFollow] = useState(true);
-  const [reset, setReset] = useState(0);
-  const [playing, setPlaying] = useState(false);
-  const [speed, setSpeed] = useState(1);
   const [expanded, setExpanded] = useState(false);
-
   const dialog = useRef<HTMLDialogElement>(null);
   const expandButton = useRef<HTMLButtonElement>(null);
-  const position = useRef(idx);
-  const lastStep = useRef<number | null>(null);
 
-  const view = useMemo(
-    () => buildFieldSceneState(field, state, preset, overrides),
-    [field, state, preset, overrides],
-  );
-
-  useEffect(() => {
-    position.current = idx;
-    if (lastStep.current !== idx) setPlaying(false);
-  }, [idx]);
-
-  useEffect(() => {
-    if (!playing) return;
-    const timer = setInterval(() => {
-      const next = position.current + 1;
-      if (next > maxIndex) {
-        setPlaying(false);
-        return;
-      }
-      position.current = next;
-      lastStep.current = next;
-      onDate(next);
-      if (next === maxIndex) setPlaying(false);
-    }, 1000 / speed);
-    return () => clearInterval(timer);
-  }, [playing, speed, maxIndex, onDate]);
+  const view = useMemo(() => buildFieldSceneState(field, state, preset, overrides), [field, state, preset, overrides]);
+  const callouts = useMemo(() => calloutsFor(dim, view), [dim, view]);
 
   useEffect(() => {
     const node = dialog.current;
-    if (expanded) {
-      node?.showModal();
-    }
-    return () => {
-      node?.close();
-    };
+    if (expanded) node?.showModal();
+    return () => node?.close();
   }, [expanded]);
 
   const close = () => {
@@ -106,266 +72,128 @@ export default function FieldSimulationPanel({
   };
 
   const content = (
-    <Card className="overflow-hidden p-4 sm:p-6">
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+    <Card className={clsx("overflow-hidden", expanded && "rounded-none border-0 shadow-none")}>
+      <div className="flex flex-wrap items-start justify-between gap-3 px-5 pb-3 pt-4">
         <div>
-          <h2 className="font-semibold">Field environment simulation</h2>
-          <SourceTag kind={view.provenance} />
-          <span className="ml-2 text-xs text-muted">
-            Illustrative view · {view.date}
-          </span>
+          <h2 className="flex items-center gap-1.5 text-base font-semibold text-ink">
+            Field environment
+            <InfoTip label="field environment">
+              An illustrative 3D view of this field driven by its record. Pick a part to see it: water turns the soil blue
+              and fills the cut faces to the root-zone storage; soil zooms into the cut face and its 10 cm and 40 cm probes;
+              vegetation grows and colours the crop by its stage and NDVI; climate shows rain or sun from the day&apos;s rain
+              gauge; rotation lays out past seasons. Plant size, weather and soil colours are not to scale.
+            </InfoTip>
+          </h2>
+          <p className="mt-0.5 flex flex-wrap items-center gap-x-2 text-xs text-muted">
+            {view.isSimulated ? <SourceTag kind="simulated" detail={PRESETS[preset].label} /> : <span>Field record · demo data</span>}
+            <span aria-hidden>·</span>
+            <span className="tabular">{longDate(view.date)}</span>
+            <span aria-hidden>·</span>
+            <span className="font-medium text-green-strong">{DIMENSION_LABEL[dim]}</span>
+          </p>
         </div>
-        <div className="flex gap-3">
-          <button
-            type="button"
-            onClick={() => {
-              setFollow(true);
-              setReset((n) => n + 1);
-            }}
-          >
-            Reset view
-          </button>
-          {expanded ? (
-            <button type="button" onClick={close}>
-              Close
+        <button ref={expanded ? undefined : expandButton} type="button" onClick={expanded ? close : () => { playback.stop(); setExpanded(true); }}
+          className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[13px] font-medium text-ink-soft hover:bg-sunken hover:text-ink">
+          {expanded ? <Minimize2 size={15} aria-hidden /> : <Maximize2 size={15} aria-hidden />}
+          {expanded ? "Close" : "Expand"}
+        </button>
+      </div>
+
+      <div className="relative border-y border-line">
+        <Scene state={view} dim={dim} callouts={callouts} tall={expanded} controls={expanded} />
+
+        {/* The page's dimension cards and date bar drive the scene; expanded, it carries its own */}
+        {expanded && <>
+        <div className="pointer-events-none absolute inset-x-0 top-0 flex justify-center p-3">
+          <div role="group" aria-label="Show part of the field" className={clsx(OVERLAY, "flex max-w-full gap-0.5 overflow-x-auto p-1")}>
+            {DIMS.map(({ key, icon: Icon, short }) => {
+              const on = key === dim;
+              return (
+                <button key={key} type="button" aria-pressed={on} onClick={() => onDim(key)} title={DIMENSION_LABEL[key]}
+                  className={clsx("inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-1.5 text-[13px] font-medium transition-colors",
+                    on ? "bg-green text-white" : "text-ink-soft hover:bg-sunken hover:text-ink")}>
+                  <Icon size={15} aria-hidden />
+                  <span className={clsx(!on && "max-sm:sr-only")}>{short}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Timeline */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 p-3">
+          <div className={clsx(OVERLAY, "mx-auto flex max-w-2xl items-center gap-3 px-3 py-2")}>
+            <button type="button" onClick={playback.toggle} aria-label={playback.playing ? "Pause season" : "Play season"}
+              className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-ink text-white hover:bg-green-strong">
+              {playback.playing ? <Pause size={14} aria-hidden /> : <Play size={14} className="ml-0.5" aria-hidden />}
             </button>
-          ) : (
-            <button
-              ref={expandButton}
-              type="button"
-              onClick={() => {
-                setPlaying(false);
-                setExpanded(true);
-              }}
-            >
-              Expand
+            <span className="tabular w-[52px] shrink-0 text-[13px] font-semibold text-ink">{shortDate(view.date)}</span>
+            <input aria-label="Simulation date" type="range" min={minIndex} max={maxIndex} value={idx}
+              aria-valuetext={longDate(view.date)} className="min-w-0 flex-1"
+              onChange={(e) => { playback.stop(); onDate(Number(e.target.value)); }} />
+            <span className="tabular hidden shrink-0 text-xs text-muted sm:inline">{shortDate(dates[maxIndex])}</span>
+            <button type="button" onClick={playback.cycleSpeed} aria-label={`Playback speed ${playback.speed}×`}
+              className="tabular shrink-0 rounded-md px-1.5 py-1 text-xs font-semibold text-ink-soft hover:bg-sunken">{playback.speed}×</button>
+          </div>
+        </div>
+        </>}
+      </div>
+
+      {/* For screen readers: what the scene shows */}
+      <ul className="sr-only" aria-live="polite">
+        {callouts.map((c) => <li key={c.id}>{c.label}: {c.value}{c.sub ? `, ${c.sub}` : ""}</li>)}
+      </ul>
+
+      <div className="space-y-3 px-5 py-4">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+          <span className="text-[13px] font-medium text-ink">Scenario</span>
+          <Segmented label="Scenario" value={preset} onChange={(id) => { setPreset(id); setOverrides({}); }}
+            options={(Object.keys(PRESETS) as SimulationPresetId[]).map((id) => ({ value: id, label: PRESETS[id].label }))} />
+          {view.isSimulated && (
+            <button type="button" onClick={() => { setPreset("record"); setOverrides({}); }} className="text-[13px] font-medium text-green hover:text-green-strong">
+              Back to field record
             </button>
           )}
         </div>
+        {view.isSimulated && <p className="text-xs text-muted">What-if values: not observations and not a forecast.</p>}
+        <Disclosure title="Adjust values">
+          <div className="grid gap-x-8 gap-y-4 pb-4 sm:grid-cols-2">
+            {(Object.keys(CONTROL_RANGES) as (keyof typeof CONTROL_RANGES)[]).map((k) => {
+              const [min, max, step, unit] = CONTROL_RANGES[k];
+              const value = k === "dap" ? view.crop.dap : Number(view.metrics[k] ?? min);
+              const top = k === "storageMm" ? view.metrics.capacityMm : max;
+              return (
+                <label key={k} className="block text-[13px]">
+                  <span className="flex justify-between gap-2">
+                    <span className="font-medium text-ink">{CONTROL_LABEL[k]}</span>
+                    <span className="tabular text-ink-soft">{Number(value.toFixed(step < 1 ? 2 : 0))} {unit}</span>
+                  </span>
+                  <input type="range" className="mt-1 w-full" min={min} max={top} step={step} value={value}
+                    onChange={(e) => setOverrides((o) => ({ ...o, [k]: Number(e.target.value) }))} />
+                </label>
+              );
+            })}
+            <label className="block text-[13px]">
+              <span className="font-medium text-ink">Crop</span>
+              <select className="mt-1 block w-full rounded-lg border border-line bg-surface px-2 py-1.5 text-[13px]" value={view.crop.id}
+                onChange={(e) => setOverrides((o) => ({ ...o, cropId: e.target.value as CropId }))}>
+                {CROP_LIST.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
+            </label>
+          </div>
+        </Disclosure>
       </div>
-
-      <div className="flex flex-wrap items-center gap-3 text-sm">
-        <label>
-          <input
-            type="checkbox"
-            checked={follow}
-            onChange={(e) => setFollow(e.target.checked)}
-          />{" "}
-          Auto-focus on selected tab
-        </label>
-        {DIMS.map((d) => (
-          <button
-            type="button"
-            key={d}
-            aria-pressed={dim === d}
-            onClick={() => {
-              onDim(d);
-              setFollow(true);
-              setReset((n) => n + 1);
-            }}
-            className="rounded border border-line px-2 py-1 capitalize"
-          >
-            {d}
-          </button>
-        ))}
-      </div>
-
-      <Scene state={view} activeDim={dim} follow={follow} reset={reset} />
-
-      <dl className="grid grid-cols-2 gap-2 rounded-lg bg-sunken p-3 text-sm sm:grid-cols-5">
-        <div>
-          <dt>Root-zone storage</dt>
-          <dd>{view.metrics.storageMm?.toFixed(0)} mm</dd>
-        </div>
-        <div>
-          <dt>Soil / bulk EC</dt>
-          <dd>
-            {view.metrics.soilTempC} °C / {view.metrics.ecDsM} dS/m
-          </dd>
-        </div>
-        <div>
-          <dt>NDVI / stage</dt>
-          <dd>
-            {view.metrics.ndvi ?? "Unavailable"} / {view.crop.stage}
-          </dd>
-        </div>
-        <div>
-          <dt>Rain / ET₀</dt>
-          <dd>
-            {view.metrics.rainMm} / {view.metrics.et0Mm} mm/day
-          </dd>
-        </div>
-        <div>
-          <dt>Crop</dt>
-          <dd>{view.crop.name}</dd>
-        </div>
-      </dl>
-
-      <p className="mt-2 text-xs text-muted">
-        Cutaway: 10 cm and 40 cm probes. Blue fill illustrates available
-        root-zone water storage. Rear strips show rotation history; green marks
-        legumes, amber marks repeated families. Crop size and weather are
-        illustrative.
-      </p>
-
-      {view.soil.salinityAlert !== "none" && (
-        <p className="mt-2 text-sm">
-          Elevated bulk EC: indicative EC/moisture stress signal; laboratory
-          salinity is unconfirmed.
-        </p>
-      )}
-      {view.crop.heatStress && (
-        <p className="text-sm">Indicative crop heat threshold exceeded.</p>
-      )}
-      {!view.isSimulated && (
-        <p className="mt-2 text-xs text-muted">
-          Field-record visualization: retain the source and demo notices on the
-          existing page. NDVI observation: {view.ndviDate ?? "unavailable"}.
-        </p>
-      )}
-
-      <div className="mt-4 flex flex-wrap items-center gap-3">
-        <button
-          type="button"
-          onClick={() => {
-            if (idx === maxIndex) {
-              lastStep.current = minIndex;
-              position.current = minIndex;
-              onDate(minIndex);
-            }
-            setPlaying((v) => !v);
-          }}
-        >
-          {playing ? "Pause" : "Play season"}
-        </button>
-        <label>
-          Speed{" "}
-          <select
-            value={speed}
-            onChange={(e) => setSpeed(Number(e.target.value))}
-          >
-            <option value={1}>1×</option>
-            <option value={3}>3×</option>
-          </select>
-        </label>
-        <label className="flex flex-1 items-center gap-2">
-          Date{" "}
-          <input
-            aria-label="Simulation date"
-            type="range"
-            min={minIndex}
-            max={maxIndex}
-            value={idx}
-            onChange={(e) => {
-              setPlaying(false);
-              onDate(Number(e.target.value));
-            }}
-            className="w-full"
-          />
-        </label>
-      </div>
-
-      <div
-        className="mt-4 flex flex-wrap gap-2"
-        aria-label="Simulation scenarios"
-      >
-        {(Object.keys(PRESETS) as SimulationPresetId[]).map((id) => (
-          <button
-            key={id}
-            type="button"
-            aria-pressed={preset === id}
-            className="rounded-lg border border-line px-3 py-2 text-sm"
-            onClick={() => {
-              setPreset(id);
-              setOverrides({});
-            }}
-          >
-            {PRESETS[id].label}
-          </button>
-        ))}
-      </div>
-
-      <details className="mt-4">
-        <summary>What-if metric controls</summary>
-        <div className="mt-3 grid gap-3 sm:grid-cols-2">
-          {Object.entries(CONTROL_RANGES).map(([key, r]) => {
-            const k = key as keyof typeof CONTROL_RANGES;
-            return (
-              <label key={key} className="text-sm">
-                {key}: {view.metrics[k as keyof typeof view.metrics] ?? view.crop.dap}{" "}
-                {r[3]}
-                <input
-                  className="block w-full"
-                  type="range"
-                  min={r[0]}
-                  max={k === "storageMm" ? view.metrics.capacityMm : r[1]}
-                  step={r[2]}
-                  value={
-                    k === "dap"
-                      ? view.crop.dap
-                      : Number(view.metrics[k as keyof typeof view.metrics] ?? r[0])
-                  }
-                  onChange={(e) =>
-                    setOverrides((o) => ({
-                      ...o,
-                      [key]: Number(e.target.value),
-                    }))
-                  }
-                />
-              </label>
-            );
-          })}
-          <label>
-            Crop
-            <select
-              className="ml-2"
-              value={view.crop.id}
-              onChange={(e) =>
-                setOverrides((o) => ({
-                  ...o,
-                  cropId: e.target.value as CropId,
-                }))
-              }
-            >
-              {Object.values(CROPS).map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-      </details>
-
-      {view.isSimulated && (
-        <button
-          type="button"
-          className="mt-4 text-sm font-medium text-green"
-          onClick={() => {
-            setPreset("record");
-            setOverrides({});
-          }}
-        >
-          Reset to field record
-        </button>
-      )}
     </Card>
   );
 
   return expanded
     ? createPortal(
-        <dialog
-          ref={dialog}
-          aria-label="Expanded field environment simulation"
-          className="fixed inset-0 m-auto max-h-[95vh] w-[96vw] max-w-none overflow-auto rounded-xl bg-surface p-0 text-ink backdrop:bg-black/50"
-          onCancel={(e) => {
-            e.preventDefault();
-            close();
-          }}
-        >
-          {content}
-        </dialog>,
-        document.body,
-      )
+      <dialog ref={dialog} aria-label="Field environment, expanded"
+        className="fixed inset-0 m-auto max-h-[96vh] w-[96vw] max-w-none overflow-auto rounded-xl bg-surface p-0 text-ink backdrop:bg-black/50"
+        onCancel={(e) => { e.preventDefault(); close(); }}>
+        {content}
+      </dialog>,
+      document.body,
+    )
     : content;
 }

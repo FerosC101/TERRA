@@ -73,7 +73,8 @@ export function Reports() {
   const open = report.discoveries.filter((d) => d.status !== "resolved");
   const q = report.quality;
   const extremes = q.issues.filter((i) => i.kind === "extreme");
-  const allDemo = report.sources.every((src) => src.integration === "demo");
+  // The live NASA map (smap-gibs) supplies pictures only, not values in this report
+  const allDemo = report.sources.every((src) => src.integration === "demo" || src.id === "smap-gibs");
   let n = 0;
 
   const measurements: { label: string; value: string; change: string; kind: "measurement" | "satellite" | "model"; date: string }[] = [

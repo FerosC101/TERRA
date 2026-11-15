@@ -3,6 +3,9 @@
 import * as maplibregl from "maplibre-gl";
 import { type ExpressionSpecification, type GeoJSONSource, type LngLatBoundsLike, type MapGeoJSONFeature, type StyleSpecification } from "maplibre-gl";
 import { useEffect, useRef, useState } from "react";
+import { applyBasemap, GLYPHS, vectorBaseLayers, type Basemap } from "./baseStyle";
+import type { GibsLayer } from "@/services/nasaGibsService";
+import { offset } from "@/data/fields";
 import { createIotLayer, hitsStation, probeAt, type IotScreen, type IotState } from "./iotLayer";
 import type { MoistureReading, NdviPixel } from "@/lib/demo/spatial";
 import { moistureColor, ndviColor } from "@/lib/mapColors";
@@ -15,7 +18,7 @@ import type { Field, LatLng } from "@/types";
  */
 maplibregl.setWorkerUrl("/maplibre/maplibre-gl-worker.mjs");
 
-export type Basemap = "satellite" | "street" | "schematic";
+export type { Basemap } from "./baseStyle";
 export type ViewMode = "2d" | "3d";
 export type OverlayKey = "boundary" | "station" | "moisture" | "anomalies" | "ndvi" | "smap";
 export type Selection =
@@ -39,6 +42,23 @@ interface Props {
   onTileError: () => void;
   /** Room taken by floating panels, so the field is framed in the visible part of the map */
   padding: { top: number; right: number; bottom: number; left: number };
+  /** Filled with camera controls for the page's own buttons */
+  apiRef?: React.RefObject<MapApi | null>;
+  /** Called as the camera turns or tilts, for the compass */
+  onCamera?: (c: { bearing: number; pitch: number }) => void;
+  /** NASA SMAP soil-moisture imagery for the "moisture" base map, once known */
+  nasaSmap?: GibsLayer | null;
+}
+
+/** Half-width of the regional view used for the NASA moisture map, so its 9 km cells show a pattern */
+const REGION_HALF_M = 25000;
+
+export interface MapApi {
+  zoomIn: () => void;
+  zoomOut: () => void;
+  resetNorth: () => void;
+  /** Frame the field (or the SMAP cell when that layer is on) again */
+  recenter: () => void;
 }
 
 /**
@@ -50,12 +70,11 @@ export const COLUMN_SCALE = { ndviPerUnit: 350, ndviBase: 0.2 };
 export const TERRAIN_EXAGGERATION = 2;
 
 const ESRI = "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
-const OSM = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
 const TERRAIN = "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png";
 const TERRAIN_ATTRIB = "Elevation: AWS Terrain Tiles (Mapzen/Tilezen; SRTM and others)";
-/** Open vector tiles (OpenMapTiles schema) from OpenFreeMap: free, no key. Used for OpenStreetMap 3D buildings. */
+/** Open vector tiles (OpenMapTiles schema) from OpenFreeMap: free, no key. Base map, labels and 3D buildings. */
 const OPENFREEMAP = "https://tiles.openfreemap.org/planet";
-const OSM_ATTRIB = "Buildings: © OpenStreetMap contributors, OpenMapTiles, OpenFreeMap";
+const OSM_ATTRIB = "© OpenStreetMap contributors, OpenMapTiles, OpenFreeMap";
 const SKY = {
   "sky-color": "#A9CDEB", "horizon-color": "#E8F0F4", "fog-color": "#EEF2F0",
   "sky-horizon-blend": 0.6, "horizon-fog-blend": 0.7, "fog-ground-blend": 0.35, "atmosphere-blend": 0.6,
@@ -91,9 +110,9 @@ function initialStyle(): StyleSpecification {
   const geo = (d: GeoJSON.FeatureCollection) => ({ type: "geojson" as const, data: d });
   return {
     version: 8,
+    glyphs: GLYPHS,
     sources: {
       imagery: { type: "raster", tiles: [ESRI], tileSize: 256, maxzoom: 18, attribution: "Imagery © Esri, Maxar, Earthstar Geographics (archive mosaic, not a live observation)" },
-      street: { type: "raster", tiles: [OSM], tileSize: 256, maxzoom: 19, attribution: "© OpenStreetMap contributors" },
       terrain: { type: "raster-dem", tiles: [TERRAIN], tileSize: 256, maxzoom: 15, encoding: "terrarium", attribution: TERRAIN_ATTRIB },
       shade: { type: "raster-dem", tiles: [TERRAIN], tileSize: 256, maxzoom: 15, encoding: "terrarium" },
       openmap: { type: "vector", url: OPENFREEMAP, attribution: OSM_ATTRIB },
@@ -102,7 +121,7 @@ function initialStyle(): StyleSpecification {
     layers: [
       { id: "background", type: "background", paint: { "background-color": "#EEF1EA" } },
       { id: "imagery", type: "raster", source: "imagery" },
-      { id: "street", type: "raster", source: "street", layout: { visibility: "none" } },
+      ...vectorBaseLayers(),
       { id: "hillshade", type: "hillshade", source: "shade", layout: { visibility: "none" }, paint: { "hillshade-shadow-color": "#183B2A", "hillshade-exaggeration": 0.35 } },
       // OpenStreetMap buildings, extruded to their mapped height (6 m where none is recorded)
       { id: "buildings-3d", type: "fill-extrusion", source: "openmap", "source-layer": "building", minzoom: 13, layout: { visibility: "none" },
@@ -180,14 +199,16 @@ function placeLabels(layer: HTMLDivElement | null, screen: IotScreen, state: Iot
 }
 
 export default function FieldMap(props: Props) {
-  const { field, basemap, mode, overlays, moisture, pixels, smapBounds, selection, onSelect, onTileError, padding } = props;
+  const { field, basemap, mode, overlays, moisture, pixels, smapBounds, selection, onSelect, onTileError, padding, apiRef, onCamera, nasaSmap } = props;
   const host = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
   const onSelectRef = useRef(onSelect);
   const onTileErrorRef = useRef(onTileError);
-  useEffect(() => { onSelectRef.current = onSelect; onTileErrorRef.current = onTileError; });
+  const onCameraRef = useRef(onCamera);
+  const frameRef = useRef(() => {});
+  useEffect(() => { onSelectRef.current = onSelect; onTileErrorRef.current = onTileError; onCameraRef.current = onCamera; });
   // Read by the 3D device layer (station and moisture beacons) on every frame
   const labelsRef = useRef<HTMLDivElement>(null);
   const screenRef = useRef<IotScreen>({ probes: {} });
@@ -224,8 +245,16 @@ export default function FieldMap(props: Props) {
     mapRef.current = map;
     // Development only: lets browser tests steer the camera
     if (process.env.NODE_ENV === "development") (window as unknown as { __terraMap?: maplibregl.Map }).__terraMap = map;
-    map.addControl(new maplibregl.NavigationControl({ visualizePitch: true, showCompass: true }), "bottom-right");
     map.addControl(new maplibregl.ScaleControl({ unit: "metric" }), "bottom-right");
+    const reduce = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (apiRef) apiRef.current = {
+      zoomIn: () => map.zoomIn({ duration: reduce() ? 0 : 300 }),
+      zoomOut: () => map.zoomOut({ duration: reduce() ? 0 : 300 }),
+      resetNorth: () => map.easeTo({ bearing: 0, duration: reduce() ? 0 : 500 }),
+      recenter: () => frameRef.current(),
+    };
+    map.on("rotate", () => onCameraRef.current?.({ bearing: map.getBearing(), pitch: map.getPitch() }));
+    map.on("pitch", () => onCameraRef.current?.({ bearing: map.getBearing(), pitch: map.getPitch() }));
 
     const popup = new maplibregl.Popup({ closeButton: false, closeOnClick: false, className: "terra-pop", offset: 12 });
     // Beacon names sit below the beacon's foot, so they never cover its value tag
@@ -275,9 +304,11 @@ export default function FieldMap(props: Props) {
     let tileErrorSent = false;
     map.on("error", (e) => {
       const source = (e as unknown as { sourceId?: string }).sourceId;
-      if (!tileErrorSent && (source === "imagery" || source === "street")) { tileErrorSent = true; onTileErrorRef.current(); }
+      if (!tileErrorSent && source === "imagery") { tileErrorSent = true; onTileErrorRef.current(); }
     });
     map.on("load", () => {
+      // Soft directional light, so 3D buildings read like a map app's
+      map.setLight({ anchor: "viewport", color: "#ffffff", intensity: 0.38, position: [1.2, 200, 35] });
       // Keep the attribution folded behind its "i" button so it never covers the legend
       host.current?.querySelector(".maplibregl-ctrl-attrib")?.classList.remove("maplibregl-compact-show");
       // The field station and the soil-moisture beacons, drawn in 3D on top of the map layers
@@ -289,7 +320,7 @@ export default function FieldMap(props: Props) {
     });
     const ro = new ResizeObserver(() => map.resize());
     ro.observe(host.current);
-    return () => { ro.disconnect(); popup.remove(); beaconPop.remove(); map.remove(); mapRef.current = null; };
+    return () => { ro.disconnect(); popup.remove(); beaconPop.remove(); map.remove(); mapRef.current = null; if (apiRef) apiRef.current = null; };
     // The map is created once; later prop changes are applied by the effects below.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -302,17 +333,34 @@ export default function FieldMap(props: Props) {
     (Object.keys(d) as (keyof typeof d)[]).forEach((k) => (map.getSource(k) as GeoJSONSource).setData(d[k]));
   }, [ready, field, moisture, pixels, smapBounds]);
 
+  // NASA SMAP imagery, added once its latest date is known
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !ready || !nasaSmap) return;
+    if (map.getLayer("nasa-smap")) map.removeLayer("nasa-smap");
+    if (map.getSource("nasa-smap")) map.removeSource("nasa-smap");
+    map.addSource("nasa-smap", {
+      type: "raster", tiles: [nasaSmap.tiles], tileSize: 256, maxzoom: nasaSmap.maxZoom,
+      attribution: `Soil moisture: NASA SMAP L4 (SPL4SMGP v8, doi:${nasaSmap.doi}), ${nasaSmap.date}, via NASA GIBS`,
+    });
+    // nearest-neighbour keeps the 9 km grid cells visible instead of blurring them
+    map.addLayer({ id: "nasa-smap", type: "raster", source: "nasa-smap", layout: { visibility: basemap === "moisture" ? "visible" : "none" },
+      paint: { "raster-opacity": 0.82, "raster-resampling": "nearest", "raster-fade-duration": 0 } }, "vb-road");
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- visibility is kept current by the base-map effect
+  }, [ready, nasaSmap]);
+
   // Base map, layers and 2D / 3D
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !ready) return;
     const three = mode === "3d";
     const show = (id: string, on: boolean) => map.setLayoutProperty(id, "visibility", on ? "visible" : "none");
-    show("imagery", basemap === "satellite");
-    show("street", basemap === "street");
+    applyBasemap(map, basemap);
     show("hillshade", three);
-    map.setPaintProperty("hillshade", "hillshade-exaggeration", basemap === "satellite" ? 0.25 : 0.4);
+    map.setPaintProperty("hillshade", "hillshade-exaggeration", basemap === "map" ? 0.4 : 0.25);
     show("buildings-3d", three);
+    // flat footprints in 2D, extruded buildings in 3D
+    show("vb-building", basemap === "map" && !three);
     show("smap-fill", overlays.smap); show("smap-line", overlays.smap);
     show("pixels-fill", overlays.ndvi && !three); show("pixels-line", overlays.ndvi && !three); show("pixels-3d", overlays.ndvi && three);
     show("boundary-fill", overlays.boundary); show("boundary-line", overlays.boundary);
@@ -322,7 +370,7 @@ export default function FieldMap(props: Props) {
     show("station", overlays.station);
 
     // Outlines change colour so they stay visible on dark imagery and on light maps
-    const onImagery = basemap === "satellite";
+    const onImagery = basemap !== "map";
     map.setPaintProperty("boundary-line", "line-color", onImagery ? "#8EE39F" : "#37864A");
     map.setPaintProperty("boundary-fill", "fill-color", onImagery ? "#8EE39F" : "#37864A");
     map.setPaintProperty("smap-line", "line-color", onImagery ? "#FFD27A" : "#9A6410");
@@ -354,12 +402,19 @@ export default function FieldMap(props: Props) {
 
   // Framing: the field, or the whole SMAP cell when that layer is on
   useEffect(() => {
-    const map = mapRef.current;
-    if (!map || !ready) return;
-    const target = overlays.smap ? [smapBounds[0], smapBounds[1]] : field.boundary;
-    map.fitBounds(boundsOf(target), { padding, pitch: mode === "3d" ? 64 : 0, bearing: mode === "3d" ? -24 : 0, duration: 700, maxZoom: 16.5 });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ready, field, overlays.smap, smapBounds]);
+    frameRef.current = () => {
+      const map = mapRef.current;
+      if (!map) return;
+      const target = basemap === "moisture"
+        ? [offset(field.center, -REGION_HALF_M, -REGION_HALF_M), offset(field.center, REGION_HALF_M, REGION_HALF_M)]
+        : overlays.smap ? [smapBounds[0], smapBounds[1]] : field.boundary;
+      map.fitBounds(boundsOf(target), { padding, pitch: mode === "3d" ? 64 : 0, bearing: mode === "3d" ? -24 : 0, duration: 700, maxZoom: 16.5 });
+    };
+  }, [field, overlays.smap, smapBounds, padding, mode, basemap]);
+  const regional = basemap === "moisture";
+  useEffect(() => {
+    if (ready) frameRef.current();
+  }, [ready, field, overlays.smap, smapBounds, regional]);
 
   if (failed) {
     return <div className="flex h-full items-center justify-center bg-sunken p-6 text-center text-sm text-muted">This browser cannot show the interactive map (WebGL is unavailable).</div>;

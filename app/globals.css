@@ -150,6 +150,43 @@ input[type="checkbox"] {
   border-radius: 50%;
   background: var(--dot);
 }
+/* Readouts that pop up inside the field environment scene */
+@keyframes terra-callout-in {
+  from { opacity: 0; transform: translateY(6px) scale(0.92); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes terra-callout-dot-in {
+  from { scale: 0; }
+  60% { scale: 1.5; }
+  to { scale: 1; }
+}
+@keyframes terra-callout-line-in {
+  from { stroke-opacity: 0; }
+  to { stroke-opacity: 0.55; }
+}
+.terra-callout {
+  transform-origin: bottom center;
+  animation: terra-callout-in 420ms cubic-bezier(0.2, 0.9, 0.3, 1.2) var(--d, 0ms) both;
+}
+.terra-callout-dot {
+  position: absolute;
+  left: -5px;
+  top: -5px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 2.5px solid var(--ink);
+  animation: terra-callout-dot-in 380ms ease-out var(--d, 0ms) both;
+}
+.terra-callout-line {
+  stroke: var(--ink);
+  animation: terra-callout-line-in 300ms ease-out var(--d, 0ms) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .terra-callout, .terra-callout-dot, .terra-callout-line { animation: none; }
+  .terra-callout-line { stroke-opacity: 0.55; }
+}
 .terra-beacon-tag.is-selected {
   background: var(--ink);
   border-color: var(--ink);

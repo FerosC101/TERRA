@@ -2,7 +2,7 @@
 
 import clsx from "clsx";
 import FieldSimulationPanel from "./FieldSimulationPanel";
-import { CloudSun, Droplets, Layers3, Leaf, Repeat } from "lucide-react";
+import { CloudSun, Droplets, Layers3, Leaf, Pause, Play, Repeat } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Card, Disclosure, ErrorState, Loading, PageHeader, Section, Segmented } from "@/components/ui";
 import { longDate, shortDate } from "@/lib/dates";
@@ -13,6 +13,7 @@ import { getNasaSnapshot } from "@/services/nasaDataService";
 import type { DimensionKey, FieldModel, NasaSnapshot } from "@/types";
 import { DIMENSION_LABEL, Relationships } from "./parts";
 import { ClimateSection, RotationSection, SoilSection, VegetationSection, WaterSection } from "./sections";
+import { useSeasonPlayback } from "./playback";
 import { headline, modelStateAt } from "./state";
 
 const DIMENSIONS: { key: DimensionKey; icon: typeof Droplets }[] = [
@@ -29,6 +30,9 @@ function Body({ model, snapshot }: { model: FieldModel; snapshot: NasaSnapshot |
   const [dim, setDim] = useState<DimensionKey>("water");
   const [idx, setIdx] = useState(obs.length - 1);
   const [span, setSpan] = useState<60 | 120 | 240>(120);
+  const dates = useMemo(() => obs.map((o) => o.date), [obs]);
+  const minIndex = Math.min(30, obs.length - 1);
+  const playback = useSeasonPlayback(idx, setIdx, minIndex, obs.length - 1);
 
   const state = useMemo(() => modelStateAt(field, model, idx, span), [field, model, idx, span]);
   const heads = headline(state);
@@ -53,9 +57,17 @@ function Body({ model, snapshot }: { model: FieldModel; snapshot: NasaSnapshot |
         </div>
 
         <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 rounded-xl bg-sunken px-4 py-3">
+          <span className="flex items-center gap-1">
+            <button type="button" onClick={playback.toggle} aria-label={playback.playing ? "Pause season" : "Play season"}
+              className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-ink text-white hover:bg-green-strong">
+              {playback.playing ? <Pause size={14} aria-hidden /> : <Play size={14} className="ml-0.5" aria-hidden />}
+            </button>
+            <button type="button" onClick={playback.cycleSpeed} aria-label={`Playback speed ${playback.speed}×`}
+              className="tabular rounded-md px-1.5 py-1 text-xs font-semibold text-ink-soft hover:bg-surface">{playback.speed}×</button>
+          </span>
           <label htmlFor="model-time" className="text-[13px] font-medium text-ink">Model as of <span className="tabular">{longDate(state.at.date)}</span></label>
-          <input id="model-time" type="range" min={30} max={obs.length - 1} value={idx} onChange={(e) => setIdx(Number(e.target.value))} className="min-w-[180px] flex-1" aria-valuetext={longDate(state.at.date)} />
-          <span className="tabular text-xs text-muted">{shortDate(obs[30].date)} to {shortDate(obs[obs.length - 1].date)}</span>
+          <input id="model-time" type="range" min={minIndex} max={obs.length - 1} value={idx} onChange={(e) => setIdx(Number(e.target.value))} className="min-w-[180px] flex-1" aria-valuetext={longDate(state.at.date)} />
+          <span className="tabular text-xs text-muted">{shortDate(obs[minIndex].date)} to {shortDate(obs[obs.length - 1].date)}</span>
           {!state.isLatest && <button type="button" onClick={() => setIdx(obs.length - 1)} className="text-[13px] font-medium text-green hover:text-green-strong">Back to latest</button>}
         </div>
       </div>
@@ -66,9 +78,11 @@ function Body({ model, snapshot }: { model: FieldModel; snapshot: NasaSnapshot |
         dim={dim}
         onDim={setDim}
         idx={idx}
-        minIndex={Math.min(30, obs.length - 1)}
+        minIndex={minIndex}
         maxIndex={obs.length - 1}
         onDate={setIdx}
+        dates={dates}
+        playback={playback}
       />
 
       <Card className="p-5 sm:p-7">
