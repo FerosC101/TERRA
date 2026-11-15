@@ -12,3 +12,10 @@ venv/
 # Ignore large raw global satellite granules (~2 GB) and machine-local cache index
 data/raw/
 data/metadata/retrieval_cache_index.json
+
+# External downloads: raw server files stay local (provenance and URLs are in each request.json and DATA-MANIFEST.md);
+# the derived CSVs and request/task records next to them are committed.
+data/external/*/raw/
+data/external/*/files/
+# Per-run console logs (kept locally only)
+data/run_logs/

@@ -1,0 +1,303 @@
+{
+ "submitted_at_utc": "2026-11-15T05:08:03Z",
+ "git_commit": "e5fa04a6cf0f3cf9a55fef5835fb1330565c295c",
+ "api": "https://appeears.earthdatacloud.nasa.gov/api/task",
+ "body": {
+  "task_type": "point",
+  "task_name": "terra_lipa_modis_ndvi_2001_2025",
+  "params": {
+   "dates": [
+    {
+     "startDate": "01-01-2001",
+     "endDate": "12-31-2025"
+    }
+   ],
+   "layers": [
+    {
+     "product": "MOD13Q1.061",
+     "layer": "_250m_16_days_NDVI"
+    },
+    {
+     "product": "MOD13Q1.061",
+     "layer": "_250m_16_days_VI_Quality"
+    },
+    {
+     "product": "MOD13Q1.061",
+     "layer": "_250m_16_days_pixel_reliability"
+    },
+    {
+     "product": "MYD13Q1.061",
+     "layer": "_250m_16_days_NDVI"
+    },
+    {
+     "product": "MYD13Q1.061",
+     "layer": "_250m_16_days_VI_Quality"
+    },
+    {
+     "product": "MYD13Q1.061",
+     "layer": "_250m_16_days_pixel_reliability"
+    }
+   ],
+   "coordinates": [
+    {
+     "id": "lipa_aoi_modis_px00",
+     "category": "lipa_cropland_001",
+     "latitude": 13.990625,
+     "longitude": 121.187706
+    },
+    {
+     "id": "lipa_aoi_modis_px01",
+     "category": "lipa_cropland_001",
+     "latitude": 13.990625,
+     "longitude": 121.189853
+    },
+    {
+     "id": "lipa_aoi_modis_px02",
+     "category": "lipa_cropland_001",
+     "latitude": 13.988542,
+     "longitude": 121.180167
+    },
+    {
+     "id": "lipa_aoi_modis_px03",
+     "category": "lipa_cropland_001",
+     "latitude": 13.988542,
+     "longitude": 121.182314
+    },
+    {
+     "id": "lipa_aoi_modis_px04",
+     "category": "lipa_cropland_001",
+     "latitude": 13.988542,
+     "longitude": 121.184461
+    },
+    {
+     "id": "lipa_aoi_modis_px05",
+     "category": "lipa_cropland_001",
+     "latitude": 13.988542,
+     "longitude": 121.186608
+    },
+    {
+     "id": "lipa_aoi_modis_px06",
+     "category": "lipa_cropland_001",
+     "latitude": 13.988542,
+     "longitude": 121.188755
+    },
+    {
+     "id": "lipa_aoi_modis_px07",
+     "category": "lipa_cropland_001",
+     "latitude": 13.988542,
+     "longitude": 121.190902
+    },
+    {
+     "id": "lipa_aoi_modis_px08",
+     "category": "lipa_cropland_001",
+     "latitude": 13.986458,
+     "longitude": 121.179069
+    },
+    {
+     "id": "lipa_aoi_modis_px09",
+     "category": "lipa_cropland_001",
+     "latitude": 13.986458,
+     "longitude": 121.181216
+    },
+    {
+     "id": "lipa_aoi_modis_px10",
+     "category": "lipa_cropland_001",
+     "latitude": 13.986458,
+     "longitude": 121.183363
+    },
+    {
+     "id": "lipa_aoi_modis_px11",
+     "category": "lipa_cropland_001",
+     "latitude": 13.986458,
+     "longitude": 121.18551
+    },
+    {
+     "id": "lipa_aoi_modis_px12",
+     "category": "lipa_cropland_001",
+     "latitude": 13.986458,
+     "longitude": 121.187657
+    },
+    {
+     "id": "lipa_aoi_modis_px13",
+     "category": "lipa_cropland_001",
+     "latitude": 13.986458,
+     "longitude": 121.189804
+    },
+    {
+     "id": "lipa_aoi_modis_px14",
+     "category": "lipa_cropland_001",
+     "latitude": 13.986458,
+     "longitude": 121.191951
+    },
+    {
+     "id": "lipa_aoi_modis_px15",
+     "category": "lipa_cropland_001",
+     "latitude": 13.984375,
+     "longitude": 121.180119
+    },
+    {
+     "id": "lipa_aoi_modis_px16",
+     "category": "lipa_cropland_001",
+     "latitude": 13.984375,
+     "longitude": 121.182266
+    },
+    {
+     "id": "lipa_aoi_modis_px17",
+     "category": "lipa_cropland_001",
+     "latitude": 13.984375,
+     "longitude": 121.184413
+    },
+    {
+     "id": "lipa_aoi_modis_px18",
+     "category": "lipa_cropland_001",
+     "latitude": 13.984375,
+     "longitude": 121.18656
+    },
+    {
+     "id": "lipa_aoi_modis_px19",
+     "category": "lipa_cropland_001",
+     "latitude": 13.984375,
+     "longitude": 121.188707
+    },
+    {
+     "id": "lipa_aoi_modis_px20",
+     "category": "lipa_cropland_001",
+     "latitude": 13.984375,
+     "longitude": 121.190854
+    },
+    {
+     "id": "lipa_aoi_modis_px21",
+     "category": "lipa_cropland_001",
+     "latitude": 13.984375,
+     "longitude": 121.193001
+    },
+    {
+     "id": "lipa_aoi_modis_px22",
+     "category": "lipa_cropland_001",
+     "latitude": 13.982292,
+     "longitude": 121.176875
+    },
+    {
+     "id": "lipa_aoi_modis_px23",
+     "category": "lipa_cropland_001",
+     "latitude": 13.982292,
+     "longitude": 121.179021
+    },
+    {
+     "id": "lipa_aoi_modis_px24",
+     "category": "lipa_cropland_001",
+     "latitude": 13.982292,
+     "longitude": 121.181168
+    },
+    {
+     "id": "lipa_aoi_modis_px25",
+     "category": "lipa_cropland_001",
+     "latitude": 13.982292,
+     "longitude": 121.183315
+    },
+    {
+     "id": "lipa_aoi_modis_px26",
+     "category": "lipa_cropland_001",
+     "latitude": 13.982292,
+     "longitude": 121.185462
+    },
+    {
+     "id": "lipa_aoi_modis_px27",
+     "category": "lipa_cropland_001",
+     "latitude": 13.982292,
+     "longitude": 121.187609
+    },
+    {
+     "id": "lipa_aoi_modis_px28",
+     "category": "lipa_cropland_001",
+     "latitude": 13.982292,
+     "longitude": 121.189756
+    },
+    {
+     "id": "lipa_aoi_modis_px29",
+     "category": "lipa_cropland_001",
+     "latitude": 13.982292,
+     "longitude": 121.191903
+    },
+    {
+     "id": "lipa_aoi_modis_px30",
+     "category": "lipa_cropland_001",
+     "latitude": 13.980208,
+     "longitude": 121.175778
+    },
+    {
+     "id": "lipa_aoi_modis_px31",
+     "category": "lipa_cropland_001",
+     "latitude": 13.980208,
+     "longitude": 121.177924
+    },
+    {
+     "id": "lipa_aoi_modis_px32",
+     "category": "lipa_cropland_001",
+     "latitude": 13.980208,
+     "longitude": 121.180071
+    },
+    {
+     "id": "lipa_aoi_modis_px33",
+     "category": "lipa_cropland_001",
+     "latitude": 13.980208,
+     "longitude": 121.182218
+    },
+    {
+     "id": "lipa_aoi_modis_px34",
+     "category": "lipa_cropland_001",
+     "latitude": 13.980208,
+     "longitude": 121.184365
+    },
+    {
+     "id": "lipa_aoi_modis_px35",
+     "category": "lipa_cropland_001",
+     "latitude": 13.980208,
+     "longitude": 121.186512
+    },
+    {
+     "id": "lipa_aoi_modis_px36",
+     "category": "lipa_cropland_001",
+     "latitude": 13.980208,
+     "longitude": 121.188659
+    },
+    {
+     "id": "lipa_aoi_modis_px37",
+     "category": "lipa_cropland_001",
+     "latitude": 13.978125,
+     "longitude": 121.176828
+    },
+    {
+     "id": "lipa_aoi_modis_px38",
+     "category": "lipa_cropland_001",
+     "latitude": 13.978125,
+     "longitude": 121.178974
+    },
+    {
+     "id": "lipa_aoi_modis_px39",
+     "category": "lipa_cropland_001",
+     "latitude": 13.978125,
+     "longitude": 121.181121
+    },
+    {
+     "id": "lipa_aoi_modis_px40",
+     "category": "lipa_cropland_001",
+     "latitude": 13.978125,
+     "longitude": 121.183268
+    },
+    {
+     "id": "lipa_aoi_modis_px41",
+     "category": "lipa_cropland_001",
+     "latitude": 13.976042,
+     "longitude": 121.177878
+    },
+    {
+     "id": "lipa_plot_a_centre",
+     "category": "lipa_plot_a",
+     "latitude": 13.9838,
+     "longitude": 121.1539
+    }
+   ]
+  }
+ }
+}

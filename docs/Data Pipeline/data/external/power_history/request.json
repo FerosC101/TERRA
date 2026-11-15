@@ -1,0 +1,34 @@
+{
+ "script": "scripts/fetch-power-history.py",
+ "run_at_utc": "2026-11-15T05:05:18Z",
+ "git_commit": "e5fa04a6cf0f3cf9a55fef5835fb1330565c295c",
+ "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR&community=AG&longitude=121.184648&latitude=13.983842&start=20010101&end=20231231&format=JSON",
+ "header": {
+  "title": "NASA/POWER Source Native Resolution Daily Data",
+  "api": {
+   "version": "v2.10.3",
+   "name": "POWER Daily API"
+  },
+  "sources": [
+   "MERRA2"
+  ],
+  "fill_value": -999.0,
+  "time_standard": "LST",
+  "start": "20010101",
+  "end": "20231231"
+ },
+ "geometry": {
+  "type": "Point",
+  "coordinates": [
+   121.185,
+   13.984,
+   162.3
+  ]
+ },
+ "units": {
+  "units": "mm/day",
+  "longname": "Precipitation Corrected"
+ },
+ "days": 8400,
+ "fill_days": 0
+}

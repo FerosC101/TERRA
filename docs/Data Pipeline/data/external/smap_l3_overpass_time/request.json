@@ -1,0 +1,10 @@
+{
+ "script": "scripts/fetch-smap-overpass-time.py",
+ "run_at_utc": "2026-11-14T22:00:46Z",
+ "git_commit": "e5fa04a6cf0f3cf9a55fef5835fb1330565c295c",
+ "product": "SPL3SMP_E V006 (NASA NSIDC DAAC)",
+ "variable": "tb_time_seconds / tb_time_seconds_pm: mean acquisition time of the brightness-temperature footprints in the cell, seconds since 2000-01-01T12:00:00 UTC (file attribute long_name)",
+ "cell_choice": "the cell nearest to the pipeline's recorded grid_center, in the pass group the pipeline used",
+ "subset_window": "same rows/cols as collectors/earthdata_client.build_smap_l3_opendap_subset_url",
+ "days": 353
+}

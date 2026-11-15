@@ -1,0 +1,433 @@
+{
+ "script": "scripts/process-hls-ndvi-plot-a.py",
+ "run_at_utc": "2026-11-15T04:27:18Z",
+ "git_commit": "e5fa04a6cf0f3cf9a55fef5835fb1330565c295c",
+ "plot": "docs\\Data Pipeline\\Lipa Plot A.geojson",
+ "plot_corners_utm51n": [
+  [
+   300506.5,
+   1546634.4
+  ],
+  [
+   300679.4,
+   1546633.0
+  ],
+  [
+   300680.6,
+   1546787.9
+  ],
+  [
+   300507.8,
+   1546789.3
+  ]
+ ],
+ "plot_pixels": 36,
+ "grid": [
+  300480.0,
+  1546800.0,
+  30.0,
+  30.0
+ ],
+ "clear_rule": "Fmask Cloud, Adjacent to cloud/shadow, Cloud shadow, Snow/ice, Water all 'No'; Aerosol level not 'High aerosol'",
+ "min_share": 0.5,
+ "ndvi": {
+  "scale": 0.0001,
+  "fill": -19999
+ },
+ "checks": {
+  "S30": {
+   "days_without_ndvi_file_but_clear_plot_pixels": 0
+  },
+  "L30": {
+   "days_without_ndvi_file_but_clear_plot_pixels": 0
+  }
+ },
+ "rows": 227,
+ "rows_with_plot_value": 13,
+ "fmask_lookups": {
+  "HLSS30": [
+   {
+    "Value": "64",
+    "Aerosol level": "Low aerosol",
+    "Water": "No",
+    "Snow/ice": "No",
+    "Cloud shadow": "No",
+    "Adjacent to cloud/shadow": "No",
+    "Cloud": "No",
+    "Cirrus / Reserved, but not used": "Reserved, but not used"
+   },
+   {
+    "Value": "66",
+    "Aerosol level": "Low aerosol",
+    "Water": "No",
+    "Snow/ice": "No",
+    "Cloud shadow": "No",
+    "Adjacent to cloud/shadow": "No",
+    "Cloud": "Yes",
+    "Cirrus / Reserved, but not used": "Reserved, but not used"
+   },
+   {
+    "Value": "68",
+    "Aerosol level": "Low aerosol",
+    "Water": "No",
+    "Snow/ice": "No",
+    "Cloud shadow": "No",
+    "Adjacent to cloud/shadow": "Yes",
+    "Cloud": "No",
+    "Cirrus / Reserved, but not used": "Reserved, but not used"
+   },
+   {
+    "Value": "72",
+    "Aerosol level": "Low aerosol",
+    "Water": "No",
+    "Snow/ice": "No",
+    "Cloud shadow": "Yes",
+    "Adjacent to cloud/shadow": "No",
+    "Cloud": "No",
+    "Cirrus / Reserved, but not used": "Reserved, but not used"
+   },
+   {
+    "Value": "76",
+    "Aerosol level": "Low aerosol",
+    "Water": "No",
+    "Snow/ice": "No",
+    "Cloud shadow": "Yes",
+    "Adjacent to cloud/shadow": "Yes",
+    "Cloud": "No",
+    "Cirrus / Reserved, but not used": "Reserved, but not used"
+   },
+   {
+    "Value": "80",
+    "Aerosol level": "Low aerosol",
+    "Water": "No",
+    "Snow/ice": "Yes",
+    "Cloud shadow": "No",
+    "Adjacent to cloud/shadow": "No",
+    "Cloud": "No",
+    "Cirrus / Reserved, but not used": "Reserved, but not used"
+   },
+   {
+    "Value": "128",
+    "Aerosol level": "Moderate aerosol",
+    "Water": "No",
+    "Snow/ice": "No",
+    "Cloud shadow": "No",
+    "Adjacent to cloud/shadow": "No",
+    "Cloud": "No",
+    "Cirrus / Reserved, but not used": "Reserved, but not used"
+   },
+   {
+    "Value": "130",
+    "Aerosol level": "Moderate aerosol",
+    "Water": "No",
+    "Snow/ice": "No",
+    "Cloud shadow": "No",
+    "Adjacent to cloud/shadow": "No",
+    "Cloud": "Yes",
+    "Cirrus / Reserved, but not used": "Reserved, but not used"
+   },
+   {
+    "Value": "132",
+    "Aerosol level": "Moderate aerosol",
+    "Water": "No",
+    "Snow/ice": "No",
+    "Cloud shadow": "No",
+    "Adjacent to cloud/shadow": "Yes",
+    "Cloud": "No",
+    "Cirrus / Reserved, but not used": "Reserved, but not used"
+   },
+   {
+    "Value": "134",
+    "Aerosol level": "Moderate aerosol",
+    "Water": "No",
+    "Snow/ice": "No",
+    "Cloud shadow": "No",
+    "Adjacent to cloud/shadow": "Yes",
+    "Cloud": "Yes",
+    "Cirrus / Reserved, but not used": "Reserved, but not used"
+   },
+   {
+    "Value": "136",
+    "Aerosol level": "Moderate aerosol",
+    "Water": "No",
+    "Snow/ice": "No",
+    "Cloud shadow": "Yes",
+    "Adjacent to cloud/shadow": "No",
+    "Cloud": "No",
+    "Cirrus / Reserved, but not used": "Reserved, but not used"
+   },
+   {
+    "Value": "140",
+    "Aerosol level": "Moderate aerosol",
+    "Water": "No",
+    "Snow/ice": "No",
+    "Cloud shadow": "Yes",
+    "Adjacent to cloud/shadow": "Yes",
+    "Cloud": "No",
+    "Cirrus / Reserved, but not used": "Reserved, but not used"
+   },
+   {
+    "Value": "192",
+    "Aerosol level": "High aerosol",
+    "Water": "No",
+    "Snow/ice": "No",
+    "Cloud shadow": "No",
+    "Adjacent to cloud/shadow": "No",
+    "Cloud": "No",
+    "Cirrus / Reserved, but not used": "Reserved, but not used"
+   },
+   {
+    "Value": "194",
+    "Aerosol level": "High aerosol",
+    "Water": "No",
+    "Snow/ice": "No",
+    "Cloud shadow": "No",
+    "Adjacent to cloud/shadow": "No",
+    "Cloud": "Yes",
+    "Cirrus / Reserved, but not used": "Reserved, but not used"
+   },
+   {
+    "Value": "196",
+    "Aerosol level": "High aerosol",
+    "Water": "No",
+    "Snow/ice": "No",
+    "Cloud shadow": "No",
+    "Adjacent to cloud/shadow": "Yes",
+    "Cloud": "No",
+    "Cirrus / Reserved, but not used": "Reserved, but not used"
+   },
+   {
+    "Value": "198",
+    "Aerosol level": "High aerosol",
+    "Water": "No",
+    "Snow/ice": "No",
+    "Cloud shadow": "No",
+    "Adjacent to cloud/shadow": "Yes",
+    "Cloud": "Yes",
+    "Cirrus / Reserved, but not used": "Reserved, but not used"
+   },
+   {
+    "Value": "200",
+    "Aerosol level": "High aerosol",
+    "Water": "No",
+    "Snow/ice": "No",
+    "Cloud shadow": "Yes",
+    "Adjacent to cloud/shadow": "No",
+    "Cloud": "No",
+    "Cirrus / Reserved, but not used": "Reserved, but not used"
+   },
+   {
+    "Value": "202",
+    "Aerosol level": "High aerosol",
+    "Water": "No",
+    "Snow/ice": "No",
+    "Cloud shadow": "Yes",
+    "Adjacent to cloud/shadow": "No",
+    "Cloud": "Yes",
+    "Cirrus / Reserved, but not used": "Reserved, but not used"
+   },
+   {
+    "Value": "204",
+    "Aerosol level": "High aerosol",
+    "Water": "No",
+    "Snow/ice": "No",
+    "Cloud shadow": "Yes",
+    "Adjacent to cloud/shadow": "Yes",
+    "Cloud": "No",
+    "Cirrus / Reserved, but not used": "Reserved, but not used"
+   },
+   {
+    "Value": "206",
+    "Aerosol level": "High aerosol",
+    "Water": "No",
+    "Snow/ice": "No",
+    "Cloud shadow": "Yes",
+    "Adjacent to cloud/shadow": "Yes",
+    "Cloud": "Yes",
+    "Cirrus / Reserved, but not used": "Reserved, but not used"
+   }
+  ],
+  "HLSL30": [
+   {
+    "Value": "64",
+    "Aerosol level": "Low aerosol",
+    "Water": "No",
+    "Snow/ice": "No",
+    "Cloud shadow": "No",
+    "Adjacent to cloud/shadow": "No",
+    "Cloud": "No",
+    "Cirrus / Reserved, but not used": "Reserved, but not used"
+   },
+   {
+    "Value": "66",
+    "Aerosol level": "Low aerosol",
+    "Water": "No",
+    "Snow/ice": "No",
+    "Cloud shadow": "No",
+    "Adjacent to cloud/shadow": "No",
+    "Cloud": "Yes",
+    "Cirrus / Reserved, but not used": "Reserved, but not used"
+   },
+   {
+    "Value": "68",
+    "Aerosol level": "Low aerosol",
+    "Water": "No",
+    "Snow/ice": "No",
+    "Cloud shadow": "No",
+    "Adjacent to cloud/shadow": "Yes",
+    "Cloud": "No",
+    "Cirrus / Reserved, but not used": "Reserved, but not used"
+   },
+   {
+    "Value": "70",
+    "Aerosol level": "Low aerosol",
+    "Water": "No",
+    "Snow/ice": "No",
+    "Cloud shadow": "No",
+    "Adjacent to cloud/shadow": "Yes",
+    "Cloud": "Yes",
+    "Cirrus / Reserved, but not used": "Reserved, but not used"
+   },
+   {
+    "Value": "128",
+    "Aerosol level": "Moderate aerosol",
+    "Water": "No",
+    "Snow/ice": "No",
+    "Cloud shadow": "No",
+    "Adjacent to cloud/shadow": "No",
+    "Cloud": "No",
+    "Cirrus / Reserved, but not used": "Reserved, but not used"
+   },
+   {
+    "Value": "130",
+    "Aerosol level": "Moderate aerosol",
+    "Water": "No",
+    "Snow/ice": "No",
+    "Cloud shadow": "No",
+    "Adjacent to cloud/shadow": "No",
+    "Cloud": "Yes",
+    "Cirrus / Reserved, but not used": "Reserved, but not used"
+   },
+   {
+    "Value": "132",
+    "Aerosol level": "Moderate aerosol",
+    "Water": "No",
+    "Snow/ice": "No",
+    "Cloud shadow": "No",
+    "Adjacent to cloud/shadow": "Yes",
+    "Cloud": "No",
+    "Cirrus / Reserved, but not used": "Reserved, but not used"
+   },
+   {
+    "Value": "134",
+    "Aerosol level": "Moderate aerosol",
+    "Water": "No",
+    "Snow/ice": "No",
+    "Cloud shadow": "No",
+    "Adjacent to cloud/shadow": "Yes",
+    "Cloud": "Yes",
+    "Cirrus / Reserved, but not used": "Reserved, but not used"
+   },
+   {
+    "Value": "136",
+    "Aerosol level": "Moderate aerosol",
+    "Water": "No",
+    "Snow/ice": "No",
+    "Cloud shadow": "Yes",
+    "Adjacent to cloud/shadow": "No",
+    "Cloud": "No",
+    "Cirrus / Reserved, but not used": "Reserved, but not used"
+   },
+   {
+    "Value": "138",
+    "Aerosol level": "Moderate aerosol",
+    "Water": "No",
+    "Snow/ice": "No",
+    "Cloud shadow": "Yes",
+    "Adjacent to cloud/shadow": "No",
+    "Cloud": "Yes",
+    "Cirrus / Reserved, but not used": "Reserved, but not used"
+   },
+   {
+    "Value": "140",
+    "Aerosol level": "Moderate aerosol",
+    "Water": "No",
+    "Snow/ice": "No",
+    "Cloud shadow": "Yes",
+    "Adjacent to cloud/shadow": "Yes",
+    "Cloud": "No",
+    "Cirrus / Reserved, but not used": "Reserved, but not used"
+   },
+   {
+    "Value": "192",
+    "Aerosol level": "High aerosol",
+    "Water": "No",
+    "Snow/ice": "No",
+    "Cloud shadow": "No",
+    "Adjacent to cloud/shadow": "No",
+    "Cloud": "No",
+    "Cirrus / Reserved, but not used": "Reserved, but not used"
+   },
+   {
+    "Value": "194",
+    "Aerosol level": "High aerosol",
+    "Water": "No",
+    "Snow/ice": "No",
+    "Cloud shadow": "No",
+    "Adjacent to cloud/shadow": "No",
+    "Cloud": "Yes",
+    "Cirrus / Reserved, but not used": "Reserved, but not used"
+   },
+   {
+    "Value": "196",
+    "Aerosol level": "High aerosol",
+    "Water": "No",
+    "Snow/ice": "No",
+    "Cloud shadow": "No",
+    "Adjacent to cloud/shadow": "Yes",
+    "Cloud": "No",
+    "Cirrus / Reserved, but not used": "Reserved, but not used"
+   },
+   {
+    "Value": "198",
+    "Aerosol level": "High aerosol",
+    "Water": "No",
+    "Snow/ice": "No",
+    "Cloud shadow": "No",
+    "Adjacent to cloud/shadow": "Yes",
+    "Cloud": "Yes",
+    "Cirrus / Reserved, but not used": "Reserved, but not used"
+   },
+   {
+    "Value": "200",
+    "Aerosol level": "High aerosol",
+    "Water": "No",
+    "Snow/ice": "No",
+    "Cloud shadow": "Yes",
+    "Adjacent to cloud/shadow": "No",
+    "Cloud": "No",
+    "Cirrus / Reserved, but not used": "Reserved, but not used"
+   },
+   {
+    "Value": "202",
+    "Aerosol level": "High aerosol",
+    "Water": "No",
+    "Snow/ice": "No",
+    "Cloud shadow": "Yes",
+    "Adjacent to cloud/shadow": "No",
+    "Cloud": "Yes",
+    "Cirrus / Reserved, but not used": "Reserved, but not used"
+   },
+   {
+    "Value": "204",
+    "Aerosol level": "High aerosol",
+    "Water": "No",
+    "Snow/ice": "No",
+    "Cloud shadow": "Yes",
+    "Adjacent to cloud/shadow": "Yes",
+    "Cloud": "No",
+    "Cirrus / Reserved, but not used": "Reserved, but not used"
+   }
+  ]
+ }
+}

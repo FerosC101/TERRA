@@ -1,0 +1,19 @@
+{
+ "script": "scripts/process-smap-l4-lipa.py",
+ "run_at_utc": "2026-11-15T05:38:58Z",
+ "git_commit": "e5fa04a6cf0f3cf9a55fef5835fb1330565c295c",
+ "source_csv": "docs\\Data Pipeline\\data\\external\\smap_l4\\files\\terra-lipa-smap-l4-2024-2025-SPL4SMGP-008-results.csv",
+ "rows_in": 5848,
+ "ease_grid_cell_line_sample": [
+  "615.0",
+  "3226.0"
+ ],
+ "day_rule": "Asia/Manila date of the HH:30 UTC stamp (taken as window centre, UNVERIFIED); mean only with all 8 values",
+ "valid_range_m3_m3": [
+  0.0,
+  0.9
+ ],
+ "fill": -9999.0,
+ "days_out": 732,
+ "days_with_both_means": 730
+}
