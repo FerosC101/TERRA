@@ -9,6 +9,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { LogoMark } from "@/components/brand/Logo";
 import { LogoLoader } from "@/components/brand/LogoLoader";
+import { ModelResults, Technology } from "./Technical";
 
 const StationModel = dynamic(() => import("@/components/three/StationModel"), {
   ssr: false,
@@ -19,7 +20,10 @@ const NAV = [
   { href: "#problem", label: "Problem" },
   { href: "#solution", label: "Solution" },
   { href: "#features", label: "Features" },
+  { href: "#device", label: "Device" },
   { href: "#how", label: "How it works" },
+  { href: "#technology", label: "Technology" },
+  { href: "#results", label: "Results" },
 ];
 
 /** Fade sections up as they scroll into view. */
@@ -129,8 +133,8 @@ export function Landing() {
               <Link href="/overview" className="inline-flex items-center gap-2 rounded-xl bg-green px-5 py-3 text-[15px] font-medium text-white shadow-card hover:bg-green-strong">
                 Explore the demo field <ArrowRight size={16} aria-hidden />
               </Link>
-              <a href="#how" className="inline-flex items-center gap-2 rounded-xl border border-line bg-surface px-5 py-3 text-[15px] font-medium text-ink hover:border-line-strong">
-                How it works
+              <a href="#results" className="inline-flex items-center gap-2 rounded-xl border border-line bg-surface px-5 py-3 text-[15px] font-medium text-ink hover:border-line-strong">
+                See the results
               </a>
             </div>
           </div>
@@ -217,8 +221,28 @@ export function Landing() {
           </div>
         </section>
 
+        {/* Device: the field station, after the software */}
+        <section id="device" className="scroll-mt-20 border-y border-line bg-surface py-24 sm:py-28">
+          <div className="mx-auto grid max-w-6xl items-center gap-12 px-5 sm:px-8 lg:grid-cols-2">
+            <div className="terra-reveal relative h-[380px] overflow-hidden rounded-3xl border border-line bg-gradient-to-b from-green-soft to-surface shadow-card sm:h-[440px]">
+              <StationModel className="absolute inset-0" />
+              <p className="pointer-events-none absolute left-4 top-4 flex items-center gap-1.5 text-xs text-muted"><Hand size={13} aria-hidden /> Drag to rotate</p>
+            </div>
+            <div>
+              <SectionHead eyebrow="The device" title="A station in the field keeps the satellites honest."
+                lead="Satellites see a whole landscape. The TERRA station measures the soil where the crop actually grows, so the two can be compared." />
+              <ul className="terra-reveal mt-7 grid gap-3 text-[15px] text-ink-soft sm:grid-cols-2">
+                {["Soil moisture at 10 cm", "Soil moisture at 40 cm", "Soil temperature", "Bulk electrical conductivity", "Rainfall (tipping bucket)", "Solar powered"].map((t) => (
+                  <li key={t} className="flex items-center gap-2.5"><span className="h-1.5 w-1.5 rounded-full bg-green" aria-hidden />{t}</li>
+                ))}
+              </ul>
+              <p className="terra-reveal mt-6 text-[13px] text-muted">Prototype hardware. In this demonstration build, station readings are simulated.</p>
+            </div>
+          </div>
+        </section>
+
         {/* How it works */}
-        <section id="how" className="scroll-mt-20 border-y border-line bg-surface py-24 sm:py-28">
+        <section id="how" className="scroll-mt-20 py-24 sm:py-28">
           <div className="mx-auto max-w-6xl px-5 sm:px-8">
             <SectionHead eyebrow="How it works" title="A simple loop, every season." center
               lead="Observe, Discover, Investigate, Understand, Experiment, Adapt." />
@@ -239,25 +263,8 @@ export function Landing() {
           </div>
         </section>
 
-        {/* Station */}
-        <section className="py-24 sm:py-28">
-          <div className="mx-auto grid max-w-6xl items-center gap-12 px-5 sm:px-8 lg:grid-cols-2">
-            <div className="terra-reveal relative h-[380px] overflow-hidden rounded-3xl border border-line bg-gradient-to-b from-green-soft to-surface shadow-card sm:h-[440px]">
-              <StationModel className="absolute inset-0" />
-              <p className="pointer-events-none absolute left-4 top-4 flex items-center gap-1.5 text-xs text-muted"><Hand size={13} aria-hidden /> Drag to rotate</p>
-            </div>
-            <div>
-              <SectionHead eyebrow="Ground truth" title="A station in the field keeps the satellites honest."
-                lead="Satellites see a whole landscape. The TERRA station measures the soil where the crop actually grows, so the two can be compared." />
-              <ul className="terra-reveal mt-7 grid gap-3 text-[15px] text-ink-soft sm:grid-cols-2">
-                {["Soil moisture at 10 cm", "Soil moisture at 40 cm", "Soil temperature", "Bulk electrical conductivity", "Rainfall (tipping bucket)", "Solar powered"].map((t) => (
-                  <li key={t} className="flex items-center gap-2.5"><span className="h-1.5 w-1.5 rounded-full bg-green" aria-hidden />{t}</li>
-                ))}
-              </ul>
-              <p className="terra-reveal mt-6 text-[13px] text-muted">Prototype hardware. In this demonstration build, station readings are simulated.</p>
-            </div>
-          </div>
-        </section>
+        <Technology />
+        <ModelResults />
 
         {/* Call to action */}
         <section className="mx-auto max-w-6xl px-5 pb-24 sm:px-8">
