@@ -4,7 +4,7 @@ import { CATEGORICAL } from "@/lib/chartTheme";
 import { fmt, pct } from "@/lib/format";
 import { useApp } from "@/lib/store";
 import { useService } from "@/lib/useService";
-import { evaluateRotations } from "@/services/rotationService";
+import { evaluateRotations, type Evaluation } from "@/services/rotationService";
 import type { RotationEvaluation, RotationIndicators, RotationPlan, Scenario } from "@/types";
 
 export function planColor(plan: RotationPlan): string {
@@ -15,7 +15,7 @@ export function planColor(plan: RotationPlan): string {
 export function useEvaluations(plans: RotationPlan[], scenario: Scenario) {
   const { field, settings, priorities } = useApp();
   const req = { fieldId: field.id, plans, settings, priorities, scenario };
-  return useService<RotationEvaluation[]>(JSON.stringify(req), () => evaluateRotations(req));
+  return useService<Evaluation[]>(JSON.stringify(req), () => evaluateRotations(req));
 }
 
 export type CriterionGroup = "Water" | "Crop diversity" | "Soil cover" | "Nutrient management" | "Climate exposure";

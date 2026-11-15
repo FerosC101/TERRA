@@ -1,34 +1,35 @@
-import { CROPS } from "@/data/crops";
 import { DEKADS_BY_FIELD } from "@/data/nasa/lipaDekads";
-import { evaluateRotation, rotationRisk } from "@/lib/science/waterBalance";
+import { evaluateRotation, rotationRisk, type RotationRisk } from "@/lib/science/waterBalance";
 import type { EvaluateRequest, RotationEvaluation } from "@/types";
 import { request } from "./apiClient";
 import { mockField } from "./fieldSensorService";
 
+/** Historical-years result (D-014) for one plan: per season, how often it ran short across real past years. */
+export interface RealYears extends RotationRisk {
+  /** Where the ten-day rain comes from. */
+  source: string;
+}
+
+/** A rotation evaluation plus, for fields with real ten-day rain under historical conditions, its real-years result. */
+export type Evaluation = RotationEvaluation & { realYears?: RealYears };
+
 /**
  * Rotation evaluations. For a field with real ten-day rain (DEKADS_BY_FIELD, D-014), the historical-conditions
- * run also reports, per season, how often the rotation ran short of water across real past years: the
- * average-climate run cannot show dry years.
+ * run also carries the real-years result: the average-climate run cannot show dry years.
  */
-export function mockEvaluate(req: EvaluateRequest): RotationEvaluation[] {
+export function mockEvaluate(req: EvaluateRequest): Evaluation[] {
   const field = mockField(req.fieldId);
   const dekads = DEKADS_BY_FIELD[field.id];
   return req.plans.map((plan) => {
     const ev = evaluateRotation(plan, field, req.settings, req.priorities, req.scenario);
     if (!dekads || req.scenario.id !== "historical") return ev;
     const risk = rotationRisk(plan, field, req.settings, req.priorities, dekads);
-    const n = risk.startYears.length;
-    if (n === 0) return ev;
-    const span = `${risk.startYears[0]}–${risk.startYears[n - 1] + 1}`;
-    const short = risk.seasons.filter((s) => s.yearsShort > 0);
-    const notes = short.length
-      ? short.map((s) => `Real rain ${span} (NASA POWER): season ${s.index + 1} (${CROPS[s.cropId].name}, ${s.windowLabel}) ran short of water in ${s.yearsShort} of ${n} years; in the driest 20 % of years by ${s.dry20DeficitMm} mm or more.`)
-      : [`Real rain ${span} (NASA POWER): no season of this rotation ran short of water in any of ${n} years.`];
-    return { ...ev, notes: [...ev.notes, ...notes] };
+    if (risk.startYears.length === 0) return ev;
+    return { ...ev, realYears: { ...risk, source: "NASA POWER daily rain (model, ~50 km), summed to ten-day totals" } };
   });
 }
 
 /** POST /api/rotations/evaluate */
-export function evaluateRotations(req: EvaluateRequest): Promise<RotationEvaluation[]> {
+export function evaluateRotations(req: EvaluateRequest): Promise<Evaluation[]> {
   return request("/api/rotations/evaluate", () => mockEvaluate(req), { method: "POST", body: JSON.stringify(req) });
 }

@@ -10,6 +10,7 @@ import { InfoTip } from "@/components/visual/InfoTip";
 import { CROPS } from "@/data/crops";
 import { SERIES } from "@/lib/chartTheme";
 import { pct } from "@/lib/format";
+import type { Evaluation } from "@/services/rotationService";
 import type { Provenance, RotationEvaluation, RotationPlan } from "@/types";
 import { BETTER_HINT, CRITERIA, planColor, tradeoffs, type CriterionGroup } from "./shared";
 
@@ -165,4 +166,53 @@ function SeasonTable({ plans, evaluations }: Props) {
   );
 }
 
-export { SeasonTable, WaterCharts };
+/**
+ * Historical-years mode (D-014): each compared plan run once per real start year on ten-day rain, so dry years show.
+ * Renders nothing when no plan has a real-years result (fields without real ten-day rain, or a climate scenario).
+ */
+function RealYearsTable({ plans, evaluations }: { plans: RotationPlan[]; evaluations: Evaluation[] }) {
+  const rows = plans.flatMap((p, i) => {
+    const ry = evaluations[i]?.realYears;
+    return ry ? [{ plan: p, ry }] : [];
+  });
+  if (rows.length === 0) return null;
+  const first = rows[0].ry;
+  const n = first.startYears.length;
+  const starts = `${first.startYears[0]}–${first.startYears[n - 1]}`;
+  const cell = "border-b border-line px-3 py-2.5 first:pl-0";
+  return (
+    <div>
+      <p className="mb-3 max-w-3xl text-[13px] leading-relaxed text-ink-soft">
+        Each plan run once for every start year {starts} ({n} runs, the last one ending in {first.startYears[n - 1] + 1}) on real rain: {first.source}. ET0 and temperature
+        stay monthly averages. A season &ldquo;ran short&rdquo; when the soil could not meet its whole water demand.
+      </p>
+      <div className="overflow-x-auto">
+        <table className={`${TABLE} tabular min-w-[680px] text-[13px]`}>
+          <thead>
+            <tr>{["Rotation", "Season", "Crop", "Period", "Years short of water", "Median shortfall", "Shortfall in the driest 20 % of years"].map((h) => <th key={h} className={clsx(cell, "text-left font-medium text-muted")}>{h}</th>)}</tr>
+          </thead>
+          <tbody>
+            {rows.flatMap(({ plan, ry }) => ry.seasons.map((s) => {
+              const fallow = s.cropId === "fallow";
+              const n = ry.startYears.length;
+              return (
+                <tr key={`${plan.id}-${s.index}`} className="text-ink-soft">
+                  <td className={cell}>{s.index === 0 && <span className="inline-flex items-center gap-2 font-medium text-ink"><Swatch color={planColor(plan)} />{plan.name}</span>}</td>
+                  <td className={cell}>{s.index + 1}</td>
+                  <td className={clsx(cell, "font-medium text-ink")}>{CROPS[s.cropId].name}</td>
+                  <td className={cell}>{s.windowLabel}</td>
+                  <td className={cell}>{fallow ? "Not applicable" : `${s.yearsShort} of ${n}`}</td>
+                  <td className={cell}>{fallow ? "Not applicable" : `${s.medianDeficitMm} mm`}</td>
+                  <td className={cell}>{fallow ? "Not applicable" : `${s.dry20DeficitMm} mm${s.dry20DeficitMm > 0 ? " or more" : ""}`}</td>
+                </tr>
+              );
+            }))}
+          </tbody>
+        </table>
+      </div>
+      <p className="mt-3 text-[13px] text-muted">Model estimates on real NASA POWER rain. Not a yield forecast.</p>
+    </div>
+  );
+}
+
+export { RealYearsTable, SeasonTable, WaterCharts };

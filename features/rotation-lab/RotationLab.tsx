@@ -9,7 +9,7 @@ import { MONTH_NAMES } from "@/lib/dates";
 import { fmt } from "@/lib/format";
 import { useApp } from "@/lib/store";
 import { Assumptions } from "./Assumptions";
-import { CriteriaTable, SeasonTable, Tradeoffs, WaterCharts } from "./Comparison";
+import { CriteriaTable, RealYearsTable, SeasonTable, Tradeoffs, WaterCharts } from "./Comparison";
 import { Priorities } from "./Priorities";
 import { RotationBuilder } from "./RotationBuilder";
 import { useEvaluations } from "./shared";
@@ -21,6 +21,8 @@ export function RotationLab() {
   const compared = plans.filter((p) => p.compare && evaluations.some((e) => e.planId === p.id));
   const comparedEvals = compared.map((p) => evaluations.find((e) => e.planId === p.id)!);
   const annualRain = field.climate.rainMm.reduce((a, b) => a + b, 0);
+  const realYears = comparedEvals.find((e) => e.realYears)?.realYears;
+  const realSpan = realYears ? `${realYears.startYears[0]}–${realYears.startYears[realYears.startYears.length - 1] + 1}` : null;
 
   return (
     <div>
@@ -51,7 +53,7 @@ export function RotationLab() {
           <RotationBuilder evaluations={evaluations} />
         </Section>
 
-        <Section title="2. Compare the plans" description={`${compared.length} of ${plans.length} plans · average historical climate`}
+        <Section title="2. Compare the plans" description={`${compared.length} of ${plans.length} plans · average climate${realSpan ? ` and real years ${realSpan}` : ""}`}
           info={`Model estimates from ${field.climate.basis === "retrieved" ? "the NASA POWER climatology for this area" : "an illustrative climatology"} and typical crop parameters. They compare plans with each other; they are not yield forecasts.`}
           actions={<Link href="/future-earth" className={LINK}>Test these under climate scenarios <ArrowRight size={15} aria-hidden /></Link>}>
           {all.error ? <ErrorState message={all.error} /> : !all.data ? <Loading label="Evaluating rotations" /> : compared.length === 0 ? (
@@ -68,9 +70,15 @@ export function RotationLab() {
                 <CriteriaTable plans={compared} evaluations={comparedEvals} />
               </div>
               <div>
-                <h3 className="mb-3 text-[15px] font-semibold text-ink">Season by season</h3>
+                <h3 className="mb-3 text-[15px] font-semibold text-ink">Season by season{realSpan ? ", average climate" : ""}</h3>
                 <SeasonTable plans={compared} evaluations={comparedEvals} />
               </div>
+              {realSpan && (
+                <div>
+                  <h3 className="mb-1 flex items-center gap-1.5 text-[15px] font-semibold text-ink">How often each season ran short in real years, {realSpan}<InfoTip label="real years">Average monthly climate can hide dry years. Running each plan through every real year shows how often a season runs short, and by how much in the driest years (D-014).</InfoTip></h3>
+                  <RealYearsTable plans={compared} evaluations={comparedEvals} />
+                </div>
+              )}
             </div>
           )}
         </Section>
@@ -80,7 +88,7 @@ export function RotationLab() {
         </Section>
 
         <Section title="Methods and assumptions">
-          <Assumptions field={field} />
+          <Assumptions field={field} realSpan={realSpan} />
         </Section>
       </div>
     </div>

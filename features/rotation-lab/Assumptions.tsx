@@ -7,7 +7,7 @@ import type { Field } from "@/types";
 const TERM = "font-medium text-ink";
 const CODE = "rounded bg-sunken px-1.5 py-0.5 font-mono text-[13px] text-ink";
 
-export function Assumptions({ field }: { field: Field }) {
+export function Assumptions({ field, realSpan }: { field: Field; realSpan?: string | null }) {
   const cap = field.soil.awcMmPerM * field.soil.profileDepthM;
   return (
     <div className="max-w-4xl">
@@ -21,6 +21,7 @@ export function Assumptions({ field }: { field: Field }) {
           <li>Water stress: crop use falls linearly once soil water drops below the crop&apos;s depletion fraction p.</li>
           <li>Between crops and during fallow, bare-soil evaporation uses Kc = {ASSUMPTIONS.bareSoilKc}.</li>
           <li>Rain-fed only. Irrigation is not modelled.</li>
+          {realSpan && <li>Real years ({realSpan}): the same model is run once per start year with that year&apos;s ten-day rain from NASA POWER (model, ~50 km grid), in place of the monthly average. ET0 and temperature stay monthly averages.</li>}
         </ul>
       </Disclosure>
       <Disclosure title="How diversity, cover, nutrients and heat are assessed">
