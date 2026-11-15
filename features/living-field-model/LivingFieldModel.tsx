@@ -1,6 +1,7 @@
 "use client";
 
 import clsx from "clsx";
+import FieldSimulationPanel from "./FieldSimulationPanel";
 import { CloudSun, Droplets, Layers3, Leaf, Repeat } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Card, Disclosure, ErrorState, Loading, PageHeader, Section, Segmented } from "@/components/ui";
@@ -58,6 +59,17 @@ function Body({ model, snapshot }: { model: FieldModel; snapshot: NasaSnapshot |
           {!state.isLatest && <button type="button" onClick={() => setIdx(obs.length - 1)} className="text-[13px] font-medium text-green hover:text-green-strong">Back to latest</button>}
         </div>
       </div>
+
+      <FieldSimulationPanel
+        field={field}
+        state={state}
+        dim={dim}
+        onDim={setDim}
+        idx={idx}
+        minIndex={Math.min(30, obs.length - 1)}
+        maxIndex={obs.length - 1}
+        onDate={setIdx}
+      />
 
       <Card className="p-5 sm:p-7">
         <div id="dimension-panel" role="tabpanel" aria-label={DIMENSION_LABEL[dim]}>
