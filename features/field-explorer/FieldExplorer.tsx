@@ -6,7 +6,7 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { COLUMN_SCALE, TERRAIN_EXAGGERATION, type Basemap, type OverlayKey, type Selection, type ViewMode } from "@/components/maps/FieldMap";
-import { STATION_MODEL_SCALE } from "@/components/maps/stationLayer";
+import { BEACON_FULL_VWC, STATION_MODEL_SCALE } from "@/components/maps/iotLayer";
 import { DetailRow, ErrorState, LINK, Loading, Segmented, SourceTag } from "@/components/ui";
 import { InfoTip } from "@/components/visual/InfoTip";
 import { ndviPixels, probeReadings, smapCell } from "@/lib/demo/spatial";
@@ -210,7 +210,18 @@ export function FieldExplorer() {
                 <InfoTip label="station model">The field station is drawn as its 3D model at its real position, enlarged {STATION_MODEL_SCALE} times so it can be seen at field scale. The real pod is about 1.2 m tall. Select it to see its readings.</InfoTip>
               </li>
             )}
-            {overlays.moisture && <li className="inline-flex items-center gap-1.5">Soil moisture <Ramp colors={MOISTURE_RAMP} range={MOISTURE_RANGE} unit=" %" /></li>}
+            {overlays.moisture && (
+              <li className="inline-flex items-center gap-1.5">
+                Soil moisture <Ramp colors={MOISTURE_RAMP} range={MOISTURE_RANGE} unit=" %" />
+                {three && (
+                  <InfoTip label="moisture beacons">
+                    Each probe point is a beacon: a stake where the reading was taken, a droplet filled to the measured moisture
+                    (full at {BEACON_FULL_VWC} %), a ground ring that widens with it, and the value on its tag. The beacon&apos;s height
+                    does not encode anything. Select one to see its reading.
+                  </InfoTip>
+                )}
+              </li>
+            )}
             {overlays.ndvi && <li className="inline-flex items-center gap-1.5">NDVI <Ramp colors={NDVI_RAMP} range={NDVI_RANGE} unit="" /></li>}
             {three && (
               <li className="inline-flex items-center gap-1">
@@ -218,8 +229,8 @@ export function FieldExplorer() {
                 <InfoTip label="3D view">
                   Ground relief comes from a global elevation model (AWS Terrain Tiles, about 30 m) and is exaggerated ×{TERRAIN_EXAGGERATION}.
                   The land here is a gently sloping plateau, so relief is subtle. Buildings are OpenStreetMap footprints at their mapped height, or 6 m where none is recorded.
-                  Column heights encode values, not physical size: {COLUMN_SCALE.moisturePerPct} m per percentage point of soil moisture,
-                  {" "}and {COLUMN_SCALE.ndviPerUnit / 10} m per 0.1 NDVI above {COLUMN_SCALE.ndviBase} (bare soil). Drag with the right mouse button, or two fingers, to tilt and turn.
+                  NDVI pixel heights encode values, not physical size: {COLUMN_SCALE.ndviPerUnit / 10} m per 0.1 NDVI above {COLUMN_SCALE.ndviBase} (bare soil).
+                  Drag with the right mouse button, or two fingers, to tilt and turn.
                 </InfoTip>
               </li>
             )}

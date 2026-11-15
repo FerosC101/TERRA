@@ -3,8 +3,7 @@
 import * as maplibregl from "maplibre-gl";
 import { type ExpressionSpecification, type GeoJSONSource, type LngLatBoundsLike, type MapGeoJSONFeature, type StyleSpecification } from "maplibre-gl";
 import { useEffect, useRef, useState } from "react";
-import { offset } from "@/data/fields";
-import { createStationLayer, hitsStation, type StationLayerState } from "./stationLayer";
+import { createIotLayer, hitsStation, probeAt, type IotScreen, type IotState } from "./iotLayer";
 import type { MoistureReading, NdviPixel } from "@/lib/demo/spatial";
 import { moistureColor, ndviColor } from "@/lib/mapColors";
 import type { Field, LatLng } from "@/types";
@@ -43,10 +42,11 @@ interface Props {
 }
 
 /**
- * In 3D, value columns rise by this many metres per unit. Heights encode values, not
+ * In 3D, NDVI pixels rise by this many metres per unit. Heights encode values, not
  * physical size. NDVI starts from 0.2 (bare soil), so canopy differences stay visible.
+ * Soil-moisture probes are drawn as beacons instead (see iotLayer.ts).
  */
-export const COLUMN_SCALE = { moisturePerPct: 9, ndviPerUnit: 350, ndviBase: 0.2 };
+export const COLUMN_SCALE = { ndviPerUnit: 350, ndviBase: 0.2 };
 export const TERRAIN_EXAGGERATION = 2;
 
 const ESRI = "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
@@ -64,7 +64,6 @@ const SKY = {
 const pt = (p: LatLng): [number, number] => [p.lng, p.lat];
 const ring = (pts: LatLng[]) => [[...pts.map(pt), pt(pts[0])]];
 const box = (sw: LatLng, ne: LatLng) => ring([sw, { lat: sw.lat, lng: ne.lng }, ne, { lat: ne.lat, lng: sw.lng }]);
-const square = (c: LatLng, half: number) => box(offset(c, -half, -half), offset(c, half, half));
 const collection = (features: GeoJSON.Feature[]): GeoJSON.FeatureCollection => ({ type: "FeatureCollection", features });
 
 function data(props: Pick<Props, "field" | "moisture" | "pixels" | "smapBounds">) {
@@ -79,10 +78,6 @@ function data(props: Pick<Props, "field" | "moisture" | "pixels" | "smapBounds">
     probes: collection(moisture.map((m) => ({
       type: "Feature", properties: { id: m.id, value: m.value, color: moistureColor(m.value), label: `${m.label}: ${m.value.toFixed(1)}%` },
       geometry: { type: "Point", coordinates: pt(m.position) },
-    }))),
-    columns: collection(moisture.map((m) => ({
-      type: "Feature", properties: { id: m.id, value: m.value, color: moistureColor(m.value), label: `${m.label}: ${m.value.toFixed(1)}%` },
-      geometry: { type: "Polygon", coordinates: square(m.position, 22) },
     }))),
     anomalies: collection(field.points.filter((p) => p.kind === "anomaly").map((a) => ({
       type: "Feature", properties: { id: a.id, label: `Discovery: ${a.label}` }, geometry: { type: "Point", coordinates: pt(a.position) },
@@ -102,7 +97,7 @@ function initialStyle(): StyleSpecification {
       terrain: { type: "raster-dem", tiles: [TERRAIN], tileSize: 256, maxzoom: 15, encoding: "terrarium", attribution: TERRAIN_ATTRIB },
       shade: { type: "raster-dem", tiles: [TERRAIN], tileSize: 256, maxzoom: 15, encoding: "terrarium" },
       openmap: { type: "vector", url: OPENFREEMAP, attribution: OSM_ATTRIB },
-      field: geo(empty), smap: geo(empty), pixels: geo(empty), probes: geo(empty), columns: geo(empty), anomalies: geo(empty), station: geo(empty),
+      field: geo(empty), smap: geo(empty), pixels: geo(empty), probes: geo(empty), anomalies: geo(empty), station: geo(empty),
     },
     layers: [
       { id: "background", type: "background", paint: { "background-color": "#EEF1EA" } },
@@ -126,8 +121,6 @@ function initialStyle(): StyleSpecification {
         paint: { "fill-extrusion-color": ["get", "color"], "fill-extrusion-height": ["*", ["max", 0.02, ["-", ["get", "value"], COLUMN_SCALE.ndviBase]], COLUMN_SCALE.ndviPerUnit], "fill-extrusion-opacity": 0.78 } },
       { id: "boundary-fill", type: "fill", source: "field", paint: { "fill-color": "#8EE39F", "fill-opacity": 0.1 } },
       { id: "boundary-line", type: "line", source: "field", paint: { "line-color": "#8EE39F", "line-width": 2.5 } },
-      { id: "columns-3d", type: "fill-extrusion", source: "columns", layout: { visibility: "none" },
-        paint: { "fill-extrusion-color": ["get", "color"], "fill-extrusion-height": ["*", ["get", "value"], COLUMN_SCALE.moisturePerPct], "fill-extrusion-opacity": 0.95 } },
       { id: "probes", type: "circle", source: "probes", paint: { "circle-color": ["get", "color"], "circle-radius": 7, "circle-stroke-color": "#FFFFFF", "circle-stroke-width": 2, "circle-pitch-alignment": "map" } },
       { id: "anomalies", type: "circle", source: "anomalies",
         paint: { "circle-color": "#B7791F", "circle-opacity": 0.18, "circle-radius": 16, "circle-stroke-color": "#FFD27A", "circle-stroke-width": 2, "circle-pitch-alignment": "map" } },
@@ -138,13 +131,13 @@ function initialStyle(): StyleSpecification {
 }
 
 /** Clickable layers, most specific first: the first one under the pointer wins. */
-const PICK_ORDER = ["station", "probes", "columns-3d", "anomalies", "pixels-3d", "pixels-fill", "boundary-fill", "smap-fill"] as const;
+const PICK_ORDER = ["station", "probes", "anomalies", "pixels-3d", "pixels-fill", "boundary-fill", "smap-fill"] as const;
 
 function selectionOf(f: MapGeoJSONFeature): Selection {
   const id = String(f.properties?.id ?? "");
   switch (f.layer.id) {
     case "station": return { type: "station" };
-    case "probes": case "columns-3d": return { type: "moisture", id };
+    case "probes": return { type: "moisture", id };
     case "anomalies": return { type: "anomaly", id };
     case "pixels-3d": case "pixels-fill": return { type: "pixel", id };
     case "smap-fill": return { type: "smap" };
@@ -158,6 +151,34 @@ function boundsOf(points: LatLng[]): LngLatBoundsLike {
   return [[Math.min(...lngs), Math.min(...lats)], [Math.max(...lngs), Math.max(...lats)]];
 }
 
+/**
+ * Keep one small value tag above each beacon. Updated straight in the DOM on every
+ * frame (no React render), and hidden when the beacon is off screen.
+ */
+function placeLabels(layer: HTMLDivElement | null, screen: IotScreen, state: IotState) {
+  if (!layer) return;
+  const seen = new Set<string>();
+  for (const p of state.probes) {
+    const at = screen.probes[p.id]?.label;
+    let tag = layer.querySelector<HTMLSpanElement>(`[data-probe="${p.id}"]`);
+    if (!at || !at.visible) { if (tag) tag.style.display = "none"; continue; }
+    seen.add(p.id);
+    if (!tag) {
+      tag = document.createElement("span");
+      tag.dataset.probe = p.id;
+      tag.className = "terra-beacon-tag";
+      layer.appendChild(tag);
+    }
+    const text = `${p.value.toFixed(1)}%`;
+    if (tag.textContent !== text) tag.textContent = text;
+    tag.classList.toggle("is-selected", state.selectedProbe === p.id);
+    tag.style.setProperty("--dot", p.color);
+    tag.style.display = "";
+    tag.style.transform = `translate(${at.x.toFixed(1)}px, ${at.y.toFixed(1)}px) translate(-50%, -100%)`;
+  }
+  layer.querySelectorAll<HTMLSpanElement>("[data-probe]").forEach((t) => { if (!seen.has(t.dataset.probe ?? "")) t.style.display = "none"; });
+}
+
 export default function FieldMap(props: Props) {
   const { field, basemap, mode, overlays, moisture, pixels, smapBounds, selection, onSelect, onTileError, padding } = props;
   const host = useRef<HTMLDivElement>(null);
@@ -167,12 +188,24 @@ export default function FieldMap(props: Props) {
   const onSelectRef = useRef(onSelect);
   const onTileErrorRef = useRef(onTileError);
   useEffect(() => { onSelectRef.current = onSelect; onTileErrorRef.current = onTileError; });
-  // Read by the 3D station layer on every frame
-  const stationRef = useRef<StationLayerState>({ name: field.station.name, position: field.station.position, visible: overlays.station, terrain: 0 });
+  // Read by the 3D device layer (station and moisture beacons) on every frame
+  const labelsRef = useRef<HTMLDivElement>(null);
+  const screenRef = useRef<IotScreen>({ probes: {} });
+  const iotRef = useRef<IotState>({
+    station: { name: field.station.name, position: field.station.position, visible: overlays.station },
+    probes: [], showProbes: false, selectedProbe: null, terrain: 0, reduceMotion: false,
+  });
   useEffect(() => {
-    stationRef.current = { name: field.station.name, position: field.station.position, visible: overlays.station, terrain: mode === "3d" ? TERRAIN_EXAGGERATION : 0 };
+    iotRef.current = {
+      station: { name: field.station.name, position: field.station.position, visible: overlays.station },
+      probes: moisture.map((m) => ({ id: m.id, label: m.label, position: m.position, value: m.value, color: moistureColor(m.value) })),
+      showProbes: overlays.moisture,
+      selectedProbe: selection.type === "moisture" ? selection.id : null,
+      terrain: mode === "3d" ? TERRAIN_EXAGGERATION : 0,
+      reduceMotion: window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+    };
     mapRef.current?.triggerRepaint();
-  }, [field, overlays.station, mode]);
+  }, [field, moisture, overlays.station, overlays.moisture, selection, mode]);
 
   // Create the map once
   useEffect(() => {
@@ -195,15 +228,29 @@ export default function FieldMap(props: Props) {
     map.addControl(new maplibregl.ScaleControl({ unit: "metric" }), "bottom-right");
 
     const popup = new maplibregl.Popup({ closeButton: false, closeOnClick: false, className: "terra-pop", offset: 12 });
+    // Beacon names sit below the beacon's foot, so they never cover its value tag
+    const beaconPop = new maplibregl.Popup({ closeButton: false, closeOnClick: false, className: "terra-pop", offset: 10, anchor: "top" });
     const pickable = () => PICK_ORDER.filter((id) => map.getLayer(id) && map.getLayoutProperty(id, "visibility") !== "none");
     const topFeature = (point: maplibregl.Point) => {
       const hits = map.queryRenderedFeatures(point, { layers: pickable() });
       return PICK_ORDER.map((id) => hits.find((h) => h.layer.id === id)).find(Boolean);
     };
+    const beaconAt = (point: maplibregl.Point) => {
+      const id = probeAt(screenRef.current, point);
+      return id ? iotRef.current.probes.find((p) => p.id === id) : undefined;
+    };
     map.on("mousemove", (e) => {
-      if (hitsStation(map, stationRef.current, e.point)) {
+      const beacon = beaconAt(e.point);
+      if (beacon) {
         map.getCanvas().style.cursor = "pointer";
-        popup.setLngLat(e.lngLat).setText(`${stationRef.current.name} (model shown enlarged)`).addTo(map);
+        popup.remove();
+        beaconPop.setLngLat(pt(beacon.position)).setText(`${beacon.label} · soil moisture`).addTo(map);
+        return;
+      }
+      beaconPop.remove();
+      if (hitsStation(screenRef.current, e.point)) {
+        map.getCanvas().style.cursor = "pointer";
+        popup.setLngLat(e.lngLat).setText(`${iotRef.current.station.name} (model shown enlarged)`).addTo(map);
         return;
       }
       const f = topFeature(e.point);
@@ -211,9 +258,14 @@ export default function FieldMap(props: Props) {
       if (f && f.layer.id !== "boundary-fill" && f.layer.id !== "smap-fill") popup.setLngLat(e.lngLat).setText(String(f.properties?.label ?? "")).addTo(map);
       else popup.remove();
     });
-    map.on("mouseout", () => popup.remove());
+    map.on("mouseout", () => { popup.remove(); beaconPop.remove(); });
     map.on("click", (e) => {
-      if (hitsStation(map, stationRef.current, e.point)) {
+      const beacon = beaconAt(e.point);
+      if (beacon) {
+        onSelectRef.current({ type: "moisture", id: beacon.id });
+        return;
+      }
+      if (hitsStation(screenRef.current, e.point)) {
         onSelectRef.current({ type: "station" });
         return;
       }
@@ -228,13 +280,16 @@ export default function FieldMap(props: Props) {
     map.on("load", () => {
       // Keep the attribution folded behind its "i" button so it never covers the legend
       host.current?.querySelector(".maplibregl-ctrl-attrib")?.classList.remove("maplibregl-compact-show");
-      // The IoT field station, drawn as its 3D model on top of the map layers
-      map.addLayer(createStationLayer(() => stationRef.current));
+      // The field station and the soil-moisture beacons, drawn in 3D on top of the map layers
+      map.addLayer(createIotLayer(() => iotRef.current, (screen) => {
+        screenRef.current = screen;
+        placeLabels(labelsRef.current, screen, iotRef.current);
+      }));
       setReady(true);
     });
     const ro = new ResizeObserver(() => map.resize());
     ro.observe(host.current);
-    return () => { ro.disconnect(); popup.remove(); map.remove(); mapRef.current = null; };
+    return () => { ro.disconnect(); popup.remove(); beaconPop.remove(); map.remove(); mapRef.current = null; };
     // The map is created once; later prop changes are applied by the effects below.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -261,7 +316,8 @@ export default function FieldMap(props: Props) {
     show("smap-fill", overlays.smap); show("smap-line", overlays.smap);
     show("pixels-fill", overlays.ndvi && !three); show("pixels-line", overlays.ndvi && !three); show("pixels-3d", overlays.ndvi && three);
     show("boundary-fill", overlays.boundary); show("boundary-line", overlays.boundary);
-    show("probes", overlays.moisture); show("columns-3d", overlays.moisture && three);
+    // In 3D the probes are drawn as beacons by the device layer
+    show("probes", overlays.moisture && !three);
     show("anomalies", overlays.anomalies);
     show("station", overlays.station);
 
@@ -290,7 +346,6 @@ export default function FieldMap(props: Props) {
     const is = (type: Selection["type"]): ExpressionSpecification => ["==", ["literal", selection.type === type ? id : "__none__"], ["get", "id"]];
     map.setPaintProperty("pixels-line", "line-width", ["case", is("pixel"), 3, 0.6]);
     map.setPaintProperty("probes", "circle-radius", ["case", is("moisture"), 11, 7]);
-    map.setPaintProperty("columns-3d", "fill-extrusion-opacity", 0.95);
     map.setPaintProperty("anomalies", "circle-opacity", ["case", is("anomaly"), 0.4, 0.18]);
     map.setPaintProperty("station", "circle-radius", selection.type === "station" ? 10 : 7);
     map.setPaintProperty("boundary-line", "line-width", selection.type === "field" ? 3.5 : 2.5);
@@ -309,5 +364,11 @@ export default function FieldMap(props: Props) {
   if (failed) {
     return <div className="flex h-full items-center justify-center bg-sunken p-6 text-center text-sm text-muted">This browser cannot show the interactive map (WebGL is unavailable).</div>;
   }
-  return <div ref={host} className="h-full w-full" role="region" aria-label={`Map of ${field.name}`} />;
+  return (
+    <div className="relative h-full w-full">
+      <div ref={host} className="h-full w-full" role="region" aria-label={`Map of ${field.name}`} />
+      {/* Value tags above the 3D beacons, placed every frame by the device layer */}
+      <div ref={labelsRef} className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden />
+    </div>
+  );
 }

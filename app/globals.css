@@ -123,6 +123,38 @@ input[type="checkbox"] {
 .terra-pop .maplibregl-popup-tip {
   display: none;
 }
+/* Value tag floating above a 3D soil-moisture beacon */
+.terra-beacon-tag {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px 2px 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid var(--line-strong);
+  color: var(--ink);
+  font-size: 11px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(24, 59, 42, 0.18);
+  will-change: transform;
+}
+.terra-beacon-tag::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--dot);
+}
+.terra-beacon-tag.is-selected {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
+}
 
 @keyframes terra-pulse {
   0%, 100% { opacity: 1; }
