@@ -1,0 +1,326 @@
+{
+  "source_commit": "25c63adaf47091932ba094a80841d7b18ef39894",
+  "source_sha256": "9d66f565c3a0e52e72dfe26ee000179ec896b02fcb405183152af1ce169d6659",
+  "modules": [
+    {
+      "id": 1,
+      "name": "GNSS Receiver Module",
+      "conceptual": true,
+      "external_accessory": false,
+      "home": [
+        0.0,
+        -0.054999999701976776,
+        0.3499999940395355
+      ],
+      "exploded": [
+        -0.5799999833106995,
+        -0.05000000074505806,
+        0.3799999952316284
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Solar Power Regulation Board",
+      "conceptual": true,
+      "external_accessory": false,
+      "home": [
+        0.07500000298023224,
+        -0.054999999701976776,
+        0.3499999940395355
+      ],
+      "exploded": [
+        -0.28999999165534973,
+        -0.05000000074505806,
+        0.3799999952316284
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Battery Pack",
+      "conceptual": true,
+      "external_accessory": false,
+      "home": [
+        -0.07500000298023224,
+        0.054999999701976776,
+        0.3499999940395355
+      ],
+      "exploded": [
+        0.0,
+        -0.05000000074505806,
+        0.3799999952316284
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Battery Management System BMS",
+      "conceptual": true,
+      "external_accessory": false,
+      "home": [
+        0.0,
+        0.054999999701976776,
+        0.3499999940395355
+      ],
+      "exploded": [
+        0.28999999165534973,
+        -0.05000000074505806,
+        0.3799999952316284
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Main Controller ESP32 STM32",
+      "conceptual": true,
+      "external_accessory": false,
+      "home": [
+        0.07500000298023224,
+        0.054999999701976776,
+        0.3499999940395355
+      ],
+      "exploded": [
+        0.5799999833106995,
+        -0.05000000074505806,
+        0.3799999952316284
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Edge AI Processing Module",
+      "conceptual": true,
+      "external_accessory": false,
+      "home": [
+        -0.07500000298023224,
+        -0.054999999701976776,
+        0.47999998927116394
+      ],
+      "exploded": [
+        -0.5799999833106995,
+        0.20000000298023224,
+        0.5899999737739563
+      ]
+    },
+    {
+      "id": 7,
+      "name": "Main PCB",
+      "conceptual": true,
+      "external_accessory": false,
+      "home": [
+        0.0,
+        -0.054999999701976776,
+        0.47999998927116394
+      ],
+      "exploded": [
+        -0.28999999165534973,
+        0.20000000298023224,
+        0.5899999737739563
+      ]
+    },
+    {
+      "id": 8,
+      "name": "Communication Module LoRa LTE WiFi",
+      "conceptual": true,
+      "external_accessory": false,
+      "home": [
+        0.07500000298023224,
+        -0.054999999701976776,
+        0.47999998927116394
+      ],
+      "exploded": [
+        0.0,
+        0.20000000298023224,
+        0.5899999737739563
+      ]
+    },
+    {
+      "id": 9,
+      "name": "Multispectral Camera Module",
+      "conceptual": true,
+      "external_accessory": false,
+      "home": [
+        -0.07500000298023224,
+        0.054999999701976776,
+        0.47999998927116394
+      ],
+      "exploded": [
+        0.28999999165534973,
+        0.20000000298023224,
+        0.5899999737739563
+      ]
+    },
+    {
+      "id": 10,
+      "name": "Camera Interface Module",
+      "conceptual": true,
+      "external_accessory": false,
+      "home": [
+        0.0,
+        0.054999999701976776,
+        0.47999998927116394
+      ],
+      "exploded": [
+        0.5799999833106995,
+        0.20000000298023224,
+        0.5899999737739563
+      ]
+    },
+    {
+      "id": 11,
+      "name": "Environmental Sensor Board",
+      "conceptual": true,
+      "external_accessory": true,
+      "home": [
+        0.699999988079071,
+        0.5,
+        0.12999999523162842
+      ],
+      "exploded": [
+        -0.5799999833106995,
+        0.44999998807907104,
+        0.800000011920929
+      ]
+    },
+    {
+      "id": 12,
+      "name": "Rainfall Sensor Module",
+      "conceptual": true,
+      "external_accessory": true,
+      "home": [
+        0.800000011920929,
+        0.5,
+        0.12999999523162842
+      ],
+      "exploded": [
+        -0.28999999165534973,
+        0.44999998807907104,
+        0.800000011920929
+      ]
+    },
+    {
+      "id": 13,
+      "name": "Solar Radiation Sensor",
+      "conceptual": true,
+      "external_accessory": true,
+      "home": [
+        0.8999999761581421,
+        0.5,
+        0.12999999523162842
+      ],
+      "exploded": [
+        0.0,
+        0.44999998807907104,
+        0.800000011920929
+      ]
+    },
+    {
+      "id": 14,
+      "name": "Soil Moisture Sensor Array",
+      "conceptual": true,
+      "external_accessory": true,
+      "home": [
+        1.0,
+        0.5,
+        0.12999999523162842
+      ],
+      "exploded": [
+        0.28999999165534973,
+        0.44999998807907104,
+        0.800000011920929
+      ]
+    },
+    {
+      "id": 15,
+      "name": "Soil Temperature Sensor Array",
+      "conceptual": true,
+      "external_accessory": true,
+      "home": [
+        1.100000023841858,
+        0.5,
+        0.12999999523162842
+      ],
+      "exploded": [
+        0.5799999833106995,
+        0.44999998807907104,
+        0.800000011920929
+      ]
+    },
+    {
+      "id": 16,
+      "name": "Soil Electrical Conductivity Module",
+      "conceptual": true,
+      "external_accessory": true,
+      "home": [
+        1.2000000476837158,
+        0.5,
+        0.12999999523162842
+      ],
+      "exploded": [
+        -0.5799999833106995,
+        0.699999988079071,
+        1.0099999904632568
+      ]
+    },
+    {
+      "id": 17,
+      "name": "Analog to Digital Converter ADC",
+      "conceptual": true,
+      "external_accessory": false,
+      "home": [
+        0.07500000298023224,
+        0.054999999701976776,
+        0.6100000143051147
+      ],
+      "exploded": [
+        -0.28999999165534973,
+        0.699999988079071,
+        1.0099999904632568
+      ]
+    },
+    {
+      "id": 18,
+      "name": "MicroSD Storage Module",
+      "conceptual": true,
+      "external_accessory": false,
+      "home": [
+        -0.07500000298023224,
+        -0.054999999701976776,
+        0.7400000095367432
+      ],
+      "exploded": [
+        0.0,
+        0.699999988079071,
+        1.0099999904632568
+      ]
+    },
+    {
+      "id": 19,
+      "name": "Real Time Clock RTC",
+      "conceptual": true,
+      "external_accessory": false,
+      "home": [
+        0.0,
+        -0.054999999701976776,
+        0.7400000095367432
+      ],
+      "exploded": [
+        0.28999999165534973,
+        0.699999988079071,
+        1.0099999904632568
+      ]
+    },
+    {
+      "id": 20,
+      "name": "Power Distribution Board",
+      "conceptual": true,
+      "external_accessory": false,
+      "home": [
+        0.07500000298023224,
+        -0.054999999701976776,
+        0.7400000095367432
+      ],
+      "exploded": [
+        0.5799999833106995,
+        0.699999988079071,
+        1.0099999904632568
+      ]
+    }
+  ]
+}

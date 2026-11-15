@@ -1,0 +1,122 @@
+{
+  "modules": 20,
+  "samples": [
+    {
+      "frame": 1,
+      "visible_modules": {
+        "01_GNSS Receiver Module": 199,
+        "02_Solar Power Regulation Board": 200,
+        "03_Battery Pack": 217,
+        "04_Battery Management System BMS": 200,
+        "05_Main Controller ESP32 STM32": 203,
+        "06_Edge AI Processing Module": 216,
+        "07_Main PCB": 198,
+        "08_Communication Module LoRa LTE WiFi": 203,
+        "09_Multispectral Camera Module": 202,
+        "10_Camera Interface Module": 198,
+        "17_Analog to Digital Converter ADC": 198,
+        "18_MicroSD Storage Module": 200,
+        "19_Real Time Clock RTC": 199,
+        "20_Power Distribution Board": 200
+      },
+      "logo_visible": true
+    },
+    {
+      "frame": 760,
+      "visible_modules": {
+        "01_GNSS Receiver Module": 199,
+        "02_Solar Power Regulation Board": 200,
+        "03_Battery Pack": 217,
+        "04_Battery Management System BMS": 200,
+        "05_Main Controller ESP32 STM32": 203,
+        "06_Edge AI Processing Module": 216,
+        "07_Main PCB": 198,
+        "08_Communication Module LoRa LTE WiFi": 203,
+        "09_Multispectral Camera Module": 202,
+        "10_Camera Interface Module": 198,
+        "11_Environmental Sensor Board": 203,
+        "12_Rainfall Sensor Module": 199,
+        "13_Solar Radiation Sensor": 199,
+        "14_Soil Moisture Sensor Array": 207,
+        "15_Soil Temperature Sensor Array": 207,
+        "16_Soil Electrical Conductivity Module": 207,
+        "17_Analog to Digital Converter ADC": 198,
+        "18_MicroSD Storage Module": 200,
+        "19_Real Time Clock RTC": 199,
+        "20_Power Distribution Board": 200
+      },
+      "logo_visible": true
+    },
+    {
+      "frame": 865,
+      "visible_modules": {
+        "01_GNSS Receiver Module": 199
+      },
+      "logo_visible": false
+    },
+    {
+      "frame": 913,
+      "visible_modules": {
+        "02_Solar Power Regulation Board": 200
+      },
+      "logo_visible": false
+    },
+    {
+      "frame": 1105,
+      "visible_modules": {
+        "06_Edge AI Processing Module": 216
+      },
+      "logo_visible": false
+    },
+    {
+      "frame": 1825,
+      "visible_modules": {
+        "01_GNSS Receiver Module": 199,
+        "02_Solar Power Regulation Board": 200,
+        "03_Battery Pack": 217,
+        "04_Battery Management System BMS": 200,
+        "05_Main Controller ESP32 STM32": 203,
+        "06_Edge AI Processing Module": 216,
+        "07_Main PCB": 198,
+        "08_Communication Module LoRa LTE WiFi": 203,
+        "09_Multispectral Camera Module": 202,
+        "10_Camera Interface Module": 198,
+        "11_Environmental Sensor Board": 203,
+        "12_Rainfall Sensor Module": 199,
+        "13_Solar Radiation Sensor": 199,
+        "14_Soil Moisture Sensor Array": 207,
+        "15_Soil Temperature Sensor Array": 207,
+        "16_Soil Electrical Conductivity Module": 207,
+        "17_Analog to Digital Converter ADC": 198,
+        "18_MicroSD Storage Module": 200,
+        "19_Real Time Clock RTC": 199,
+        "20_Power Distribution Board": 200
+      },
+      "logo_visible": true
+    },
+    {
+      "frame": 2160,
+      "visible_modules": {
+        "01_GNSS Receiver Module": 199,
+        "02_Solar Power Regulation Board": 200,
+        "03_Battery Pack": 217,
+        "04_Battery Management System BMS": 200,
+        "05_Main Controller ESP32 STM32": 203,
+        "06_Edge AI Processing Module": 216,
+        "07_Main PCB": 198,
+        "08_Communication Module LoRa LTE WiFi": 203,
+        "09_Multispectral Camera Module": 202,
+        "10_Camera Interface Module": 198,
+        "17_Analog to Digital Converter ADC": 198,
+        "18_MicroSD Storage Module": 200,
+        "19_Real Time Clock RTC": 199,
+        "20_Power Distribution Board": 200
+      },
+      "logo_visible": true
+    }
+  ],
+  "packed_images": [
+    "solar_panel",
+    "TERRA Green Leaf Wordmark.png"
+  ]
+}

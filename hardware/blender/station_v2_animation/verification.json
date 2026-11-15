@@ -1,0 +1,88 @@
+{
+  "modules": 20,
+  "meshes": 847,
+  "samples": [
+    {
+      "frame": 1,
+      "camera": "01_Hero",
+      "foot_min_z": 2.3283064365386963e-09,
+      "foot_max_lower_bound": 2.3283064365386963e-09
+    },
+    {
+      "frame": 384,
+      "camera": "Top.001",
+      "foot_min_z": 2.3283064365386963e-09,
+      "foot_max_lower_bound": 2.3283064365386963e-09
+    },
+    {
+      "frame": 552,
+      "camera": "Explode",
+      "foot_min_z": 2.3283064365386963e-09,
+      "foot_max_lower_bound": 2.3283064365386963e-09
+    },
+    {
+      "frame": 720,
+      "camera": "Explode",
+      "foot_min_z": 2.3283064365386963e-09,
+      "foot_max_lower_bound": 2.3283064365386963e-09
+    },
+    {
+      "frame": 760,
+      "camera": "Exploded_Right",
+      "foot_min_z": 2.3283064365386963e-09,
+      "foot_max_lower_bound": 2.3283064365386963e-09
+    },
+    {
+      "frame": 864,
+      "camera": "Exploded_Left",
+      "foot_min_z": 2.3283064365386963e-09,
+      "foot_max_lower_bound": 2.3283064365386963e-09
+    },
+    {
+      "frame": 865,
+      "camera": "Module_01",
+      "foot_min_z": 2.3283064365386963e-09,
+      "foot_max_lower_bound": 2.3283064365386963e-09
+    },
+    {
+      "frame": 1345,
+      "camera": "Module_11",
+      "foot_min_z": 2.3283064365386963e-09,
+      "foot_max_lower_bound": 2.3283064365386963e-09
+    },
+    {
+      "frame": 1824,
+      "camera": "Module_20",
+      "foot_min_z": 2.3283064365386963e-09,
+      "foot_max_lower_bound": 2.3283064365386963e-09
+    },
+    {
+      "frame": 1944,
+      "camera": "Reassembly",
+      "foot_min_z": 2.3283064365386963e-09,
+      "foot_max_lower_bound": 2.3283064365386963e-09
+    },
+    {
+      "frame": 2064,
+      "camera": "Reassembly",
+      "foot_min_z": 2.3283064365386963e-09,
+      "foot_max_lower_bound": 2.3283064365386963e-09
+    },
+    {
+      "frame": 2160,
+      "camera": "Final_Hero",
+      "foot_min_z": 2.3283064365386963e-09,
+      "foot_max_lower_bound": 2.3283064365386963e-09
+    }
+  ],
+  "return_transform_error": 0.0,
+  "render_engine": "CYCLES",
+  "look": "AgX - Medium High Contrast",
+  "resolution": [
+    3840,
+    2160
+  ],
+  "frames": 2160,
+  "conceptual_layout": true,
+  "collision_check": "Requires visual inspection; bounding boxes alone cannot validate fitted parts."
+}
