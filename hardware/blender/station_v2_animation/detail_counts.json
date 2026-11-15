@@ -1,0 +1,18 @@
+{
+  "v2_exterior": {
+    "mesh_objects": 197,
+    "vertices": 10642,
+    "polygons": 8258
+  },
+  "modules_before": {
+    "mesh_objects": 649,
+    "vertices": 16568,
+    "polygons": 9580
+  },
+  "modules_after": {
+    "mesh_objects": 3677,
+    "vertices": 54472,
+    "polygons": 34588
+  },
+  "note": "Detail meshes include shared topology, through-hole cutters, pins, solder, passives, contacts; curves and lettering counted separately."
+}
