@@ -1,0 +1,740 @@
+{
+  "ruleset_id": "TERRA-ROT-RULES",
+  "name": "TERRA Crop Rotation Rules",
+  "version": "1.2",
+  "date": "2026-11-14",
+  "status": "proposed_starting_values_audited",
+  "purpose": "Translate agronomic rotation principles into implementable evaluation rules for the TERRA Rotation Lab. Each rule flags a specific pattern, names its severity, and cites the reference behind it.",
+  "disclaimer": "These are evaluation rules and advisories, not absolute agricultural laws. Suitability depends on local conditions, crop varieties, pest history, and farmer practices. A triggered rule is a prompt for review, not a final judgement. Thresholds marked as proposed must be calibrated with local data and expert review.",
+  "severity_levels": [
+    {
+      "severity": "constraint",
+      "meaning": "A documented agronomic mismatch. The sequence should be rejected or require explicit mitigation before being presented as suitable.",
+      "ui_treatment": "red flag; block recommendation until acknowledged"
+    },
+    {
+      "severity": "advisory",
+      "meaning": "A risk or tradeoff worth showing. The sequence may still be suitable with management.",
+      "ui_treatment": "amber flag; show with explanation"
+    },
+    {
+      "severity": "info",
+      "meaning": "A positive feature or neutral observation.",
+      "ui_treatment": "green note; no action required"
+    }
+  ],
+  "evaluation_engine": {
+    "input_object": "rotation",
+    "required_fields": [
+      "seasons[]",
+      "seasons[].crop_name",
+      "seasons[].crop_family",
+      "seasons[].planting_date",
+      "seasons[].harvest_date"
+    ],
+    "optional_fields": [
+      "seasons[].variety",
+      "seasons[].residue_management",
+      "field.soil_ph_class",
+      "field.slope_class",
+      "field.drainage_class",
+      "scenario.water_supply_mm",
+      "scenario.crop_water_requirement_mm",
+      "scenario.daily_temperature",
+      "scenario.excess_water_days"
+    ],
+    "output_object": {
+      "rule_id": "string",
+      "triggered": "boolean",
+      "severity": "constraint | advisory | info",
+      "message": "string with placeholders resolved",
+      "evidence": "object of the values that triggered the rule",
+      "linked_criterion": "string",
+      "linked_indicator": "string",
+      "source": "string"
+    },
+    "missing_input_behavior": "If a rule's required inputs are absent, return triggered=false with status='not_evaluable' and list the missing fields. Do not guess.",
+    "message_variants": "Most rules expose a single 'message' template. Where the outcome changes the wording, the rule exposes 'message_empty'/'message_present' (ROT002) or 'message_deficit'/'message_excess' (ROT003). Render the variant that matches the evaluated outcome.",
+    "ordering": "Evaluate all rules independently. Sort output by severity (constraint, advisory, info), then by rule_id. Do not let one rule suppress another.",
+    "method_metadata_required": {
+      "water_rules": "Record water_balance_method (daily_root_zone_balance or seasonal_totals) and the balance terms (P, RO, I, CR, DP, S_start, S_end) for ROT005 and ROT006.",
+      "waterlogging_rule": "Record metric_used (saturation_excess_days or heavy_rain_days) for ROT008.",
+      "indicator_status": "Every rule output must state whether it was evaluated, not triggered, or not evaluable.",
+      "nitrogen_rule": "Record nitrogen_balance_boundary (gross_soil_surface or full_soil) and the N surplus and NUE for ROT003."
+    }
+  },
+  "rules": [
+    {
+      "rule_id": "ROT001",
+      "name": "Crop Family Diversification",
+      "description": "Flag consecutive crops belonging to the same plant family.",
+      "evaluation": "flag_consecutive_same_family",
+      "evaluation_type": "sequence_check",
+      "applies_to": [
+        "crop_sequence"
+      ],
+      "inputs": [
+        {
+          "field": "seasons[].crop_family",
+          "source": "crop_database.csv crop_family"
+        }
+      ],
+      "parameters": {
+        "max_consecutive_same_family": 1,
+        "proposed": true
+      },
+      "logic": "Walk the ordered season list. For each adjacent pair, compare crop_family. Count pairs where family(t) equals family(t+1). Trigger when the count is greater than max_consecutive_same_family minus one, that is, when any adjacent pair shares a family.",
+      "trigger": "count(adjacent same-family pairs) >= 1",
+      "severity": "advisory",
+      "message": "Seasons {season_from} and {season_to} both grow {family} crops ({crop_from}, {crop_to}). Repeated families can build pest, disease, and weed pressure.",
+      "reason": "Repeated crops from the same family may increase pest and disease pressure and exploit similar nutrient and water pools.",
+      "linked_criterion": "DIVERSITY",
+      "linked_indicator": "D2",
+      "source": "USDA NRCS Conservation Practice Standard 328: Crop Rotation",
+      "source_url": "https://www.nrcs.usda.gov/sites/default/files/2022-09/Crop_Rotation_328_CPS.pdf",
+      "notes": "A single repeat is not automatically a failure. Severity stays advisory; the message should show which pair triggered it.",
+      "edge_cases": "With fewer than 2 seasons there is no adjacent pair. Return status=not_applicable, not passed."
+    },
+    {
+      "rule_id": "ROT002",
+      "name": "Legume Integration",
+      "description": "Identify rotations that contain or omit nitrogen-fixing legumes.",
+      "evaluation": "legume_presence_check",
+      "evaluation_type": "window_check",
+      "applies_to": [
+        "rotation_window"
+      ],
+      "inputs": [
+        {
+          "field": "seasons[].crop_name",
+          "source": "crop_database.csv crop_name"
+        },
+        {
+          "field": "crop_database.nitrogen_fixation",
+          "source": "crop_database.csv nitrogen_fixation"
+        }
+      ],
+      "parameters": {
+        "recommended_legume_seasons_in_window": 1,
+        "window_seasons": 3,
+        "proposed": true
+      },
+      "logic": "Count seasons whose crop has nitrogen_fixation = Yes. If the window has at least the recommended number, emit an info rule confirming legume integration and naming the crop. If zero, emit an advisory rule.",
+      "trigger": "legume_seasons = 0 in the evaluated window",
+      "severity": "advisory",
+      "message_empty": "No nitrogen-fixing legume appears in this {window_seasons}-season rotation. Consider a legume such as mungbean or peanut to diversify nutrient sources.",
+      "message_present": "Legume integration present: {legume_crops} fix atmospheric nitrogen and can contribute to the following crop.",
+      "reason": "Legumes can add biologically fixed nitrogen and break cereal disease cycles, but the contribution depends on effective rhizobia, inoculation, and growing conditions.",
+      "linked_criterion": "FERTILITY",
+      "linked_indicator": "F1",
+      "source": "ICRISAT/CABI Africa Soil Health Consortium Groundnut Cropping Guide; Philippine DA Mungbean Production Guide",
+      "source_url": "https://oar.icrisat.org/10832/1/562-ASHC-English-Groundnut-A4-bw-lowres.pdf",
+      "notes": "Presence of a legume is not proof of nitrogen contribution. Fixation conditions are recorded in crop_database.csv and should be shown."
+    },
+    {
+      "rule_id": "ROT003",
+      "name": "Nitrogen Balance Check",
+      "description": "Compare estimated nitrogen supply with crop nitrogen removal across the rotation window using a gross soil-surface balance, counting each pool once.",
+      "evaluation": "nitrogen_balance_check",
+      "evaluation_type": "quantitative_threshold",
+      "applies_to": [
+        "rotation_window"
+      ],
+      "inputs": [
+        {
+          "field": "N_fertilizer",
+          "source": "farm records; mineral nitrogen applied in the window"
+        },
+        {
+          "field": "N_amendment_external",
+          "source": "farm records; organic nitrogen imported from outside the window"
+        },
+        {
+          "field": "N_fixed_gross",
+          "source": "gross legume fixation, counted once; do not net losses from fixation alone"
+        },
+        {
+          "field": "N_deposition",
+          "source": "local atmospheric deposition estimate, or 0 with a note"
+        },
+        {
+          "field": "N_harvest_removal",
+          "source": "measured yield x crop nitrogen concentration"
+        },
+        {
+          "field": "N_residue_removed",
+          "source": "residue exported, grazed, or burned"
+        }
+      ],
+      "parameters": {
+        "deficit_threshold_ratio": 0.8,
+        "excess_threshold_ratio": 1.5,
+        "proposed": true,
+        "balance_boundary": "gross_soil_surface"
+      },
+      "logic": "Compute NBR from the six pools. In-situ residue is an internal transfer and is excluded from the numerator. Retained residue is excluded from the denominator. Compute N_surplus = inputs - outputs and NUE = outputs / inputs. If NBR is below deficit_threshold_ratio, emit an advisory for a nutrient deficit. If NBR is above excess_threshold_ratio, emit an advisory for excess nitrogen and leaching risk. Otherwise emit info with the ratio, surplus, and NUE.",
+      "trigger": "NBR < 0.8 or NBR > 1.5",
+      "severity": "advisory",
+      "message_deficit": "Estimated nitrogen supply is {nbr} of crop removal. This rotation may draw down soil nitrogen; review fertilizer and legume contributions.",
+      "message_excess": "Estimated nitrogen supply is {nbr} of crop removal. Excess nitrogen raises leaching and lodging risk; review application rates and timing.",
+      "reason": "Repeated nutrient removal without balanced inputs can deplete soil fertility, while large surpluses have environmental and crop-quality costs.",
+      "linked_criterion": "FERTILITY",
+      "linked_indicator": "F2",
+      "source": "Eurostat/OECD gross nitrogen balance; FAO Irrigation and Drainage Paper 56 nutrient-water context; Philippine DA crop techno-guides; ICRISAT groundnut guide",
+      "source_url": "https://www.fao.org/3/x0490e/x0490e00.htm",
+      "notes": "This is the inverse of the Eurostat/OECD nitrogen use efficiency ratio (NUE = outputs / inputs). A ratio alone can hide the absolute size of the surplus or deficit, so report N surplus and NUE as well. This is a simplified gross balance, not a soil nutrient model. Removal coefficients must come from measured yield and crop concentration values, not from fertilizer guidance ranges.",
+      "formula": "NBR = (N_fertilizer + N_amendment_external + N_fixed_gross + N_deposition) / (N_harvest_removal + N_residue_removed)",
+      "excluded_from_inputs": [
+        "in-situ crop residue nitrogen",
+        "legume residue nitrogen already represented in N_fixed_gross"
+      ],
+      "guard": "Use one boundary. Under the gross balance, do not deduct gaseous or leaching losses from fixation unless the same deduction is applied to all inputs. Never net only fixation. Do not count legume residue nitrogen and N_fixed_gross separately. Do not count retained residue as a removal. Count imported residue once as N_amendment_external, not again as residue return."
+    },
+    {
+      "rule_id": "ROT004",
+      "name": "Soil Cover Continuity",
+      "description": "Flag long bare-soil gaps between harvest and the next established crop or cover.",
+      "evaluation": "bare_soil_gap_check",
+      "evaluation_type": "calendar_check",
+      "applies_to": [
+        "rotation_window"
+      ],
+      "inputs": [
+        {
+          "field": "seasons[].harvest_date",
+          "source": "crop calendar or crop duration"
+        },
+        {
+          "field": "seasons[].next_establishment_date",
+          "source": "crop calendar"
+        },
+        {
+          "field": "seasons[].residue_management",
+          "source": "farm records"
+        }
+      ],
+      "parameters": {
+        "max_bare_soil_gap_days": 30,
+        "cover_threshold_percent": 30,
+        "proposed": true
+      },
+      "logic": "For each transition, compute the days between harvest and next establishment. Reduce the gap when managed residue cover is retained at or above the cover threshold. Trigger when any adjusted gap exceeds max_bare_soil_gap_days.",
+      "trigger": "adjusted_bare_soil_gap_days > 30",
+      "severity": "advisory",
+      "message": "A bare-soil period of about {gap_days} days follows {crop_name} before {next_crop}. Bare soil increases erosion and nutrient loss, especially on sloping land.",
+      "reason": "Soil cover protects against raindrop impact, surface sealing, runoff, and erosion, and supports soil moisture and biology.",
+      "linked_criterion": "PROTECTION",
+      "linked_indicator": "S1",
+      "source": "FAO Soils Portal conservation agriculture guidance; USDA NRCS RUSLE cover-management principles; Purdue AY-269-W residue-cover guidance",
+      "source_url": "https://www.fao.org/soils-portal/soil-management/conservation-agriculture/en/",
+      "notes": "Threshold is proposed. Thirty percent residue cover is the common conservation-tillage definition and is associated with roughly halving water erosion in the cited extension guidance; it is a screening convention, not a site-specific validated constant. On steep or high-rainfall land, a shorter gap may be appropriate. When cover is inferred only from a crop calendar, label the result as a proxy and cap confidence at medium."
+    },
+    {
+      "rule_id": "ROT005",
+      "name": "Seasonal Water Balance",
+      "description": "Compare crop water requirement with net available water for each season, using one stated water-balance method.",
+      "evaluation": "water_supply_demand_check",
+      "evaluation_type": "quantitative_threshold",
+      "applies_to": [
+        "season",
+        "rotation_window"
+      ],
+      "inputs": [
+        {
+          "field": "AW_net",
+          "source": "P - RO + I + CR - DP for a daily balance, or (P - RO) + I + CR + (S_start - S_end) - DP for seasonal totals"
+        },
+        {
+          "field": "water_balance_method",
+          "source": "daily_root_zone_balance or seasonal_totals"
+        },
+        {
+          "field": "crop_water_requirement_mm",
+          "source": "crop_database.csv Kc values x scenario ETo"
+        }
+      ],
+      "parameters": {
+        "advisory_threshold_ratio": 0.8,
+        "constraint_threshold_ratio": 0.6,
+        "proposed": true
+      },
+      "logic": "Compute WSDR using exactly one AW_net method. P is gross rainfall and RO is runoff, following FAO-56 Eq. 85. With daily_root_zone_balance, soil-moisture change is internal and must not be added. With seasonal_totals, include (S_start - S_end) once. If an effective-rainfall product is used, it must equal P - RO and RO must not be subtracted again. If WSDR is below the constraint threshold, emit a constraint. Else if below the advisory threshold, emit an advisory. Otherwise emit info with the ratio and the method used.",
+      "trigger": "WSDR < 0.8",
+      "severity": "advisory",
+      "message": "{crop_name} has an estimated water supply of {wsdr} of its seasonal requirement under the {scenario_name} scenario.",
+      "reason": "A seasonal water deficit limits transpiration, growth, and yield; the size of the gap determines whether the sequence is viable without irrigation.",
+      "linked_criterion": "WATER",
+      "linked_indicator": "W1",
+      "source": "FAO Irrigation and Drainage Paper 56",
+      "source_url": "https://www.fao.org/3/x0490e/x0490e00.htm",
+      "notes": "Seasonal totals can hide stage-level deficits, which are handled by ROT006. Record AW_net components and water_balance_method with every result. Available water must state whether irrigation is included.",
+      "formula": "WSDR = AW_net / crop_water_requirement_mm",
+      "guard": "Count rainfall (or effective rainfall), irrigation, and capillary rise once each. Do not add soil-moisture change on top of a daily simulation. If irrigation is already included in effective rainfall, do not add it again. If rainfall is already net of runoff, do not subtract runoff again."
+    },
+    {
+      "rule_id": "ROT006",
+      "name": "Critical-Stage Water Deficit",
+      "description": "Flag water deficit during stages where the crop is most sensitive.",
+      "evaluation": "critical_stage_deficit_check",
+      "evaluation_type": "daily_series_check",
+      "applies_to": [
+        "season"
+      ],
+      "inputs": [
+        {
+          "field": "daily_root_zone_available_water_mm",
+          "source": "water balance simulation"
+        },
+        {
+          "field": "critical_stages",
+          "source": "crop_database.csv water_requirements_by_stage"
+        },
+        {
+          "field": "depletion_fraction_p",
+          "source": "crop_database.csv depletion_fraction_p_fao56 (FAO-56 Table 22); stress threshold = 1 - p"
+        }
+      ],
+      "parameters": {
+        "advisory_deficit_days": 3,
+        "constraint_deficit_days": 7,
+        "proposed": true
+      },
+      "logic": "For each documented critical stage, count days where the root-zone available-water fraction falls below (1 - p), where p is the crop-specific FAO-56 depletion fraction. Sum across stages. Emit constraint at or above the constraint threshold, advisory at or above the advisory threshold, otherwise info. If no p value exists, use 0.5 only as a labeled fallback convention.",
+      "trigger": "critical_stage_deficit_days >= 3",
+      "severity": "advisory",
+      "message": "{crop_name} experiences {deficit_days} deficit days during {stage_names} under the {scenario_name} scenario.",
+      "reason": "Stress during flowering, grain filling, or storage-root initiation can reduce yield disproportionately compared with stress at other stages.",
+      "linked_criterion": "WATER",
+      "linked_indicator": "W2",
+      "source": "FAO Irrigation and Drainage Paper 56; Philippine DA corn and mungbean guides",
+      "source_url": "https://www.fao.org/3/x0490e/x0490e00.htm",
+      "notes": "Requires a daily water balance. Without it, return not_evaluable rather than estimating from seasonal totals. Adjust p for the actual ETc rate with p = p_table + 0.04(5 - ETc), bounded 0.1-0.8."
+    },
+    {
+      "rule_id": "ROT007",
+      "name": "Species Return Interval",
+      "description": "Flag replanting the same species with too short a break, using season-index intervals.",
+      "evaluation": "species_return_interval_check",
+      "evaluation_type": "sequence_check",
+      "applies_to": [
+        "crop_sequence"
+      ],
+      "inputs": [
+        {
+          "field": "seasons[].crop_name",
+          "source": "crop_database.csv crop_name"
+        }
+      ],
+      "parameters": {
+        "minimum_return_interval_seasons": 2,
+        "preferred_return_interval_seasons": 3,
+        "proposed": true
+      },
+      "logic": "For each species that appears more than once, compute the minimum season-index difference between consecutive plantings. If the window has fewer than 3 seasons, return not_evaluable for the score and report the raw repeat separately. If no species repeats in a window of 3 or more seasons, emit info with basis=no_repeat rather than a penalty. Trigger an advisory when the interval is below the minimum and an info note when it meets the preferred interval.",
+      "trigger": "minimum_return_interval_seasons < 2",
+      "severity": "advisory",
+      "message": "{crop_name} returns after only {interval} season(s). A longer break is usually needed to reduce species-specific pest and disease build-up.",
+      "reason": "Species-specific pests, pathogens, and weeds survive in residues and soil; a longer rotation break reduces inoculum and weed pressure.",
+      "linked_criterion": "DIVERSITY",
+      "linked_indicator": "D3",
+      "source": "USDA NRCS Conservation Practice Standard 328: Crop Rotation",
+      "source_url": "https://www.nrcs.usda.gov/sites/default/files/2022-09/Crop_Rotation_328_CPS.pdf",
+      "notes": "Pest-specific intervals override the default. Where a known disease requires four seasons, the rule parameter must be raised for that crop. Do not score an interval longer than the window as if it were observed.",
+      "interval_definition": "Return interval = season index difference. Adjacent seasons = 1; one full season between plantings = 2.",
+      "edge_cases": "Same species with different varieties counts as the same species. Fallow seasons are excluded from the sequence. A cover crop planted as a crop counts as its own species. A single occurrence is not missing data.",
+      "threshold_basis": "The 2/3/4-season return intervals are a project default. Real intervals are pathogen- and pest-specific and must override the default where known."
+    },
+    {
+      "rule_id": "ROT008",
+      "name": "Waterlogging Risk",
+      "description": "Flag waterlogging-sensitive crops exposed to saturation or, as a labeled proxy, to heavy rainfall.",
+      "evaluation": "waterlogging_exposure_check",
+      "evaluation_type": "threshold_check",
+      "applies_to": [
+        "season",
+        "scenario"
+      ],
+      "inputs": [
+        {
+          "field": "crop_waterlogging_sensitivity",
+          "source": "crop_database.csv waterlogging_sensitivity"
+        },
+        {
+          "field": "saturation_excess_days",
+          "source": "daily water balance and soil drainage class; preferred metric"
+        },
+        {
+          "field": "heavy_rain_days",
+          "source": "climate_scenarios.csv; proxy metric, default threshold 50 mm/day"
+        },
+        {
+          "field": "metric_used",
+          "source": "saturation_excess_days or heavy_rain_days"
+        },
+        {
+          "field": "field_drainage_class",
+          "source": "soil_reference.csv drainage_class"
+        }
+      ],
+      "parameters": {
+        "sensitive_advisory_days": 1,
+        "sensitive_constraint_days": 3,
+        "moderate_advisory_days": 3,
+        "proposed": true
+      },
+      "logic": "Use saturation_excess_days when available. Otherwise use heavy_rain_days as a proxy and lower confidence. Never add the two metrics. Read the crop sensitivity class. For sensitive crops, trigger advisory at one excess-water day and constraint at three. For moderately sensitive crops, trigger advisory at three days. Tolerant crops emit info unless exposure is extreme.",
+      "trigger": "excess_water_days >= threshold for the crop sensitivity class",
+      "severity": "constraint",
+      "message": "{crop_name} is classed {sensitivity} to waterlogging and faces {excess_water_days} excess-water days under the {scenario_name} scenario.",
+      "reason": "Saturation depletes root-zone oxygen and can cause root rot, nutrient loss, and crop death, especially in poorly drained soils.",
+      "linked_criterion": "CLIMATE",
+      "linked_indicator": "C3",
+      "source": "Philippine DA crop guides; ICRISAT groundnut guide; CARDI cassava soil and water fact sheet",
+      "source_url": "https://cardi.org/wp-content/uploads/2021/12/Fact-sheet-04-Growing-Cassava-_-Soil-and-Water-Management-_-Final.pdf",
+      "notes": "Excess-water days must come from a documented scenario or measurement, not assumed. The 24-hour tolerance notes for sweet potato and cassava are documented in crop_database.csv; the 3-day screening limit and the multipliers are project conventions, not validated universal thresholds.",
+      "metric_precedence": [
+        "saturation_excess_days",
+        "heavy_rain_days"
+      ],
+      "prohibited_interpretation": "Do not label field-capacity exceedance as waterlogging. Field capacity is not saturation.",
+      "confidence_rule": "Saturation-based results may reach medium or high confidence. Heavy-rain proxy results are capped at medium and must be labeled as a proxy.",
+      "threshold_basis": "Crop sensitivity classes come from crop_database.csv. The 3-day limit and the 2/10/20 multipliers are project conventions. The 50 mm/day heavy-rain proxy is a configurable default and must be labeled as a proxy."
+    },
+    {
+      "rule_id": "ROT009",
+      "name": "Heat Stress Risk",
+      "description": "Flag crops exposed to temperatures above their documented heat threshold during sensitive stages.",
+      "evaluation": "heat_stress_check",
+      "evaluation_type": "threshold_check",
+      "applies_to": [
+        "season",
+        "scenario"
+      ],
+      "inputs": [
+        {
+          "field": "daily_tmax_c",
+          "source": "climate_scenarios.csv"
+        },
+        {
+          "field": "crop_heat_threshold_c",
+          "source": "crop_database.csv heat_sensitivity"
+        },
+        {
+          "field": "sensitive_stages",
+          "source": "crop_database.csv"
+        }
+      ],
+      "parameters": {
+        "advisory_heat_days": 2,
+        "constraint_heat_days": 5,
+        "proposed": true
+      },
+      "logic": "Count days where daily maximum temperature exceeds the crop heat threshold during a sensitive stage. Emit constraint at or above the constraint threshold, advisory at or above the advisory threshold, otherwise info. If the crop has no documented threshold, return not_evaluable for that crop.",
+      "trigger": "heat_stress_days >= 2",
+      "severity": "constraint",
+      "message": "{crop_name} may experience {heat_days} heat-stress days during {stage_names} under the {scenario_name} scenario.",
+      "reason": "High temperatures during flowering and grain filling can reduce pollen viability, set fewer fruits or grains, and lower yield.",
+      "linked_criterion": "CLIMATE",
+      "linked_indicator": "C2",
+      "source": "Purdue University NCH-40 corn production; ICRISAT groundnut guide",
+      "source_url": "https://www.extension.purdue.edu/extmedia/NCH/NCH-40.html",
+      "notes": "Corn and cassava heat ceilings are not fully documented in the current crop database; those cases must return not_evaluable."
+    },
+    {
+      "rule_id": "ROT010",
+      "name": "Soil pH Suitability",
+      "description": "Flag crops whose documented pH range does not overlap the field pH class.",
+      "evaluation": "soil_ph_suitability_check",
+      "evaluation_type": "range_overlap_check",
+      "applies_to": [
+        "crop",
+        "field"
+      ],
+      "inputs": [
+        {
+          "field": "crop_soil_ph_min, crop_soil_ph_max",
+          "source": "crop_database.csv soil_ph_range"
+        },
+        {
+          "field": "field_ph_min, field_ph_max",
+          "source": "soil_reference.csv ph_min, ph_max, with data_source_class"
+        }
+      ],
+      "parameters": {
+        "allow_partial_overlap": true,
+        "proposed": false
+      },
+      "logic": "Compare the field pH interval with the crop pH interval. If they do not overlap at all, emit a constraint. If they overlap only partially, emit an advisory. If the field value is regional-map data rather than a measurement, include that provenance in the message.",
+      "trigger": "field pH interval and crop pH interval do not overlap",
+      "severity": "constraint",
+      "message": "{crop_name} prefers pH {crop_ph}. The available field value is {field_ph} from a {data_source_class} source, so this flag is {provenance_note}.",
+      "reason": "Soil pH controls nutrient availability and aluminum toxicity; a large mismatch limits growth regardless of other management.",
+      "linked_criterion": "FERTILITY",
+      "linked_indicator": "F3",
+      "source": "Bureau of Soils and Water Management pH maps; crop-specific guides in crop_database.csv",
+      "source_url": "https://www.bswm.da.gov.ph/",
+      "notes": "Regional map classes are aggregates. The message must not imply a parcel measurement when the source is a provincial map."
+    },
+    {
+      "rule_id": "ROT011",
+      "name": "Residue Retention",
+      "description": "Flag removal or burning of crop residues, especially on sloping land.",
+      "evaluation": "residue_management_check",
+      "evaluation_type": "practice_check",
+      "applies_to": [
+        "season",
+        "field"
+      ],
+      "inputs": [
+        {
+          "field": "seasons[].residue_management",
+          "source": "farm records"
+        },
+        {
+          "field": "field_slope_class",
+          "source": "DEM or field survey"
+        }
+      ],
+      "parameters": {
+        "slope_classes_high_risk": [
+          "moderate",
+          "steep"
+        ],
+        "proposed": false
+      },
+      "logic": "If residue is burned or fully removed and the field slope class is moderate or steep, emit an advisory. If residue is retained, emit info.",
+      "trigger": "residue removed or burned on moderate or steep land",
+      "severity": "advisory",
+      "message": "Residue from {crop_name} is {residue_management}. On {slope_class} land this reduces soil cover and increases erosion risk.",
+      "reason": "Residues intercept rainfall, slow runoff, feed soil organic matter, and recycle nutrients.",
+      "linked_criterion": "PROTECTION",
+      "linked_indicator": "S3",
+      "source": "FAO Soils Portal conservation agriculture guidance",
+      "source_url": "https://www.fao.org/soils-portal/soil-management/conservation-agriculture/en/",
+      "notes": "Residue may be grazed or used for fuel; the rule should report the tradeoff rather than assume waste."
+    },
+    {
+      "rule_id": "ROT012",
+      "name": "Rooting-Depth Feasibility",
+      "description": "Flag crops whose effective rooting depth exceeds the available soil depth.",
+      "evaluation": "rooting_depth_check",
+      "evaluation_type": "range_check",
+      "applies_to": [
+        "crop",
+        "field"
+      ],
+      "inputs": [
+        {
+          "field": "crop_root_depth_min_m, crop_root_depth_max_m",
+          "source": "crop_database.csv root_characteristics"
+        },
+        {
+          "field": "field_effective_depth_class",
+          "source": "soil_reference.csv effective_depth_class"
+        }
+      ],
+      "parameters": {
+        "shallow_depth_m": 0.5,
+        "moderate_depth_m": 1.0,
+        "proposed": true
+      },
+      "logic": "Convert the field effective-depth class to a depth range. If the crop's minimum effective rooting depth exceeds the field's maximum available depth, emit an advisory. If the crop maximum exceeds available depth but the minimum does not, emit info noting reduced buffer.",
+      "trigger": "crop_root_depth_min_m > field_available_depth_m",
+      "severity": "advisory",
+      "message": "{crop_name} can root to {crop_root_depth} m, while the field is classed {field_depth_class}. Restricted depth reduces the water and nutrient reservoir.",
+      "reason": "Effective rooting depth bounds the volume of soil a crop can exploit for water and nutrients and affects drought resilience.",
+      "linked_criterion": "WATER",
+      "linked_indicator": "W2",
+      "source": "FAO Irrigation and Drainage Paper 56 Table 22; PhilRice Simplified Keys to Soil Series",
+      "source_url": "https://www.fao.org/3/x0490e/x0490e00.htm",
+      "notes": "The demo fields have no verified series or depth measurement, so this rule will usually return not_evaluable until field data exist."
+    }
+  ],
+  "evaluation_keys": [
+    {
+      "evaluation": "flag_consecutive_same_family",
+      "rule_id": "ROT001",
+      "linked_indicator": "D2"
+    },
+    {
+      "evaluation": "legume_presence_check",
+      "rule_id": "ROT002",
+      "linked_indicator": "F1"
+    },
+    {
+      "evaluation": "nitrogen_balance_check",
+      "rule_id": "ROT003",
+      "linked_indicator": "F2"
+    },
+    {
+      "evaluation": "bare_soil_gap_check",
+      "rule_id": "ROT004",
+      "linked_indicator": "S1"
+    },
+    {
+      "evaluation": "water_supply_demand_check",
+      "rule_id": "ROT005",
+      "linked_indicator": "W1"
+    },
+    {
+      "evaluation": "critical_stage_deficit_check",
+      "rule_id": "ROT006",
+      "linked_indicator": "W2"
+    },
+    {
+      "evaluation": "species_return_interval_check",
+      "rule_id": "ROT007",
+      "linked_indicator": "D3"
+    },
+    {
+      "evaluation": "waterlogging_exposure_check",
+      "rule_id": "ROT008",
+      "linked_indicator": "C3"
+    },
+    {
+      "evaluation": "heat_stress_check",
+      "rule_id": "ROT009",
+      "linked_indicator": "C2"
+    },
+    {
+      "evaluation": "soil_ph_suitability_check",
+      "rule_id": "ROT010",
+      "linked_indicator": "F3"
+    },
+    {
+      "evaluation": "residue_management_check",
+      "rule_id": "ROT011",
+      "linked_indicator": "S3"
+    },
+    {
+      "evaluation": "rooting_depth_check",
+      "rule_id": "ROT012",
+      "linked_indicator": "W2"
+    }
+  ],
+  "integration_notes": {
+    "framework_link": "linked_criterion and linked_indicator values match rotation_evaluation_framework.json so rule flags can be shown beside the corresponding score.",
+    "parameters_are_configurable": "Every numeric threshold is a configuration parameter, not a hard-coded constant. The proposed flag marks values that still need expert calibration.",
+    "not_evaluable": "Distinguish a rule that was evaluated and not triggered from one that could not be evaluated. The UI must not show a green pass for missing data.",
+    "evidence": "Always return the input values that triggered or cleared a rule so the user can inspect the basis."
+  },
+  "change_log": [
+    {
+      "version": "1.2",
+      "date": "2026-11-14",
+      "changes": [
+        "ROT003 now uses the gross soil-surface nitrogen balance and reports N surplus and NUE with NBR.",
+        "ROT005 now uses gross P and explicit RO, consistent with FAO-56 Eq. 85.",
+        "ROT006 now reads the crop-specific FAO-56 p value and uses 1 - p as the stress threshold.",
+        "ROT004 and ROT008 now cite the 30 percent residue-cover convention and correct the unsupported 3-day limit reference.",
+        "Added scientific_validation_traceability for the v1.2 audit."
+      ]
+    },
+    {
+      "version": "1.1",
+      "date": "2026-11-14",
+      "changes": [
+        "ROT003 now counts external nitrogen once and excludes in-situ residue from inputs.",
+        "ROT005 now consumes AW_net with an explicit water-balance method.",
+        "ROT007 now defines the return interval by season index and its short-window edge cases.",
+        "ROT008 now separates saturation days from heavy-rain proxy days.",
+        "ROT001 documents the n < 2 edge case."
+      ]
+    },
+    {
+      "version": "1.0",
+      "date": "2026-11-14",
+      "changes": [
+        "Initial ruleset."
+      ]
+    }
+  ],
+  "clarifications_ref": "See rotation_evaluation_framework.json, section clarifications (version 1.1), for the normative definitions behind ROT001, ROT003, ROT005, ROT007, and ROT008.",
+  "review_traceability": [
+    {
+      "review_item": "1. Water resilience: avoid double-counting water inputs and soil-moisture change.",
+      "affected_rules": [
+        "ROT005",
+        "ROT006"
+      ],
+      "resolution": "AW_net has two mutually exclusive methods and explicit counting guards; method_id is required in output."
+    },
+    {
+      "review_item": "2. Soil fertility: prevent double-counting nitrogen fixation and residue contributions.",
+      "affected_rules": [
+        "ROT003"
+      ],
+      "resolution": "External inputs, net legume credit, harvest removal, and residue removal are separate pools; in-situ residue is an internal transfer."
+    },
+    {
+      "review_item": "3. Crop diversity: define short-sequence and return-interval edge cases.",
+      "affected_rules": [
+        "ROT001",
+        "ROT007"
+      ],
+      "resolution": "n < 2 is not applicable; n < 3 returns not_evaluable for D3; no repeat scores 100 only at n >= 3; interval uses season index."
+    },
+    {
+      "review_item": "4. Soil protection and climate: clarify cover and waterlogging so thresholds are not treated as universal.",
+      "affected_rules": [
+        "ROT004",
+        "ROT008",
+        "ROT011"
+      ],
+      "resolution": "Cover and waterlogging thresholds are labeled configurable conventions; saturation and heavy-rain proxies are separated."
+    },
+    {
+      "review_item": "5. Scoring and missing data: finalize coverage, confidence, and insufficient-data rules.",
+      "affected_rules": [
+        "all"
+      ],
+      "resolution": "Coverage formulas, confidence rules, and insufficient-data conditions are defined in the framework's scoring_scales.missing_data."
+    }
+  ],
+  "scientific_validation_traceability": [
+    {
+      "area": "Water balance",
+      "affected_rules": [
+        "ROT005",
+        "ROT006"
+      ],
+      "finding": "v1.1 used P_eff + R, which can double-count runoff because effective rainfall is often already net of runoff; the flat 0.5 stress threshold ignored FAO-56 p values.",
+      "resolution": "ROT005 now uses gross P and explicit RO (FAO-56 Eq. 85); ROT006 uses the crop-specific p value and 1 - p."
+    },
+    {
+      "area": "Nitrogen balance",
+      "affected_rules": [
+        "ROT003"
+      ],
+      "finding": "v1.1 counted gross fertilizer N but net fixation, mixing two balance boundaries.",
+      "resolution": "ROT003 now uses the Eurostat/OECD gross soil-surface balance and reports N surplus and NUE."
+    },
+    {
+      "area": "Diversity",
+      "affected_rules": [
+        "ROT001",
+        "ROT007"
+      ],
+      "finding": "The diversity index normalizes by ln(n seasons), not ln(k families); it is not Pielou evenness. The worked example was arithmetically inconsistent.",
+      "resolution": "The normalization is documented as a project convention; the example is corrected from 0.63 to 0.58."
+    },
+    {
+      "area": "Configurable thresholds",
+      "affected_rules": [
+        "ROT004",
+        "ROT008",
+        "ROT011"
+      ],
+      "finding": "The 30 percent cover value had no direct citation, and the '3-day limit' was attributed to crop_database.csv but is not there.",
+      "resolution": "The cover value now cites Purdue AY-269-W; the 3-day limit is labeled a project convention; all thresholds appear in the framework's threshold register."
+    },
+    {
+      "area": "Test coverage",
+      "affected_rules": [
+        "all"
+      ],
+      "finding": "T01-T15 were mainly edge cases and accounting guards, with no normal-path numeric tests.",
+      "resolution": "T16-T26 add normal-path, numeric, renormalization, confidence, and end-to-end tests."
+    }
+  ]
+}
