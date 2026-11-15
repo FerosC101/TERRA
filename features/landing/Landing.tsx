@@ -2,7 +2,7 @@
 
 import clsx from "clsx";
 import {
-  ArrowRight, CloudSun, Hand, Compass, Eye, FlaskConical, Layers3, LineChart, Map as MapIcon, Network, RefreshCw, Satellite, Search, Sprout, Waypoints,
+  ArrowRight, CloudSun, Hand, Compass, Eye, FlaskConical, Layers3, LineChart, Map as MapIcon, Network, Play, RefreshCw, Satellite, Search, Sprout, Waypoints,
 } from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
@@ -17,6 +17,7 @@ const StationModel = dynamic(() => import("@/components/three/StationModel"), {
 });
 
 const NAV = [
+  { href: "#film", label: "Film" },
   { href: "#problem", label: "Problem" },
   { href: "#solution", label: "Solution" },
   { href: "#features", label: "Features" },
@@ -133,14 +134,33 @@ export function Landing() {
               <Link href="/overview" className="inline-flex items-center gap-2 rounded-xl bg-green px-5 py-3 text-[15px] font-medium text-white shadow-card hover:bg-green-strong">
                 Explore the demo field <ArrowRight size={16} aria-hidden />
               </Link>
-              <a href="#results" className="inline-flex items-center gap-2 rounded-xl border border-line bg-surface px-5 py-3 text-[15px] font-medium text-ink hover:border-line-strong">
-                See the results
+              <a href="#film" className="inline-flex items-center gap-2 rounded-xl border border-line bg-surface px-5 py-3 text-[15px] font-medium text-ink hover:border-line-strong">
+                <Play size={15} className="text-green" aria-hidden /> Watch the film
               </a>
             </div>
           </div>
           <div className="terra-reveal relative mx-auto max-w-6xl px-3 sm:px-8">
             {/* eslint-disable-next-line @next/next/no-img-element -- pre-rendered device mockup */}
             <img src="/landing/overview-combo.webp" alt="TERRA's field overview on a laptop and a phone" width={2400} height={1317} className="h-auto w-full" />
+          </div>
+        </section>
+
+        {/* Film */}
+        <section id="film" className="scroll-mt-20 pt-20 sm:pt-24">
+          <div className="mx-auto max-w-6xl px-5 sm:px-8">
+            <SectionHead eyebrow="The film" title="TERRA in 30 seconds." center
+              lead="From one field's story to the decisions it can support." />
+            <div className="terra-reveal mt-10 overflow-hidden rounded-3xl border border-line bg-ink shadow-pop">
+              <video className="block aspect-video h-auto w-full" controls playsInline preload="none"
+                poster="/landing/terra-promo-poster.webp" aria-label="TERRA promotional film, 30 seconds">
+                <source src="/landing/terra-promo.mp4" type="video/mp4" />
+                <track kind="captions" src="/landing/terra-promo.vtt" srcLang="en" label="English" />
+              </video>
+            </div>
+            <p className="terra-reveal mx-auto mt-4 max-w-3xl text-center text-[13px] leading-relaxed text-muted">
+              SI-generated film: narration and sound effects by ElevenLabs, 3D scenes built in Blender. The 3D scenes are
+              conceptual visualizations; the Rotation Lab clip is a real screen recording of the app showing demo data.
+            </p>
           </div>
         </section>
 
@@ -291,6 +311,10 @@ export function Landing() {
           <p className="max-w-xl sm:text-right">
             Demonstration build. Field readings are demo data; the NASA soil-moisture map is live from NASA GIBS.
             Data: NASA SMAP, GPM IMERG, MODIS and POWER. Imagery © Esri. Map data © OpenStreetMap contributors.
+            <span className="mt-2 block">
+              Use of AI: parts of the code, the hardware design and renders, the crop images and the mockups were made with
+              Super Intelligence (SI) tools; SI-generated images and videos carry an &ldquo;SI-generated&rdquo; mark.
+            </span>
           </p>
         </div>
       </footer>
