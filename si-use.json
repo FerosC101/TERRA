@@ -1,0 +1,130 @@
+{
+  "about": "Where Super Intelligence (SI) tools were used in TERRA, for the NASA Space Apps Challenge. SI-generated images and videos carry a visible \"SI-generated\" watermark and a metadata note; the 3D field environment and 3D station views in the app show an on-screen \"SI-generated\" label.",
+  "updated": "2026-11-15",
+  "tools": [
+    {
+      "name": "Claude Code",
+      "provider": "Anthropic",
+      "kind": "AI coding assistant (large language model)"
+    },
+    {
+      "name": "Figma AI",
+      "provider": "Figma",
+      "kind": "image generation"
+    },
+    {
+      "name": "ElevenLabs",
+      "provider": "ElevenLabs",
+      "kind": "speech and sound-effect generation"
+    }
+  ],
+  "uses": [
+    {
+      "area": "Web application and website",
+      "tool": "Claude Code",
+      "type": "code",
+      "what": "Large parts of the web app were written with Claude Code under the developer's direction and review: page layouts and redesigns, the 3D maps and moisture beacons, the NASA GIBS soil-moisture map, the 3D field environment, the station viewer and its exploded view (procedural parts and textures), the website with its animated logo loader, and the guided tour.",
+      "paths": [
+        "app/",
+        "components/",
+        "features/",
+        "lib/",
+        "services/",
+        "data/"
+      ],
+      "labelled_in_app": [
+        "components/three/FieldScene.tsx (3D field environment)",
+        "components/three/StationModel.tsx (3D station and exploded view)"
+      ]
+    },
+    {
+      "area": "Field station hardware",
+      "tool": "SI tools",
+      "type": "code, images, video",
+      "what": "Hardware design, firmware and telemetry code, the 3D model, renders and the reveal video.",
+      "paths": [
+        "hardware/",
+        "public/models/"
+      ],
+      "watermarked": true
+    },
+    {
+      "area": "Crop images",
+      "tool": "Figma AI",
+      "type": "images",
+      "what": "The crop renders shown throughout the app.",
+      "paths": [
+        "public/crops/"
+      ],
+      "watermarked": true
+    },
+    {
+      "area": "Mockups, renders and videos of the app",
+      "tool": "Claude Code",
+      "type": "images, video",
+      "what": "Device mockups, website screenshots and videos, and README images, produced by scripts written with Claude Code from the running app.",
+      "paths": [
+        "docs/mockups/",
+        "docs/landing/",
+        "docs/readme/",
+        "public/landing/*.webp"
+      ],
+      "watermarked": true
+    },
+    {
+      "area": "AI/ML models and experiments",
+      "tool": "Claude Code",
+      "type": "code, data analysis, text",
+      "what": "The Discovery Engine, synthetic experiments and their notes were developed with a Claude Code project setup.",
+      "paths": [
+        "lib/science/discovery/",
+        "experiments/",
+        "scripts/",
+        "docs/ai-ml/",
+        "CLAUDE.md",
+        ".claude/"
+      ]
+    },
+    {
+      "area": "Documentation and copy",
+      "tool": "Claude Code",
+      "type": "text",
+      "what": "README, website and in-app text, guided-tour text and the progress report were drafted with Claude Code and reviewed by the team.",
+      "paths": [
+        "README.md",
+        "features/landing/",
+        "components/tour/"
+      ]
+    },
+    {
+      "area": "Promotional film",
+      "tool": "ElevenLabs, Claude Code, Blender",
+      "type": "video, audio, code",
+      "what": "30-second film: narration and sound effects generated with ElevenLabs; procedural Blender scenes and the assembly written with Claude Code; music synthesised in code. The 3D scenes are conceptual; the Rotation Lab clip is a real screen recording. Carries a visible SI-generated mark and a metadata note.",
+      "paths": [
+        "docs/film/",
+        "public/landing/terra-promo.mp4",
+        "public/landing/terra-promo-poster.webp"
+      ],
+      "watermarked": true
+    }
+  ],
+  "not_si": [
+    {
+      "what": "TERRA logo",
+      "paths": [
+        "app/BRANDING/",
+        "components/brand/",
+        "app/icon.svg"
+      ]
+    },
+    {
+      "what": "NASA data values themselves: retrieved from NASA services, never generated (the code that retrieves and processes them is listed above)",
+      "paths": [
+        "data/fields.ts",
+        "data/nasa/"
+      ]
+    }
+  ],
+  "nasa_branding": "No NASA logos, flags, insignia or mission identifiers are used or modified. \"NASA\" appears only as text naming the datasets used."
+}

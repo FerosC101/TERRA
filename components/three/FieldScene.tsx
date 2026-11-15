@@ -916,6 +916,8 @@ export default function FieldScene({ state, dim, callouts, tall = false, control
           ))}
         </div>
       )}
+      {/* The 3D scene was built with SI tools (see si-use.json) */}
+      <span className="pointer-events-none absolute bottom-3 left-3 z-10 rounded-full bg-ink/70 px-2 py-0.5 text-[10.5px] font-medium text-white">SI-generated scene</span>
     </div>
   );
 }

@@ -257,6 +257,10 @@ export default function StationModel({ className }: { className?: string }) {
           <div className="absolute inset-0 flex items-center justify-center text-sm text-muted" role="status">Loading 3D model…</div>
         )}
       </div>
+      {status !== "loading" && (
+        // The station model and its renders were made with SI tools (see si-use.json)
+        <span className="pointer-events-none absolute bottom-3 left-3 rounded-full bg-ink/70 px-2 py-0.5 text-[10.5px] font-medium text-white">SI-generated model</span>
+      )}
       {status === "ready" && (
         <div className="no-print absolute bottom-3 right-3 flex items-center gap-1.5">
           {canExplode && (
