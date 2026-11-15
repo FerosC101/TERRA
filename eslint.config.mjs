@@ -15,6 +15,8 @@ const eslintConfig = defineConfig([
     // Not part of the web app: the data pipeline and the hardware module
     "docs/**",
     "hardware/**",
+    // Vendored MapLibre worker, copied from node_modules by the postinstall script
+    "public/maplibre/**",
   ]),
 ]);
 

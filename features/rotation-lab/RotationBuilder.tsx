@@ -1,15 +1,16 @@
 "use client";
 
 import clsx from "clsx";
-import { ChevronLeft, ChevronRight, Copy, Plus, Trash2, TriangleAlert, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Copy, Droplet, Plus, Trash2, TriangleAlert, X } from "lucide-react";
 import { Card, Swatch } from "@/components/ui";
-import { CROP_LIST, CROPS, cropDuration } from "@/data/crops";
+import { CropPicker } from "@/components/visual/CropPicker";
+import { CROPS, cropDuration } from "@/data/crops";
 import { MAX_PLANS, MAX_SEASONS } from "@/data/rotations";
 import { useApp } from "@/lib/store";
 import type { CropId, RotationEvaluation, RotationPlan } from "@/types";
 import { planColor } from "./shared";
 
-const ICON_BUTTON = "rounded-md p-1.5 text-muted hover:bg-sunken hover:text-ink disabled:pointer-events-none disabled:opacity-30";
+const ICON_BUTTON = "rounded-md p-1 text-muted hover:bg-sunken hover:text-ink disabled:pointer-events-none disabled:opacity-30";
 
 /** Next free colour slot, so a plan keeps its colour when others are removed. */
 function freeSlot(plans: RotationPlan[]): number {
@@ -35,7 +36,7 @@ function PlanRow({ plan, evaluation, canDelete, canDuplicate }: { plan: Rotation
         <input value={plan.name} onChange={(e) => update({ name: e.target.value })} aria-label="Rotation name" maxLength={28}
           className="min-w-[9rem] flex-1 rounded-md bg-transparent px-1.5 py-1 text-[15px] font-semibold text-ink hover:bg-sunken focus:bg-sunken" />
         <label className="flex cursor-pointer items-center gap-2 text-[13px] text-ink-soft">
-          <input type="checkbox" checked={plan.compare} onChange={(e) => update({ compare: e.target.checked })} className="h-4 w-4" /> Include in comparison
+          <input type="checkbox" checked={plan.compare} onChange={(e) => update({ compare: e.target.checked })} className="h-4 w-4" /> Compare
         </label>
         <span className="flex items-center">
           <button type="button" className={ICON_BUTTON} onClick={duplicate} disabled={!canDuplicate} aria-label={`Duplicate ${plan.name}`} title="Duplicate"><Copy size={16} /></button>
@@ -51,29 +52,27 @@ function PlanRow({ plan, evaluation, canDelete, canDuplicate }: { plan: Rotation
           const fallow = cropId === "fallow";
           const repeat = i > 0 && !fallow && CROPS[plan.crops[i - 1]].family === crop.family;
           return (
-            <li key={i} className="w-[212px] shrink-0 rounded-lg border border-line bg-canvas p-3" style={{ borderTopColor: planColor(plan), borderTopWidth: 3 }}>
-              <div className="flex items-start justify-between gap-1">
-                <p className="text-xs leading-snug text-muted"><span className="block font-medium text-ink">Season {i + 1}</span>{season?.windowLabel ?? " "}</p>
+            <li key={i} className="w-[184px] shrink-0 rounded-xl border border-line bg-canvas p-2.5" style={{ borderTopColor: planColor(plan), borderTopWidth: 3 }}>
+              <div className="flex items-center justify-between gap-1">
+                <p className="whitespace-nowrap pl-1 text-xs leading-tight text-muted"><span className="font-medium text-ink">S{i + 1}</span> {season?.windowLabel ?? ""}</p>
                 <span className="flex">
                   <button type="button" className={ICON_BUTTON} onClick={() => move(i, -1)} disabled={i === 0} aria-label={`Move season ${i + 1} earlier`}><ChevronLeft size={15} /></button>
                   <button type="button" className={ICON_BUTTON} onClick={() => move(i, 1)} disabled={i === plan.crops.length - 1} aria-label={`Move season ${i + 1} later`}><ChevronRight size={15} /></button>
                   <button type="button" className={ICON_BUTTON} onClick={() => setCrops(plan.crops.filter((_, j) => j !== i))} disabled={plan.crops.length <= 1} aria-label={`Remove season ${i + 1}`}><X size={15} /></button>
                 </span>
               </div>
-              <select value={cropId} aria-label={`Crop for season ${i + 1}`} title={crop.note} onChange={(e) => setCrops(plan.crops.map((c, j) => (j === i ? (e.target.value as CropId) : c)))}
-                className="field-input mt-2 w-full !py-1.5 font-medium">
-                {CROP_LIST.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-              </select>
-              <dl className="mt-2.5 space-y-1 text-xs text-muted">
-                <div className="flex justify-between gap-2"><dt>Family</dt><dd className="text-ink-soft">{fallow ? "No crop" : crop.familyCommon}</dd></div>
-                <div className="flex justify-between gap-2"><dt>Growing period</dt><dd className="tabular text-ink-soft">{fallow ? "Whole season" : `about ${cropDuration(crop)} days`}</dd></div>
-                <div className="flex justify-between gap-2"><dt>Water demand</dt><dd className="tabular text-ink-soft">{season && !fallow ? `${season.demandMm} mm` : "None"}</dd></div>
-              </dl>
+              <CropPicker value={cropId} label={`Season ${i + 1} crop`} onChange={(c) => setCrops(plan.crops.map((x, j) => (j === i ? c : x)))} />
+              <div className="mt-1 flex items-center justify-center gap-1.5 text-xs text-muted">
+                <span>{fallow ? "No crop" : crop.familyCommon}</span>
+                {!fallow && <><span aria-hidden>·</span><span className="tabular">~{cropDuration(crop)} d</span></>}
+              </div>
+              <div className="mt-2 flex items-center justify-center gap-1 rounded-md bg-surface py-1 text-xs text-ink-soft" title="Estimated water demand for this season">
+                <Droplet size={12} className="text-blue" aria-hidden /><span className="tabular font-medium">{season && !fallow ? `${season.demandMm} mm` : "0 mm"}</span>
+              </div>
               {(repeat || season?.overrun) && (
-                <ul className="mt-2 space-y-1 text-xs font-medium text-amber">
-                  {repeat && <li className="flex gap-1.5"><TriangleAlert size={13} className="mt-px shrink-0" aria-hidden />Same family as the season before</li>}
-                  {season?.overrun && <li className="flex gap-1.5"><TriangleAlert size={13} className="mt-px shrink-0" aria-hidden />Needs longer than the season window</li>}
-                </ul>
+                <p className="mt-2 flex items-start gap-1 text-[11px] font-medium leading-snug text-amber">
+                  <TriangleAlert size={12} className="mt-px shrink-0" aria-hidden />{repeat ? "Same family as before" : "Longer than the season"}
+                </p>
               )}
             </li>
           );
@@ -81,7 +80,7 @@ function PlanRow({ plan, evaluation, canDelete, canDuplicate }: { plan: Rotation
         {plan.crops.length < MAX_SEASONS && (
           <li className="flex shrink-0">
             <button type="button" onClick={() => setCrops([...plan.crops, "mungbean"])}
-              className="flex w-[120px] flex-col items-center justify-center gap-1.5 rounded-lg border border-dashed border-line-strong text-[13px] font-medium text-muted hover:border-green hover:text-green-strong">
+              className="flex w-[110px] flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed border-line-strong text-[13px] font-medium text-muted hover:border-green hover:text-green-strong">
               <Plus size={18} aria-hidden /> Add season
             </button>
           </li>

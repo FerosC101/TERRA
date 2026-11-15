@@ -1,6 +1,7 @@
 "use client";
 
 import { Swatch } from "@/components/ui";
+import { InfoTip } from "@/components/visual/InfoTip";
 import { useApp } from "@/lib/store";
 import type { Priorities as PriorityWeights, RotationEvaluation, RotationPlan } from "@/types";
 import { planColor, PRIORITY_MATCH } from "./shared";
@@ -28,12 +29,12 @@ export function Priorities({ plans, evaluations }: { plans: RotationPlan[]; eval
             <span className="flex items-baseline justify-between gap-2 text-sm font-medium text-ink">{w.label}<span className="text-[13px] font-normal text-muted">{LEVELS[priorities[w.key]]}</span></span>
             <input type="range" min={0} max={5} step={1} value={priorities[w.key]} aria-valuetext={LEVELS[priorities[w.key]]}
               onChange={(e) => setPriorities({ ...priorities, [w.key]: Number(e.target.value) })} className="mt-2 w-full" />
-            <span className="mt-0.5 block text-[13px] leading-snug text-muted">{w.hint}</span>
+
           </label>
         ))}
       </div>
       <div>
-        <h3 className="text-sm font-medium text-ink">Match to your priorities</h3>
+        <h3 className="flex items-center gap-1.5 text-sm font-medium text-ink">Match to your priorities<InfoTip label="match to your priorities">Each of the five considerations is scaled from 0 to 1, multiplied by your weight (0 to 5), added up and divided by the total weight. It summarises your stated preferences. It is not a validated score and does not predict yield or profit.</InfoTip></h3>
         {plans.length === 0 ? <p className="mt-2 text-sm text-muted">Include a rotation in the comparison to see its match.</p> : (
           <ul className="mt-3 space-y-3.5">
             {plans.map((p, i) => {
@@ -47,9 +48,7 @@ export function Priorities({ plans, evaluations }: { plans: RotationPlan[]; eval
             })}
           </ul>
         )}
-        <p className="mt-4 text-[13px] leading-relaxed text-muted">
-          <span className="font-medium text-ink-soft">How it is calculated:</span> each of the five considerations is scaled from 0 to 1, multiplied by your weight (0 to 5), added up and divided by the total weight. It summarises your stated preferences. It is not a validated score and does not predict yield or profit.
-        </p>
+
       </div>
     </div>
   );

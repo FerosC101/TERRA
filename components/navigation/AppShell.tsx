@@ -1,12 +1,15 @@
 "use client";
 
 import clsx from "clsx";
-import { Bell, Check, ChevronsUpDown, Database, MapPin, Menu, User, X } from "lucide-react";
+import { Bell, Check, ChevronDown, Database, Menu, User, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Logo } from "@/components/brand/Logo";
-import { DEMO_TODAY, longDate, shortDate } from "@/lib/dates";
+import { CropImage } from "@/components/visual/Crop";
+import { CROPS } from "@/data/crops";
+import { DEMO_TODAY, daysBetween, longDate, shortDate } from "@/lib/dates";
+import { fmt } from "@/lib/format";
 import { useApp } from "@/lib/store";
 import { useService } from "@/lib/useService";
 import { getDiscoveries } from "@/services/discoveryService";
@@ -21,7 +24,7 @@ function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
   return (
     <div className="flex h-full flex-col">
-      <Link href="/" onClick={onNavigate} className="flex h-16 items-center px-5" aria-label="TERRA home"><Logo /></Link>
+      <Link href="/overview" onClick={onNavigate} className="flex h-16 items-center px-5" aria-label="TERRA overview"><Logo /></Link>
       <nav aria-label="Main" className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-3 py-2">
         {NAV.map((item) => {
           const active = isActive(pathname, item.href);
@@ -58,32 +61,74 @@ function usePopover() {
 const POP = "absolute top-full z-[1200] mt-2 rounded-xl border border-line-strong bg-surface p-1.5 shadow-pop";
 const ICON_BUTTON = "relative flex h-9 w-9 items-center justify-center rounded-lg text-ink-soft hover:bg-sunken hover:text-ink";
 
+/** Place name without the country, for compact labels */
+const shortPlace = (location: string) => location.split(",").slice(0, 2).join(",").trim();
+
 function FieldSelector() {
   const { field, fields, setFieldId } = useApp();
   const { open, setOpen, ref } = usePopover();
+  const options = useRef<(HTMLButtonElement | null)[]>([]);
+
+  // Open with focus on the current field; arrows, Home and End move through the list
+  useEffect(() => {
+    if (open) options.current[Math.max(0, fields.findIndex((f) => f.id === field.id))]?.focus();
+  }, [open, fields, field.id]);
+  const onKey = (e: React.KeyboardEvent) => {
+    const list = options.current.filter(Boolean) as HTMLButtonElement[];
+    const i = list.indexOf(document.activeElement as HTMLButtonElement);
+    const to = e.key === "ArrowDown" ? i + 1 : e.key === "ArrowUp" ? i - 1 : e.key === "Home" ? 0 : e.key === "End" ? list.length - 1 : null;
+    if (to === null) return;
+    e.preventDefault();
+    list[(to + list.length) % list.length]?.focus();
+  };
+
   return (
     <div className="relative min-w-0" ref={ref}>
-      <button type="button" onClick={() => setOpen(!open)} aria-haspopup="listbox" aria-expanded={open} aria-label={`Field: ${field.name}. Change field`}
-        className="flex max-w-full items-center gap-2 rounded-lg border border-line-strong bg-surface px-3 py-1.5 text-left hover:bg-sunken">
-        <span className="min-w-0 truncate text-sm font-medium text-ink">{field.name}</span>
-        <ChevronsUpDown size={14} className="shrink-0 text-muted" aria-hidden />
+      <button type="button" onClick={() => setOpen(!open)} aria-haspopup="true" aria-expanded={open} aria-label={`Field: ${field.name}. Change field`}
+        className={clsx("group flex h-11 max-w-full items-center gap-2.5 rounded-xl border bg-surface py-1 pl-1 pr-2.5 text-left shadow-card transition-colors",
+          open ? "border-green ring-2 ring-green/15" : "border-line hover:border-line-strong")}>
+        <CropImage id={field.currentCrop} size="xs" className="h-9! w-9! rounded-lg" />
+        <span className="min-w-0">
+          <span className="block truncate text-sm font-semibold leading-tight text-ink">{field.name}</span>
+          <span className="hidden truncate text-xs leading-tight text-muted sm:block">{shortPlace(field.location)} · {fmt(field.areaHa, 1)} ha</span>
+        </span>
+        <ChevronDown size={16} className={clsx("ml-0.5 shrink-0 text-muted transition-transform", open && "rotate-180 text-ink")} aria-hidden />
       </button>
       {open && (
-        <ul role="listbox" aria-label="Select field" className={clsx(POP, "left-0 w-80 max-w-[calc(100vw-2rem)]")}>
-          {fields.map((f) => (
-            <li key={f.id} role="option" aria-selected={f.id === field.id}>
-              <button type="button" onClick={() => { setFieldId(f.id); setOpen(false); }}
-                className={clsx("flex w-full items-start gap-2.5 rounded-lg px-2.5 py-2 text-left hover:bg-sunken", f.id === field.id && "bg-green-soft hover:bg-green-soft")}>
-                <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center text-green">{f.id === field.id && <Check size={15} aria-hidden />}</span>
-                <span className="min-w-0">
-                  <span className="block text-sm font-medium text-ink">{f.name}</span>
-                  <span className="block text-xs text-muted">{f.location} · {f.areaHa} ha</span>
-                  <span className="mt-0.5 block text-xs text-faint">{f.role === "primary" ? "Primary demonstration field" : "Secondary demo field"}</span>
-                </span>
-              </button>
-            </li>
-          ))}
-        </ul>
+        <div onKeyDown={onKey} className={clsx(POP, "left-0 w-[22rem] max-w-[calc(100vw-2rem)] p-2 max-sm:fixed max-sm:inset-x-3 max-sm:top-[60px] max-sm:mt-0 max-sm:w-auto max-sm:max-w-none")}>
+          <p className="flex items-center justify-between px-2 pb-2 pt-1 text-xs font-medium text-muted">
+            <span>Switch field</span><span className="tabular">{fields.length} fields</span>
+          </p>
+          <ul aria-label="Fields" className="space-y-1">
+            {fields.map((f, i) => {
+              const current = f.id === field.id;
+              const crop = CROPS[f.currentCrop];
+              const day = daysBetween(f.plantedOn, DEMO_TODAY);
+              return (
+                <li key={f.id}>
+                  <button ref={(n) => { options.current[i] = n; }} type="button" aria-current={current ? "true" : undefined}
+                    onClick={() => { setFieldId(f.id); setOpen(false); }}
+                    className={clsx("grid w-full grid-cols-[44px_minmax(0,1fr)_20px] items-center gap-3 rounded-lg p-2 text-left outline-none transition-colors",
+                      current ? "bg-green-soft" : "hover:bg-sunken focus-visible:bg-sunken", "focus-visible:ring-2 focus-visible:ring-green/40")}>
+                    <CropImage id={f.currentCrop} size="xs" className="h-11! w-11! rounded-lg" />
+                    <span className="min-w-0">
+                      <span className="flex items-center gap-2">
+                        <span className="truncate text-sm font-semibold text-ink">{f.name}</span>
+                        <span className={clsx("shrink-0 rounded-full px-1.5 py-px text-[10.5px] font-medium", f.role === "primary" ? "bg-green/10 text-green-strong" : "bg-black/[0.05] text-muted")}>
+                          {f.role === "primary" ? "Primary" : "Demo"}
+                        </span>
+                      </span>
+                      <span className="mt-0.5 block truncate text-xs text-muted">{shortPlace(f.location)} · {fmt(f.areaHa, 1)} ha</span>
+                      <span className="block truncate text-xs text-ink-soft">{crop.name}{day >= 0 ? `, day ${day}` : ""}</span>
+                    </span>
+                    <span className="flex justify-center">{current && <Check size={17} className="text-green" aria-hidden />}</span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+          <p className="mt-2 border-t border-line px-2 pt-2 text-[11px] leading-snug text-muted">Every page follows the field you choose. Demo fields use illustrative climate.</p>
+        </div>
       )}
     </div>
   );
@@ -165,9 +210,16 @@ function Profile() {
   );
 }
 
+/** Pages that use the full content area edge to edge (the map). */
+const FULL_BLEED = ["/explorer"];
+/** Pages that bring their own layout, without the app's sidebar and header: the website at / */
+const isBare = (pathname: string) => pathname === "/";
+
 export function AppShell({ children }: { children: React.ReactNode }) {
   const [drawer, setDrawer] = useState(false);
-  const { field } = useApp();
+  const pathname = usePathname();
+  const fullBleed = FULL_BLEED.some((p) => pathname.startsWith(p));
+  if (isBare(pathname)) return <>{children}</>;
   return (
     <div className="min-h-screen">
       <aside className="no-print fixed inset-y-0 left-0 z-30 hidden w-56 border-r border-line bg-surface lg:block">
@@ -192,14 +244,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <Menu size={19} />
           </button>
           <FieldSelector />
-          <span className="hidden min-w-0 items-center gap-1.5 truncate text-[13px] text-muted md:flex"><MapPin size={14} className="shrink-0" aria-hidden /><span className="truncate">{field.location}</span></span>
           <div className="ml-auto flex items-center gap-1.5">
             <DataStatus />
             <Notifications />
             <Profile />
           </div>
         </header>
-        <main className="mx-auto max-w-[1240px] px-4 py-8 sm:px-6 lg:px-10 lg:py-10">{children}</main>
+        <main className={fullBleed ? "relative" : "mx-auto max-w-[1240px] px-4 py-8 sm:px-6 lg:px-10 lg:py-10"}>{children}</main>
       </div>
     </div>
   );

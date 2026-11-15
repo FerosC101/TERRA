@@ -45,3 +45,6 @@ __pycache__/
 
 # Office lock files (created while a .docx/.pptx is open in Word/PowerPoint)
 ~$*
+
+# MapLibre worker, copied from node_modules on install (see package.json postinstall)
+/public/maplibre/

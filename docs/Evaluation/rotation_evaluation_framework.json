@@ -1,0 +1,2132 @@
+{
+  "framework_id": "TERRA-ROT-EVAL",
+  "name": "TERRA Rotation Lab Evaluation Framework",
+  "version": "1.2",
+  "date": "2026-11-14",
+  "status": "proposed_starting_values_audited",
+  "owner": "TERRA agricultural research",
+  "purpose": "Define how TERRA compares alternative crop sequences across water resilience, soil fertility management, crop diversity, soil protection, and climate suitability, while keeping criterion-level scores, assumptions, and uncertainty visible.",
+  "disclaimer": "Weights, thresholds, and scoring breakpoints are proposed heuristics for a prototype. They are not scientifically validated universal constants and must be reviewed by an agronomist and calibrated with local field data before being treated as recommendations. Rules and scores are advisories, not absolute agricultural laws.",
+  "overall_score": {
+    "symbol": "S",
+    "formula": "S = sum_i (w_i * s_i)",
+    "range": [
+      0,
+      100
+    ],
+    "direction": "higher_is_better",
+    "weights_sum": 1.0,
+    "explanation": "S is computed only from criteria that have at least one scored indicator. Criterion weights are renormalized over the included criteria. The overall score must never be displayed without the five criterion scores, criterion coverage, overall coverage, confidence, and flags.",
+    "display_requirements": [
+      "Show all five criterion scores next to the overall score.",
+      "Show the data-coverage percentage and confidence level.",
+      "Show advisory and constraint flags separately from the score.",
+      "Show which inputs were missing and which indicators were skipped."
+    ],
+    "formula_expanded": "S = sum(w_i * s_i for included criteria i) / sum(w_i for included criteria i), where included means the criterion has at least one scored indicator"
+  },
+  "scoring_scales": {
+    "numeric": {
+      "range": [
+        0,
+        100
+      ],
+      "direction": "higher_is_better",
+      "bands": [
+        {
+          "min": 90,
+          "max": 100,
+          "label": "Excellent",
+          "meaning": "Sequence strongly matches the criterion under the stated assumptions."
+        },
+        {
+          "min": 70,
+          "max": 89.99,
+          "label": "Good",
+          "meaning": "Sequence generally matches the criterion with minor limitations."
+        },
+        {
+          "min": 50,
+          "max": 69.99,
+          "label": "Moderate",
+          "meaning": "Mixed result; tradeoffs or data gaps should be reviewed."
+        },
+        {
+          "min": 30,
+          "max": 49.99,
+          "label": "Marginal",
+          "meaning": "Important limitation; mitigation or a different sequence should be considered."
+        },
+        {
+          "min": 0,
+          "max": 29.99,
+          "label": "High risk",
+          "meaning": "Sequence poorly matches the criterion; flag for expert review."
+        }
+      ]
+    },
+    "confidence": [
+      {
+        "level": "high",
+        "rule": "cov_i >= 0.80 and every scored indicator's weakest input quality is measured or local_reference."
+      },
+      {
+        "level": "medium",
+        "rule": "cov_i >= 0.50 and no scored indicator relies solely on general_reference or hypothetical data. regional_map, crop_reference, scenario_historical, and scenario_projected are allowed."
+      },
+      {
+        "level": "low",
+        "rule": "cov_i < 0.50, or any scored indicator relies solely on general_reference or hypothetical data, or a required input is a proxy rather than a measurement."
+      }
+    ],
+    "missing_data": {
+      "policy": "Do not impute missing field measurements from regional maps or general references. Each indicator must be marked scored, missing_input, or not_applicable. missing_input counts in the coverage denominator and lowers coverage; not_applicable is excluded from the denominator but reported separately.",
+      "indicator_status": {
+        "scored": "A numeric score was produced from the required inputs.",
+        "missing_input": "A required input is absent. The indicator score is null, it counts in the denominator, and coverage falls.",
+        "not_applicable": "The indicator does not apply to this rotation by definition (for example D3 when the window is shorter than three seasons, or D1/D2 when there are fewer than two seasons). It is excluded from the denominator and must not be shown as a pass or a failure."
+      },
+      "coverage": {
+        "symbols": {
+          "w_i": "criterion weight; sums to 1 across the five criteria",
+          "u_ij": "local indicator weight within criterion i; sums to 1 across applicable indicators",
+          "g_ij": "global indicator weight = w_i * u_ij",
+          "cov_i": "criterion coverage",
+          "cov_overall": "overall coverage",
+          "s_i": "criterion score",
+          "S": "overall score"
+        },
+        "criterion_coverage_formula": "cov_i = sum(u_ij for scored indicators) / sum(u_ij for applicable indicators)",
+        "overall_coverage_formula": "cov_overall = sum(w_i * cov_i) / sum(w_i) over criteria with at least one applicable indicator",
+        "equivalent_global_form": "cov_overall = sum(g_ij for scored indicators) / sum(g_ij for applicable indicators)",
+        "denominator_rules": [
+          "missing_input stays in the denominator.",
+          "not_applicable is removed from the denominator.",
+          "If a criterion has no applicable indicators, exclude the criterion and renormalize the criterion weights.",
+          "Never count the same indicator twice in a criterion."
+        ]
+      },
+      "aggregation": {
+        "criterion_score_formula": "s_i = sum(u_ij * score_ij for scored indicators) / sum(u_ij for scored indicators)",
+        "overall_score_formula": "S = sum(w_i * s_i for criteria with at least one scored indicator) / sum(w_i for those criteria)",
+        "rules": [
+          "Renormalize within a criterion when some indicators are missing_input or not_applicable.",
+          "A criterion with zero scored indicators contributes no score and is excluded from S.",
+          "Do not substitute a default score for a missing indicator."
+        ]
+      },
+      "confidence": {
+        "per_criterion_rules": [
+          {
+            "level": "high",
+            "rule": "cov_i >= 0.80 and every scored indicator's weakest input quality is measured or local_reference."
+          },
+          {
+            "level": "medium",
+            "rule": "cov_i >= 0.50 and no scored indicator relies solely on general_reference or hypothetical data. regional_map, crop_reference, scenario_historical, and scenario_projected are allowed at this level."
+          },
+          {
+            "level": "low",
+            "rule": "cov_i < 0.50, or any scored indicator relies solely on general_reference or hypothetical data, or a required input is a proxy rather than a measurement."
+          }
+        ],
+        "overall_rule": "Overall confidence is the minimum confidence among included criteria (weakest link). Per-criterion confidence must also be displayed. Do not average confidence upward.",
+        "data_quality_tags": [
+          {
+            "tag": "measured",
+            "definition": "Field measurement or laboratory result."
+          },
+          {
+            "tag": "local_reference",
+            "definition": "Local extension guidance or verified farm record."
+          },
+          {
+            "tag": "regional_map",
+            "definition": "Regional soil map or soil-series key."
+          },
+          {
+            "tag": "crop_reference",
+            "definition": "Cited crop requirement range from crop_database.csv."
+          },
+          {
+            "tag": "scenario_historical",
+            "definition": "Historical climate record such as NASA POWER 1991-2020."
+          },
+          {
+            "tag": "scenario_projected",
+            "definition": "Downscaled climate projection such as NEX-GDDP-CMIP6."
+          },
+          {
+            "tag": "general_reference",
+            "definition": "Qualitative general guidance, not location-specific."
+          },
+          {
+            "tag": "hypothetical",
+            "definition": "Demonstration-only value that is not observed or projected."
+          }
+        ],
+        "downgrade_rules": [
+          "Any proxy input caps the criterion at medium confidence.",
+          "Any hypothetical input caps the criterion at low confidence.",
+          "A criterion that mixes measured and regional-map inputs is high only if the measured inputs carry the indicators that drive the score."
+        ]
+      },
+      "insufficient_data": {
+        "conditions": "Return status=insufficient_data when cov_overall < 0.50, or when fewer than 3 of the five defined criteria have cov_i >= 0.50.",
+        "action": "Return the available criterion scores, per-criterion coverage, overall coverage, missing inputs, and reasons. Do not output an overall numeric score. Do not present the rotation as suitable or unsuitable.",
+        "edge_case": "If exactly 3 criteria qualify, S is reported but confidence may not exceed the weakest included criterion and the result must state that 2 criteria were excluded."
+      },
+      "rounding": {
+        "internal": "Keep full precision through all aggregations.",
+        "display_criterion_score": "1 decimal place.",
+        "display_overall_score": "1 decimal place.",
+        "display_coverage": "2 decimal places or an integer percentage.",
+        "display_confidence": "Label only: high, medium, or low."
+      },
+      "minimum_coverage_to_report_overall": 0.5,
+      "minimum_criteria_with_coverage": 3,
+      "below_minimum_action": "Return status=insufficient_data with the available criterion scores and the reasons listed. Never fill the gap with a default value."
+    },
+    "confidence_authoritative_source": "scoring_scales.missing_data.confidence"
+  },
+  "criteria": [
+    {
+      "criterion_id": "WATER",
+      "name": "Water resilience",
+      "weight": 0.25,
+      "definition": "How well the sequence's crop water demand is met by available water across seasons and critical growth stages, including exposure to deficit.",
+      "rationale": "Water is a primary limiting factor in rainfed Philippine cropping systems. Comparing seasonal demand with supply and checking stage-level deficits separates sequences that only look balanced on a seasonal total.",
+      "indicators": [
+        {
+          "indicator_id": "W1",
+          "evaluation_key": "water_supply_demand_ratio",
+          "name": "Seasonal water supply-to-demand ratio",
+          "unit": "ratio",
+          "direction": "higher_is_better",
+          "formula": "WSDR = AW_net / CWR_season",
+          "inputs": [
+            {
+              "symbol": "AW_net",
+              "definition": "Net water available to the crop over the season: net infiltration plus any storage drawdown, computed by exactly one of the methods in clarifications.water_balance.methods. Do not mix methods.",
+              "unit": "mm",
+              "source": "climate_scenarios.csv (gross rainfall P), field irrigation records, soil water balance (RO, CR, DP, S_start, S_end)"
+            },
+            {
+              "symbol": "CWR_season",
+              "definition": "Crop water requirement for the season: sum of Kc times reference evapotranspiration over the growing period.",
+              "unit": "mm",
+              "source": "crop_database.csv (Kc values), climate_scenarios.csv (ETo)"
+            },
+            {
+              "symbol": "water_balance_method",
+              "definition": "Method ID used: daily_root_zone_balance or seasonal_totals.",
+              "unit": "enum",
+              "source": "result metadata"
+            }
+          ],
+          "scoring": {
+            "type": "piecewise_linear",
+            "points": [
+              [
+                0.0,
+                0
+              ],
+              [
+                0.5,
+                20
+              ],
+              [
+                0.8,
+                50
+              ],
+              [
+                1.0,
+                80
+              ],
+              [
+                1.1,
+                95
+              ],
+              [
+                1.2,
+                100
+              ],
+              [
+                1.5,
+                100
+              ]
+            ],
+            "notes": "Scores above 1.2 are capped at 100 because surplus water is assessed separately by waterlogging exposure (C3) and soil protection (S1, S2)."
+          },
+          "interpretation": {
+            "100": "Seasonal demand fully met with a small buffer, using a single stated water-balance method.",
+            "0": "Available water is less than half of seasonal demand."
+          },
+          "missing_data": "Requires both AW_season and CWR_season. If either is missing, score is null.",
+          "calculation_guard": "Use gross rainfall P and subtract runoff RO explicitly, as in FAO-56 Eq. 85. If an effective-rainfall product is used, it must already equal P - RO; do not add P_eff and then subtract RO again. With daily_root_zone_balance, delta S is internal and must not be added. With seasonal_totals, delta S is added once as S_start minus S_end. Count rainfall, irrigation, and capillary rise once each; subtract runoff and deep percolation once.",
+          "reference_equation": "FAO-56 Eq. 85: Dr,i = Dr,i-1 - (P - RO)i - Ii - CRi + ETc,i + DPi. Rearranged over the growing period, net inflow = sum(P - RO + I + CR - DP) = sum(ETc) + (S_end - S_start).",
+          "threshold_basis": "WSDR advisory 0.8 and constraint 0.6 are screening bands around the FAO-56 supply-demand ratio; they are project conventions, not yield-response thresholds."
+        },
+        {
+          "indicator_id": "W2",
+          "evaluation_key": "critical_stage_deficit_days",
+          "name": "Critical-stage water deficit days",
+          "unit": "days",
+          "direction": "lower_is_better",
+          "formula": "CSDD = sum over critical stages of days where root-zone available water fraction falls below (1 - p), where p is the FAO-56 depletion fraction for no stress",
+          "inputs": [
+            {
+              "symbol": "critical_stages",
+              "definition": "Crop-specific stages listed in crop_database.csv (for example corn tasseling-silking and grain fill).",
+              "unit": "stage list",
+              "source": "crop_database.csv"
+            },
+            {
+              "symbol": "depletion_fraction_p",
+              "definition": "FAO-56 Table 22 fraction of total available water that the crop can deplete before stress. Stress begins when available water falls below (1 - p) of TAW.",
+              "unit": "fraction",
+              "source": "crop_database.csv depletion_fraction_p_fao56 (FAO-56 Table 22)"
+            },
+            {
+              "symbol": "daily_soil_water",
+              "definition": "Daily root-zone available water from the water balance.",
+              "unit": "mm",
+              "source": "simulation or field measurement"
+            }
+          ],
+          "scoring": {
+            "type": "piecewise_linear",
+            "points": [
+              [
+                0,
+                100
+              ],
+              [
+                3,
+                80
+              ],
+              [
+                7,
+                50
+              ],
+              [
+                14,
+                20
+              ],
+              [
+                21,
+                0
+              ]
+            ],
+            "notes": "p values come from FAO-56 Table 22. Adjust p for the actual ETc rate with p = p_table + 0.04(5 - ETc), bounded 0.1-0.8. The deficit-day breakpoints are proposed screening values."
+          },
+          "interpretation": {
+            "100": "No critical-stage deficit days.",
+            "0": "Three or more weeks of deficit during critical stages."
+          },
+          "missing_data": "If daily soil water is unavailable, score is null and W1 carries the criterion. If the crop has no p value, use 0.5 only as a labeled fallback convention.",
+          "calculation_guard": "Daily soil water must come from the same water balance used for W1. Do not derive daily values from a seasonal total.",
+          "threshold_basis": "Stress onset is the FAO-56 readily-available-water threshold RAW = p * TAW, so the available-water threshold is (1 - p). This replaces the v1.1 flat 0.5 default, which ignored the published crop-specific p values."
+        }
+      ],
+      "aggregation": {
+        "type": "weighted_sum",
+        "components": [
+          {
+            "indicator_id": "W1",
+            "weight": 0.65
+          },
+          {
+            "indicator_id": "W2",
+            "weight": 0.35
+          }
+        ]
+      },
+      "data_requirements": [
+        "crop water requirement and Kc by stage",
+        "seasonal and daily water supply",
+        "critical growth stages",
+        "irrigation records if any"
+      ],
+      "references": [
+        "REF-01",
+        "REF-02",
+        "REF-08"
+      ]
+    },
+    {
+      "criterion_id": "FERTILITY",
+      "name": "Soil fertility management",
+      "weight": 0.25,
+      "definition": "How well the sequence balances nutrient demand and removal with legume nitrogen contributions, applied nutrients, and residue return.",
+      "rationale": "Repeated nutrient-demanding cereals without legume or organic inputs can draw down soil fertility. The criterion rewards legume integration and a nutrient balance close to neutral, while flagging large deficits.",
+      "indicators": [
+        {
+          "indicator_id": "F1",
+          "evaluation_key": "legume_season_fraction",
+          "name": "Legume season fraction",
+          "unit": "fraction",
+          "direction": "higher_is_better",
+          "formula": "LSF = legume_seasons / total_seasons",
+          "inputs": [
+            {
+              "symbol": "legume_seasons",
+              "definition": "Number of seasons in the evaluated window planted to a crop with nitrogen_fixation = Yes in crop_database.csv.",
+              "unit": "count",
+              "source": "crop_database.csv, crop history"
+            },
+            {
+              "symbol": "total_seasons",
+              "definition": "Number of seasons in the evaluated rotation window.",
+              "unit": "count",
+              "source": "rotation definition"
+            }
+          ],
+          "scoring": {
+            "type": "piecewise_linear",
+            "points": [
+              [
+                0.0,
+                0
+              ],
+              [
+                0.2,
+                40
+              ],
+              [
+                0.33,
+                70
+              ],
+              [
+                0.5,
+                90
+              ],
+              [
+                0.67,
+                100
+              ]
+            ],
+            "notes": "A common agronomic guideline is at least one legume every two to three seasons; the breakpoints reflect that guidance, not a measured response curve."
+          },
+          "interpretation": {
+            "100": "Legumes in two of three seasons.",
+            "0": "No legume in the window."
+          },
+          "missing_data": "Requires a complete season list. If the rotation is incomplete, score is null.",
+          "threshold_basis": "The 0.2/0.33/0.5/0.67 legume-season fractions reflect the common one-legume-every-two-to-three-seasons guidance; they are project screening conventions, not a measured response curve."
+        },
+        {
+          "indicator_id": "F2",
+          "evaluation_key": "nitrogen_balance_ratio",
+          "name": "Nitrogen supply-to-removal ratio (inverse NUE)",
+          "unit": "ratio",
+          "direction": "target_range",
+          "formula": "NBR = (N_fertilizer + N_amendment_external + N_fixed_gross + N_deposition) / (N_harvest_removal + N_residue_removed)",
+          "inputs": [
+            {
+              "symbol": "N_fertilizer",
+              "definition": "Synthetic or mineral nitrogen applied in the window, counted once.",
+              "unit": "kg N/ha",
+              "source": "farm records; crop_database.csv guidance ranges"
+            },
+            {
+              "symbol": "N_amendment_external",
+              "definition": "Organic nitrogen imported from outside the window (manure, compost, imported residue). In-situ residue is excluded.",
+              "unit": "kg N/ha",
+              "source": "farm records"
+            },
+            {
+              "symbol": "N_fixed_gross",
+              "definition": "Gross biological nitrogen fixation by legumes, counted once. Under the gross balance, do not deduct gaseous or leaching losses from fixation unless the same deduction is applied to all inputs.",
+              "unit": "kg N/ha",
+              "source": "local fixation trial or documented estimate; crop_database.csv legume notes"
+            },
+            {
+              "symbol": "N_deposition",
+              "definition": "Atmospheric nitrogen deposition, if a local estimate exists; otherwise 0 with an explicit note.",
+              "unit": "kg N/ha",
+              "source": "local deposition estimate or default 0"
+            },
+            {
+              "symbol": "N_harvest_removal",
+              "definition": "Nitrogen removed in harvested grain, roots, or tubers.",
+              "unit": "kg N/ha",
+              "source": "measured yield times crop nitrogen concentration"
+            },
+            {
+              "symbol": "N_residue_removed",
+              "definition": "Nitrogen removed when residue is grazed, burned, or exported. Retained in-situ residue is not a removal.",
+              "unit": "kg N/ha",
+              "source": "residue management records"
+            }
+          ],
+          "scoring": {
+            "type": "piecewise_linear",
+            "points": [
+              [
+                0.0,
+                0
+              ],
+              [
+                0.5,
+                30
+              ],
+              [
+                0.8,
+                60
+              ],
+              [
+                1.0,
+                85
+              ],
+              [
+                1.2,
+                100
+              ],
+              [
+                1.5,
+                70
+              ],
+              [
+                2.0,
+                30
+              ]
+            ],
+            "notes": "A ratio near 1.0 is balanced (NUE near 1.0). The score declines above 1.2 because a large surplus is a loss proxy, even though 1.5 is the advisory trigger. This is the inverse of the Eurostat/OECD nitrogen use efficiency ratio. The breakpoints are project conventions, not a measured response curve."
+          },
+          "interpretation": {
+            "100": "Nutrient supply meets or moderately exceeds removal.",
+            "0": "Supply is less than half of removal."
+          },
+          "missing_data": "If N_harvest_removal is unavailable, score is null. Do not substitute regional soil fertility classes for crop removal. If N_deposition is unavailable, use 0 and lower confidence; do not present the result as a complete balance.",
+          "calculation_guard": "Use one boundary. Under the gross soil-surface balance, count gross fixation and do not subtract gaseous or leaching losses from any input. Under a full soil balance, subtract losses from all inputs consistently. Never net only fixation. Count nitrogen at the point it enters the window. Do not add in-situ residue nitrogen as a separate input. Do not count legume residue nitrogen and N_fixed_gross separately. A retained residue is neither an input nor a removal; an exported residue is a removal but not an input.",
+          "balance_boundary": "Gross soil-surface balance following the Eurostat/OECD nutrient-budget method. Inputs and outputs are counted at the soil surface; gaseous and leaching losses are reported separately, not netted from one input.",
+          "companion_outputs": {
+            "N_surplus_kg_per_ha": "N_inputs_total - N_outputs_total",
+            "NUE": "N_outputs_total / N_inputs_total",
+            "note": "Report NBR, N surplus, and NUE together. NBR = 1 / NUE. A ratio alone can hide the absolute size of the surplus or deficit."
+          },
+          "threshold_basis": "Eurostat/OECD gross nitrogen balance defines NUE = outputs / inputs and treats NUE near or above 1.0 as a soil-depletion risk. The 0.8 deficit and 1.5 excess triggers are project screening conventions.",
+          "references": [
+            "REF-03",
+            "REF-04",
+            "REF-07",
+            "REF-09",
+            "REF-21"
+          ]
+        },
+        {
+          "indicator_id": "F3",
+          "evaluation_key": "phosphorus_balance_flag",
+          "name": "Phosphorus management flag",
+          "unit": "categorical",
+          "direction": "higher_is_better",
+          "formula": "PBF = classify(P_applied - P_removal, soil_P_status)",
+          "inputs": [
+            {
+              "symbol": "P_applied",
+              "definition": "Phosphorus applied as fertilizer or manure, expressed as P2O5.",
+              "unit": "kg P2O5/ha",
+              "source": "farm records, crop_database.csv guidance"
+            },
+            {
+              "symbol": "P_removal",
+              "definition": "Phosphorus removed in harvested product.",
+              "unit": "kg P2O5/ha",
+              "source": "yield times crop P concentration"
+            },
+            {
+              "symbol": "soil_P_status",
+              "definition": "Soil-test phosphorus class, if measured.",
+              "unit": "class",
+              "source": "field soil test (currently pending)"
+            }
+          ],
+          "scoring": {
+            "type": "category_map",
+            "categories": [
+              {
+                "value": "balanced_or_building",
+                "score": 100,
+                "rule": "P_applied minus P_removal is between 0 and a moderate build-up rate, or soil P is low and application builds it."
+              },
+              {
+                "value": "maintenance_deficit",
+                "score": 60,
+                "rule": "Small negative balance with medium soil P."
+              },
+              {
+                "value": "large_deficit",
+                "score": 25,
+                "rule": "P_applied is well below removal and soil P is not high."
+              },
+              {
+                "value": "excess_risk",
+                "score": 30,
+                "rule": "P_applied greatly exceeds removal with high soil P, creating runoff and eutrophication risk."
+              },
+              {
+                "value": "unknown",
+                "score": null,
+                "rule": "Soil P status and reliable removal data are unavailable."
+              }
+            ]
+          },
+          "interpretation": {
+            "100": "Phosphorus is managed to balance or build soil supply.",
+            "0": "Large imbalance or unknown status."
+          },
+          "missing_data": "Without a soil P test, only the direction of the balance can be flagged; score is null unless P_applied and P_removal are both known."
+        }
+      ],
+      "aggregation": {
+        "type": "weighted_sum",
+        "components": [
+          {
+            "indicator_id": "F1",
+            "weight": 0.4
+          },
+          {
+            "indicator_id": "F2",
+            "weight": 0.4
+          },
+          {
+            "indicator_id": "F3",
+            "weight": 0.2
+          }
+        ]
+      },
+      "data_requirements": [
+        "crop N, P, K guidance",
+        "legume fixation status",
+        "yield and removal estimates",
+        "fertilizer and amendment records",
+        "soil test P status if available"
+      ],
+      "references": [
+        "REF-03",
+        "REF-04",
+        "REF-07",
+        "REF-09",
+        "REF-21"
+      ]
+    },
+    {
+      "criterion_id": "DIVERSITY",
+      "name": "Crop diversity",
+      "weight": 0.2,
+      "definition": "How much the sequence varies crop families and species over time, and how often the same family or species repeats.",
+      "rationale": "Repeated crops from the same family can increase pest, disease, and weed pressure and can deplete similar nutrient pools. Diversity alone does not guarantee resilience, so the indicator is paired with repeat-interval checks.",
+      "indicators": [
+        {
+          "indicator_id": "D1",
+          "evaluation_key": "family_diversity_index",
+          "name": "Crop-family diversity index",
+          "unit": "index 0-1",
+          "direction": "higher_is_better",
+          "formula": "FDI = H / ln(n), where H = -sum(p_f * ln(p_f)), p_f is the share of seasons in family f, and n is the number of non-fallow seasons",
+          "inputs": [
+            {
+              "symbol": "crop_family",
+              "definition": "Plant family for each crop in the window.",
+              "unit": "family name",
+              "source": "crop_database.csv"
+            },
+            {
+              "symbol": "n",
+              "definition": "Number of seasons in the window.",
+              "unit": "count",
+              "source": "rotation definition"
+            }
+          ],
+          "scoring": {
+            "type": "piecewise_linear",
+            "points": [
+              [
+                0.0,
+                0
+              ],
+              [
+                0.3,
+                30
+              ],
+              [
+                0.5,
+                55
+              ],
+              [
+                0.7,
+                80
+              ],
+              [
+                0.9,
+                95
+              ],
+              [
+                1.0,
+                100
+              ]
+            ],
+            "notes": "H is normalized by ln(n) so the index is comparable across windows of different length."
+          },
+          "interpretation": {
+            "100": "Every season is a different family.",
+            "0": "The same family every season."
+          },
+          "missing_data": "Requires a complete, ordered season list with families. If any crop is unknown, score is null.",
+          "minimum_n_for_scoring": 2,
+          "edge_cases": "n = 0 or n = 1 returns null because ln(n) is zero or undefined. n = 2 is computable but low confidence. Fallow seasons are excluded from n; cover crops count as their own family.",
+          "normalization_note": "The index divides H by ln(n), where n is the number of non-fallow seasons, not by ln(k), where k is the number of families. It therefore measures how close the sequence is to one family per season and reaches 1.0 only when every season is a different family. It is not Pielou's evenness and must not be compared with ecological evenness indices.",
+          "threshold_basis": "The Shannon form is standard, but the ln(n) normalization and the 0.3/0.5/0.7/0.9 breakpoints are project conventions chosen for rotation screening."
+        },
+        {
+          "indicator_id": "D2",
+          "evaluation_key": "same_family_adjacency_count",
+          "name": "Consecutive same-family pairs",
+          "unit": "count",
+          "direction": "lower_is_better",
+          "formula": "SFA = number of adjacent season pairs where family(t) = family(t+1)",
+          "inputs": [
+            {
+              "symbol": "crop_family_sequence",
+              "definition": "Ordered plant families across seasons.",
+              "unit": "sequence",
+              "source": "crop_database.csv, crop history"
+            }
+          ],
+          "scoring": {
+            "type": "piecewise_linear",
+            "points": [
+              [
+                0,
+                100
+              ],
+              [
+                1,
+                50
+              ],
+              [
+                2,
+                20
+              ],
+              [
+                3,
+                0
+              ]
+            ],
+            "notes": "A single repeat is often acceptable; two or more consecutive repeats are penalized more strongly."
+          },
+          "interpretation": {
+            "100": "No same-family neighbours.",
+            "0": "Three or more same-family neighbours in the window."
+          },
+          "missing_data": "Requires an ordered family sequence.",
+          "minimum_n_for_scoring": 2,
+          "edge_cases": "n = 0 or n = 1 returns null because there is no adjacent pair. Fallow seasons are excluded; cover crops count as their own family.",
+          "threshold_basis": "The count is descriptive. The 0/1/2/3-pair scoring breakpoints are project conventions informed by rotation guidance, not a measured pest-pressure response."
+        },
+        {
+          "indicator_id": "D3",
+          "evaluation_key": "species_return_interval",
+          "name": "Shortest species return interval",
+          "unit": "seasons",
+          "direction": "higher_is_better",
+          "formula": "SRI = minimum season-index difference between consecutive plantings of the same species; adjacent seasons = 1, one full season between = 2",
+          "inputs": [
+            {
+              "symbol": "crop_sequence",
+              "definition": "Ordered crop names across seasons.",
+              "unit": "sequence",
+              "source": "crop_database.csv, crop history"
+            }
+          ],
+          "scoring": {
+            "type": "piecewise_linear",
+            "points": [
+              [
+                1,
+                0
+              ],
+              [
+                2,
+                50
+              ],
+              [
+                3,
+                85
+              ],
+              [
+                4,
+                100
+              ]
+            ],
+            "notes": "The default assumes a one-season break is weak and a three-season break is strong. Pest-specific intervals must override this default where known. Do not score intervals beyond the window length as if they were observed."
+          },
+          "interpretation": {
+            "100": "At least three seasons between repeats.",
+            "0": "Same species in consecutive seasons."
+          },
+          "missing_data": "Requires an ordered crop sequence.",
+          "minimum_window_seasons": 3,
+          "no_repeat_rule": "If n >= 3 and no species repeats, score 100 with basis = no_repeat. If n < 3, return null because the window is too short to express a return interval.",
+          "species_identity_rule": "Different varieties of the same species count as the same species.",
+          "fallow_and_cover_rule": "Fallow seasons are excluded from the sequence. A cover crop planted as a crop counts as its own species.",
+          "threshold_basis": "The 2/3/4-season return intervals are a project default. Real intervals are pathogen- and pest-specific and must override the default where known."
+        }
+      ],
+      "aggregation": {
+        "type": "weighted_sum",
+        "components": [
+          {
+            "indicator_id": "D1",
+            "weight": 0.5
+          },
+          {
+            "indicator_id": "D2",
+            "weight": 0.3
+          },
+          {
+            "indicator_id": "D3",
+            "weight": 0.2
+          }
+        ]
+      },
+      "data_requirements": [
+        "ordered crop sequence",
+        "crop family and species names",
+        "known pest or disease constraints if available"
+      ],
+      "references": [
+        "REF-05",
+        "REF-06"
+      ]
+    },
+    {
+      "criterion_id": "PROTECTION",
+      "name": "Soil protection",
+      "weight": 0.15,
+      "definition": "How well the sequence maintains ground cover, limits bare-soil periods, and reduces erosion risk between and within crops.",
+      "rationale": "Bare soil between harvest and the next establishment is when erosion and nutrient loss are highest. Sequences that keep cover and return residues protect the resource base.",
+      "indicators": [
+        {
+          "indicator_id": "S1",
+          "evaluation_key": "ground_cover_fraction",
+          "name": "Ground-cover fraction",
+          "unit": "fraction of days",
+          "direction": "higher_is_better",
+          "formula": "GCF = covered_days / total_days, where covered means fractional ground cover at the soil surface (living canopy or managed residue) at or above the configured threshold, default 0.30",
+          "inputs": [
+            {
+              "symbol": "covered_days",
+              "definition": "Days with living cover or managed residue at or above the cover threshold.",
+              "unit": "days",
+              "source": "crop calendar, residue management records, remote-sensing cover estimates"
+            },
+            {
+              "symbol": "total_days",
+              "definition": "Total days in the evaluated window.",
+              "unit": "days",
+              "source": "rotation definition"
+            }
+          ],
+          "scoring": {
+            "type": "piecewise_linear",
+            "points": [
+              [
+                0.0,
+                0
+              ],
+              [
+                0.3,
+                25
+              ],
+              [
+                0.5,
+                50
+              ],
+              [
+                0.7,
+                75
+              ],
+              [
+                0.9,
+                95
+              ],
+              [
+                1.0,
+                100
+              ]
+            ],
+            "notes": "Thirty percent cover is used as the threshold because it is a common erosion-protection guideline; local values may differ."
+          },
+          "interpretation": {
+            "100": "Cover maintained every day.",
+            "0": "No cover during the window."
+          },
+          "missing_data": "If residue management is unknown, assume living crop cover only and mark confidence low.",
+          "measurement": "Fractional ground cover from field observation, drone or satellite cover estimates, or a documented crop-calendar proxy. Report the method.",
+          "proxy_rule": "With only a crop calendar, assume cover = 1 from canopy closure to senescence and cover = 0 after harvest unless residue is retained. Flag as a proxy and cap confidence at medium.",
+          "threshold_basis": "Thirty percent residue cover is the common conservation-tillage definition and is associated with roughly halving water erosion in the cited extension guidance (Purdue AY-269-W). It is a screening convention for this project, not a site-specific validated threshold.",
+          "references": [
+            "REF-06",
+            "REF-10",
+            "REF-11",
+            "REF-22"
+          ]
+        },
+        {
+          "indicator_id": "S2",
+          "evaluation_key": "bare_soil_gap_days",
+          "name": "Bare-soil gap length",
+          "unit": "days",
+          "direction": "lower_is_better",
+          "formula": "BSG = mean number of days between harvest and the next established cover, over all transitions in the window",
+          "inputs": [
+            {
+              "symbol": "harvest_dates",
+              "definition": "Harvest date for each crop.",
+              "unit": "date",
+              "source": "crop calendar, crop_database.csv duration"
+            },
+            {
+              "symbol": "establishment_dates",
+              "definition": "Establishment date of the following crop or cover.",
+              "unit": "date",
+              "source": "crop calendar"
+            }
+          ],
+          "scoring": {
+            "type": "piecewise_linear",
+            "points": [
+              [
+                0,
+                100
+              ],
+              [
+                7,
+                85
+              ],
+              [
+                14,
+                65
+              ],
+              [
+                30,
+                35
+              ],
+              [
+                60,
+                10
+              ],
+              [
+                90,
+                0
+              ]
+            ],
+            "notes": "Proposed breakpoints; adjust for slope and rainfall erosivity."
+          },
+          "interpretation": {
+            "100": "Immediate establishment or residue cover.",
+            "0": "Three months of bare soil."
+          },
+          "missing_data": "Requires a crop calendar. If dates are unknown, score is null.",
+          "threshold_basis": "The 7/14/30/60/90-day bare-soil breakpoints are project screening conventions; adjust for slope and rainfall erosivity."
+        },
+        {
+          "indicator_id": "S3",
+          "evaluation_key": "slope_cover_erosion_class",
+          "name": "Slope-and-cover erosion class",
+          "unit": "categorical",
+          "direction": "higher_is_better",
+          "formula": "SCE = lookup(slope_class, cover_class, residue_class)",
+          "inputs": [
+            {
+              "symbol": "slope_class",
+              "definition": "Field slope class from terrain data or survey.",
+              "unit": "class",
+              "source": "DEM, field survey"
+            },
+            {
+              "symbol": "cover_class",
+              "definition": "Typical cover during the erosive season.",
+              "unit": "class",
+              "source": "S1 result or management plan"
+            },
+            {
+              "symbol": "residue_class",
+              "definition": "Whether crop residues are retained, grazed, burned, or removed.",
+              "unit": "class",
+              "source": "farm records"
+            }
+          ],
+          "scoring": {
+            "type": "category_map",
+            "categories": [
+              {
+                "value": "low_risk",
+                "score": 100,
+                "rule": "Gentle slope with maintained cover and retained residue."
+              },
+              {
+                "value": "moderate_risk",
+                "score": 60,
+                "rule": "Moderate slope or partial cover, or residue partly removed."
+              },
+              {
+                "value": "high_risk",
+                "score": 20,
+                "rule": "Steep slope with bare periods or residue burned or removed."
+              },
+              {
+                "value": "unknown",
+                "score": null,
+                "rule": "Slope or residue management is unknown."
+              }
+            ]
+          },
+          "interpretation": {
+            "100": "Landscape and management keep erosion risk low.",
+            "0": "High-risk combination."
+          },
+          "missing_data": "If slope is unknown, score is null and the criterion relies on S1 and S2.",
+          "threshold_basis": "This is a qualitative screening class, not a RUSLE soil-loss estimate. Slope and cover classes are conventions and must be calibrated locally."
+        }
+      ],
+      "aggregation": {
+        "type": "weighted_sum",
+        "components": [
+          {
+            "indicator_id": "S1",
+            "weight": 0.45
+          },
+          {
+            "indicator_id": "S2",
+            "weight": 0.35
+          },
+          {
+            "indicator_id": "S3",
+            "weight": 0.2
+          }
+        ]
+      },
+      "data_requirements": [
+        "crop calendar and durations",
+        "residue management practice",
+        "field slope",
+        "cover observations or remote-sensing estimates"
+      ],
+      "references": [
+        "REF-06",
+        "REF-10",
+        "REF-11",
+        "REF-22"
+      ]
+    },
+    {
+      "criterion_id": "CLIMATE",
+      "name": "Climate suitability",
+      "weight": 0.15,
+      "definition": "How well each crop's temperature and waterlogging tolerances match the temperature and rainfall conditions of a defined climate scenario.",
+      "rationale": "A sequence that performs at baseline may fail under heat or excessive-rain scenarios. This criterion makes scenario-specific stress explicit instead of hiding it in a single baseline score.",
+      "indicators": [
+        {
+          "indicator_id": "C1",
+          "evaluation_key": "temperature_suitability_fraction",
+          "name": "Temperature suitability fraction",
+          "unit": "fraction of days",
+          "direction": "higher_is_better",
+          "formula": "TSF = suitable_days / growing_days, where suitable means the daily temperature range falls within the crop's documented range in crop_database.csv",
+          "inputs": [
+            {
+              "symbol": "daily_temperature",
+              "definition": "Daily minimum and maximum temperature for the scenario.",
+              "unit": "degrees Celsius",
+              "source": "climate_scenarios.csv"
+            },
+            {
+              "symbol": "crop_temperature_range",
+              "definition": "Documented suitable range for the crop.",
+              "unit": "degrees Celsius",
+              "source": "crop_database.csv"
+            },
+            {
+              "symbol": "growing_days",
+              "definition": "Days from establishment to maturity.",
+              "unit": "days",
+              "source": "crop_database.csv duration"
+            }
+          ],
+          "scoring": {
+            "type": "piecewise_linear",
+            "points": [
+              [
+                0.0,
+                0
+              ],
+              [
+                0.5,
+                30
+              ],
+              [
+                0.7,
+                60
+              ],
+              [
+                0.85,
+                85
+              ],
+              [
+                1.0,
+                100
+              ]
+            ],
+            "notes": "Where the source gives only an optimum range rather than absolute limits, days outside the optimum but within the tolerated range are scored as partially suitable."
+          },
+          "interpretation": {
+            "100": "Every growing day is within the documented range.",
+            "0": "Fewer than half the days are suitable."
+          },
+          "missing_data": "If the crop has no documented temperature range, score is null and confidence is reduced.",
+          "threshold_basis": "The temperature-suitability breakpoints are project screening conventions derived from documented crop temperature ranges, not a fitted yield response."
+        },
+        {
+          "indicator_id": "C2",
+          "evaluation_key": "heat_stress_days",
+          "name": "Heat-stress days during sensitive stages",
+          "unit": "days",
+          "direction": "lower_is_better",
+          "formula": "HSD = count of days where daily maximum temperature exceeds the crop heat threshold during a sensitive stage",
+          "inputs": [
+            {
+              "symbol": "daily_tmax",
+              "definition": "Daily maximum temperature for the scenario.",
+              "unit": "degrees Celsius",
+              "source": "climate_scenarios.csv"
+            },
+            {
+              "symbol": "heat_threshold",
+              "definition": "Crop-specific temperature above which stress is documented.",
+              "unit": "degrees Celsius",
+              "source": "crop_database.csv heat_sensitivity"
+            },
+            {
+              "symbol": "sensitive_stages",
+              "definition": "Stages listed as heat-sensitive for the crop.",
+              "unit": "stage list",
+              "source": "crop_database.csv"
+            }
+          ],
+          "scoring": {
+            "type": "piecewise_linear",
+            "points": [
+              [
+                0,
+                100
+              ],
+              [
+                2,
+                80
+              ],
+              [
+                5,
+                55
+              ],
+              [
+                10,
+                25
+              ],
+              [
+                15,
+                0
+              ]
+            ],
+            "notes": "When no heat threshold is documented, the indicator is skipped rather than guessed."
+          },
+          "interpretation": {
+            "100": "No heat-stress days in sensitive stages.",
+            "0": "Fifteen or more heat-stress days."
+          },
+          "missing_data": "If the crop heat threshold is undocumented, score is null.",
+          "threshold_basis": "The heat-stress day breakpoints are project screening conventions around documented crop thresholds, not a dose-response function."
+        },
+        {
+          "indicator_id": "C3",
+          "evaluation_key": "waterlogging_exposure_days",
+          "name": "Waterlogging exposure days",
+          "unit": "days",
+          "direction": "lower_is_better",
+          "formula": "WED = saturation_excess_days when available, otherwise heavy_rain_days as a proxy. Never add the two metrics. Score with the crop waterlogging sensitivity class.",
+          "inputs": [
+            {
+              "symbol": "saturation_excess_days",
+              "definition": "Days where root-zone water content exceeds saturation minus air-filled porosity, or the water table is within the root zone.",
+              "unit": "days",
+              "source": "daily water balance and soil drainage class"
+            },
+            {
+              "symbol": "heavy_rain_days",
+              "definition": "Proxy days with rainfall at or above the configured threshold, adjusted for drainage class. Default 50 mm/day.",
+              "unit": "days",
+              "source": "climate_scenarios.csv"
+            },
+            {
+              "symbol": "metric_used",
+              "definition": "Which metric was used: saturation_excess_days or heavy_rain_days.",
+              "unit": "enum",
+              "source": "result metadata"
+            },
+            {
+              "symbol": "waterlogging_sensitivity",
+              "definition": "Crop sensitivity class from crop_database.csv.",
+              "unit": "class",
+              "source": "crop_database.csv"
+            }
+          ],
+          "scoring": {
+            "type": "category_map_with_count",
+            "categories": [
+              {
+                "value": "tolerant",
+                "score_formula": "100 - min(100, excess_water_days * 2)",
+                "rule": "Crop tolerates prolonged saturation."
+              },
+              {
+                "value": "moderately_sensitive",
+                "score_formula": "100 - min(100, excess_water_days * 10)",
+                "rule": "Crop tolerates short saturation only."
+              },
+              {
+                "value": "sensitive",
+                "score_formula": "100 - min(100, excess_water_days * 20)",
+                "rule": "Crop is damaged by one to two days of saturation."
+              }
+            ],
+            "notes": "The multipliers (2, 10, 20) are proposed screening weights, not measured dose-response functions."
+          },
+          "interpretation": {
+            "100": "No excess-water exposure.",
+            "0": "Exposure far beyond the crop's tolerance."
+          },
+          "missing_data": "If drainage class and rainfall are unavailable, score is null.",
+          "metric_precedence": [
+            "saturation_excess_days",
+            "heavy_rain_days"
+          ],
+          "prohibited_interpretation": "Do not label field-capacity exceedance as waterlogging. Field capacity is not saturation.",
+          "threshold_basis": "Crop sensitivity classes come from crop_database.csv. The 24-hour tolerance notes for sweet potato and cassava are documented; the 3-day screening limit and the 2/10/20 multipliers are project conventions, not validated dose-response functions. The 50 mm/day heavy-rain proxy is a configurable default; calibrate it to the local 95th-99th percentile of daily rainfall and to soil drainage.",
+          "confidence_rule": "Using saturation_excess_days allows medium or high confidence. Using heavy_rain_days caps confidence at medium and must be labeled as a proxy.",
+          "references": [
+            "REF-01",
+            "REF-02",
+            "REF-04",
+            "REF-07",
+            "REF-08",
+            "REF-12",
+            "REF-13",
+            "REF-14"
+          ]
+        }
+      ],
+      "aggregation": {
+        "type": "weighted_sum",
+        "components": [
+          {
+            "indicator_id": "C1",
+            "weight": 0.4
+          },
+          {
+            "indicator_id": "C2",
+            "weight": 0.3
+          },
+          {
+            "indicator_id": "C3",
+            "weight": 0.3
+          }
+        ]
+      },
+      "data_requirements": [
+        "scenario daily temperature and rainfall",
+        "crop temperature ranges and heat thresholds",
+        "crop waterlogging sensitivity",
+        "soil drainage class"
+      ],
+      "references": [
+        "REF-01",
+        "REF-02",
+        "REF-12",
+        "REF-13",
+        "REF-14"
+      ]
+    }
+  ],
+  "constraints": [
+    {
+      "constraint_id": "CON-PH",
+      "name": "Soil pH outside crop range",
+      "rule": "If the field pH class lies entirely outside the crop's documented pH range, raise a constraint flag regardless of score.",
+      "severity": "constraint",
+      "applies_to": [
+        "crop_database.csv soil_ph_range",
+        "soil_reference.csv ph_min and ph_max"
+      ],
+      "references": [
+        "REF-04",
+        "REF-15"
+      ]
+    },
+    {
+      "constraint_id": "CON-WATERLOG",
+      "name": "Waterlogging-intolerant crop in high-excess scenario",
+      "rule": "If the crop is classed sensitive to waterlogging and the scenario has three or more excess-water days, raise a constraint flag.",
+      "severity": "constraint",
+      "applies_to": [
+        "crop_database.csv waterlogging_sensitivity",
+        "climate_scenarios.csv"
+      ],
+      "references": [
+        "REF-01",
+        "REF-04"
+      ]
+    },
+    {
+      "constraint_id": "CON-HEAT",
+      "name": "Heat ceiling exceeded",
+      "rule": "If the scenario exceeds a documented crop heat threshold during a sensitive stage, raise a constraint flag and report the number of days.",
+      "severity": "constraint",
+      "applies_to": [
+        "crop_database.csv heat_sensitivity",
+        "climate_scenarios.csv"
+      ],
+      "references": [
+        "REF-04",
+        "REF-12"
+      ]
+    },
+    {
+      "constraint_id": "CON-REPEAT",
+      "name": "Same species repeated consecutively",
+      "rule": "If the same species appears in consecutive seasons, raise an advisory flag.",
+      "severity": "advisory",
+      "applies_to": [
+        "rotation sequence"
+      ],
+      "references": [
+        "REF-05",
+        "REF-06"
+      ]
+    },
+    {
+      "constraint_id": "CON-DATA",
+      "name": "Missing field measurements",
+      "rule": "If a criterion depends on field measurements that are pending, report the score as partial and lower confidence instead of substituting regional values.",
+      "severity": "advisory",
+      "applies_to": [
+        "soil_reference.csv data_source_class",
+        "field records"
+      ],
+      "references": [
+        "REF-15"
+      ]
+    }
+  ],
+  "data_requirements": {
+    "crop_inputs": [
+      {
+        "field": "growth_duration_days_min, growth_duration_days_max",
+        "file": "crop_database.csv",
+        "used_by": [
+          "W1",
+          "S2",
+          "C1"
+        ],
+        "notes": "Defines the growing window."
+      },
+      {
+        "field": "water_requirements_by_stage",
+        "file": "crop_database.csv",
+        "used_by": [
+          "W1",
+          "W2"
+        ],
+        "notes": "Qualitative stage notes plus Kc values; seasonal totals must be computed with local ETo."
+      },
+      {
+        "field": "temperature_range_c, heat_sensitivity",
+        "file": "crop_database.csv",
+        "used_by": [
+          "C1",
+          "C2"
+        ],
+        "notes": "Documented ranges and thresholds only; blanks are not filled."
+      },
+      {
+        "field": "soil_ph_range",
+        "file": "crop_database.csv",
+        "used_by": [
+          "CON-PH"
+        ],
+        "notes": "Compared with measured or mapped field pH."
+      },
+      {
+        "field": "nutrient_requirements_npk",
+        "file": "crop_database.csv",
+        "used_by": [
+          "F2",
+          "F3"
+        ],
+        "notes": "Guidance ranges, not removal coefficients; removal must be computed from yield and concentration."
+      },
+      {
+        "field": "nitrogen_fixation, nitrogen_fixation_conditions",
+        "file": "crop_database.csv",
+        "used_by": [
+          "F1",
+          "F2"
+        ],
+        "notes": "Legume status and limitations."
+      },
+      {
+        "field": "waterlogging_sensitivity",
+        "file": "crop_database.csv",
+        "used_by": [
+          "C3",
+          "CON-WATERLOG"
+        ],
+        "notes": "Sensitivity class."
+      },
+      {
+        "field": "root_characteristics",
+        "file": "crop_database.csv",
+        "used_by": [
+          "W2",
+          "C3"
+        ],
+        "notes": "Rooting depth bounds the soil water reservoir."
+      },
+      {
+        "field": "depletion_fraction_p_fao56",
+        "file": "crop_database.csv",
+        "used_by": [
+          "W2"
+        ],
+        "notes": "FAO-56 Table 22 depletion fraction p; stress threshold is 1 - p, adjusted for the actual ETc rate."
+      }
+    ],
+    "soil_inputs": [
+      {
+        "field": "data_source_class",
+        "file": "soil_reference.csv",
+        "used_by": [
+          "all"
+        ],
+        "notes": "Separates regional maps, general references, and pending field measurements. Never mix classes silently."
+      },
+      {
+        "field": "ph_min, ph_max",
+        "file": "soil_reference.csv",
+        "used_by": [
+          "CON-PH"
+        ],
+        "notes": "Regional classes are aggregates, not parcel values."
+      },
+      {
+        "field": "texture_class, drainage_class",
+        "file": "soil_reference.csv",
+        "used_by": [
+          "C3",
+          "S3"
+        ],
+        "notes": "Drainage drives waterlogging exposure."
+      },
+      {
+        "field": "organic_matter_class, fertility_notes",
+        "file": "soil_reference.csv",
+        "used_by": [
+          "F2",
+          "F3"
+        ],
+        "notes": "Context only until measured."
+      }
+    ],
+    "climate_inputs": [
+      {
+        "field": "scenario_name, period, variable, value, unit, value_type",
+        "file": "climate_scenarios.csv",
+        "used_by": [
+          "W1",
+          "C1",
+          "C2",
+          "C3"
+        ],
+        "notes": "value_type distinguishes historical, projected, and hypothetical."
+      },
+      {
+        "field": "location_or_grid, resolution",
+        "file": "climate_scenarios.csv",
+        "used_by": [
+          "all"
+        ],
+        "notes": "Resolution must be reported with every scenario value."
+      }
+    ],
+    "field_inputs": [
+      {
+        "field": "crop history and calendar",
+        "file": "farm records (not yet in package)",
+        "used_by": [
+          "D1",
+          "D2",
+          "D3",
+          "S2"
+        ],
+        "notes": "Required before diversity and cover indicators can be scored."
+      },
+      {
+        "field": "irrigation and fertilizer records",
+        "file": "farm records (not yet in package)",
+        "used_by": [
+          "W1",
+          "F2",
+          "F3"
+        ],
+        "notes": "Required for a full water and nutrient balance."
+      },
+      {
+        "field": "slope",
+        "file": "DEM or field survey (not yet in package)",
+        "used_by": [
+          "S3"
+        ],
+        "notes": "Required for erosion classification."
+      }
+    ]
+  },
+  "worked_example_rotations": [
+    {
+      "example_id": "A",
+      "name": "Continuous cultivation",
+      "sequence": [
+        "Corn",
+        "Corn",
+        "Corn"
+      ],
+      "purpose": "Baseline for repeated cultivation and resource requirements.",
+      "expected_pattern": "Low diversity and low legume frequency; nutrient removal accumulates; water demand repeated each season. Scores should reflect these patterns, not a recommendation."
+    },
+    {
+      "example_id": "B",
+      "name": "Legume integration",
+      "sequence": [
+        "Corn",
+        "Mungbean",
+        "Corn"
+      ],
+      "purpose": "Examine the potential contribution of a nitrogen-fixing legume.",
+      "expected_pattern": "Higher legume frequency and family diversity than example A; short-duration mungbean changes the water and cover profile."
+    },
+    {
+      "example_id": "C",
+      "name": "Crop diversification",
+      "sequence": [
+        "Corn",
+        "Peanut",
+        "Sweet potato"
+      ],
+      "purpose": "Evaluate differences in crop families, rooting characteristics, and resource requirements.",
+      "expected_pattern": "Highest family diversity; peanut adds nitrogen fixation; sweet potato changes rooting depth and waterlogging sensitivity."
+    }
+  ],
+  "assumptions": [
+    "Each season is long enough to grow the selected crop within its documented duration range.",
+    "Climate scenario values are applied uniformly to the evaluated window unless a daily series is supplied.",
+    "Crop coefficients and stage lengths come from FAO-56 or the cited national guides; local variety differences are treated as uncertainty.",
+    "Fertilizer guidance ranges in crop_database.csv are not nutrient removal coefficients.",
+    "Residue is assumed retained unless farm records state otherwise; this assumption must be shown to the user.",
+    "Regional soil maps describe provincial context and are never treated as parcel measurements.",
+    "Water inputs use gross rainfall P and explicit runoff RO, following FAO-56 Eq. 85. Effective rainfall may replace P - RO only when it is defined identically.",
+    "Water inputs are counted once. In a daily balance, soil-moisture change is internal; in a seasonal balance, it is included once as S_start minus S_end.",
+    "Nitrogen uses a gross soil-surface balance. Gaseous and leaching losses are not subtracted from any input unless a full soil balance is explicitly chosen and applied to all inputs.",
+    "Nitrogen is counted at the point it enters the rotation window. In-situ residue is an internal transfer, not a new input.",
+    "The diversity minimum window is three seasons; shorter windows are reported with partial or null diversity scores.",
+    "The diversity index is normalized by ln(n seasons), not ln(k families), and is a project index, not Pielou evenness.",
+    "Ground-cover and waterlogging thresholds are configurable conventions, not validated universal constants."
+  ],
+  "limitations": [
+    "Weights and scoring breakpoints are proposed starting values, not validated universal constants.",
+    "The framework does not model pest and disease dynamics directly; diversity and repeat indicators are proxies only.",
+    "Nutrient balances are simplified and do not represent full soil nutrient cycling, mineralization, immobilization, or leaching.",
+    "The water balance is an accounting identity, not a calibrated field simulation; WSDR is a screening ratio, not a yield prediction.",
+    "NBR is a gross balance ratio; it does not model the fate of applied nitrogen after the soil surface.",
+    "Climate scenarios are screening conditions, not forecasts or local projections.",
+    "Field soil measurements, crop history, irrigation records, and slope data are not yet available, so several indicators cannot be scored for the demo fields.",
+    "The 30 percent cover threshold and the 24-hour and 3-day waterlogging limits are screening conventions and require local calibration.",
+    "The water and nitrogen balances are simplified accounting frameworks, not full biogeochemical models.",
+    "Diversity indicators are proxies for pest and disease risk, not a substitute for pest-specific history."
+  ],
+  "references": [
+    {
+      "reference_id": "REF-01",
+      "citation": "Allen RG, Pereira LS, Raes D, Smith M. Crop evapotranspiration: Guidelines for computing crop water requirements. FAO Irrigation and Drainage Paper 56. FAO, Rome, 1998.",
+      "url": "https://www.fao.org/3/x0490e/x0490e00.htm",
+      "used_for": "Kc values, crop water requirement, rooting depth, water balance structure."
+    },
+    {
+      "reference_id": "REF-02",
+      "citation": "FAO. Crop water information and irrigation scheduling guidance. FAO Land and Water Division.",
+      "url": "https://www.fao.org/land-water/databases-and-software/crop-information/en/",
+      "used_for": "Crop water requirement context and stage sensitivity."
+    },
+    {
+      "reference_id": "REF-03",
+      "citation": "ICRISAT and CABI. Groundnut Cropping Guide, Africa Soil Health Consortium, Version 04.",
+      "url": "https://oar.icrisat.org/10832/1/562-ASHC-English-Groundnut-A4-bw-lowres.pdf",
+      "used_for": "Legume nitrogen fixation, rotation benefits, peanut water and soil requirements."
+    },
+    {
+      "reference_id": "REF-04",
+      "citation": "Philippine Department of Agriculture. Crop production techno-guides (corn, mungbean) and HVCDP materials.",
+      "url": "https://cagayanvalley.da.gov.ph/wp-content/uploads/2018/02/corn_techno_guide_final.pdf",
+      "used_for": "Philippine crop durations, nutrient guidance, pH ranges, waterlogging notes."
+    },
+    {
+      "reference_id": "REF-05",
+      "citation": "USDA Natural Resources Conservation Service. Conservation Practice Standard 328: Crop Rotation.",
+      "url": "https://www.nrcs.usda.gov/sites/default/files/2022-09/Crop_Rotation_328_CPS.pdf",
+      "used_for": "Crop rotation principles, diversity, pest and nutrient considerations."
+    },
+    {
+      "reference_id": "REF-06",
+      "citation": "FAO. Conservation agriculture and crop rotation principles. FAO Soils Portal.",
+      "url": "https://www.fao.org/soils-portal/soil-management/conservation-agriculture/en/",
+      "used_for": "Cover, residue retention, and rotation principles."
+    },
+    {
+      "reference_id": "REF-07",
+      "citation": "University of Maryland Extension. Sweet Potatoes production publication.",
+      "url": "https://extension.umd.edu/sites/extension.umd.edu/files/2021-03/Sweet%20Potatoes.pdf",
+      "used_for": "Sweet potato temperature, pH, nutrient, and waterlogging guidance."
+    },
+    {
+      "reference_id": "REF-08",
+      "citation": "CARDI. Fact Sheet No. 04: Growing Cassava - Soil and Water Management. Caribbean Agricultural Research and Development Institute, 2021.",
+      "url": "https://cardi.org/wp-content/uploads/2021/12/Fact-sheet-04-Growing-Cassava-_-Soil-and-Water-Management-_-Final.pdf",
+      "used_for": "Cassava water, soil, and drainage requirements."
+    },
+    {
+      "reference_id": "REF-09",
+      "citation": "Purdue University Cooperative Extension. Corn Production (NCH-40).",
+      "url": "https://www.extension.purdue.edu/extmedia/NCH/NCH-40.html",
+      "used_for": "Corn temperature thresholds and heat stress during tasseling and silking."
+    },
+    {
+      "reference_id": "REF-10",
+      "citation": "USDA Natural Resources Conservation Service. Revised Universal Soil Loss Equation (RUSLE) guidance.",
+      "url": "https://www.nrcs.usda.gov/resources/guides-and-instructions/revised-universal-soil-loss-equation-rusle",
+      "used_for": "Slope, cover, and erosion-risk logic behind the protection criterion."
+    },
+    {
+      "reference_id": "REF-11",
+      "citation": "FAO. Soil erosion and conservation guidance. FAO Soils Portal.",
+      "url": "https://www.fao.org/soils-portal/soil-degradation-restoration/en/",
+      "used_for": "Bare-soil and cover-management rationale."
+    },
+    {
+      "reference_id": "REF-12",
+      "citation": "NASA POWER. Prediction Of Worldwide Energy Resources: agroclimatology data and documentation.",
+      "url": "https://power.larc.nasa.gov/",
+      "used_for": "Baseline temperature, rainfall, and reference evapotranspiration inputs."
+    },
+    {
+      "reference_id": "REF-13",
+      "citation": "NASA GPM IMERG. Integrated Multi-satellitE Retrievals for GPM precipitation data and documentation.",
+      "url": "https://gpm.nasa.gov/data/imerg",
+      "used_for": "Observed precipitation and intense-rainfall scenario inputs."
+    },
+    {
+      "reference_id": "REF-14",
+      "citation": "NASA NEX-GDDP-CMIP6. Downscaled climate projections dataset documentation.",
+      "url": "https://www.nccs.nasa.gov/services/data-collections/land-based-products/nex-gddp-cmip6",
+      "used_for": "Projected temperature and rainfall scenario inputs."
+    },
+    {
+      "reference_id": "REF-15",
+      "citation": "Bureau of Soils and Water Management, Philippine Department of Agriculture. Soil pH maps for key corn areas (Isabela and Bukidnon) and Philippine soil series references.",
+      "url": "https://www.bswm.da.gov.ph/",
+      "used_for": "Regional soil pH context and the separation of map classes from field measurements."
+    },
+    {
+      "reference_id": "REF-21",
+      "citation": "Eurostat and OECD. Nutrient budgets: Eurostat/OECD methodology and handbook; Eurostat agri-environmental indicator - gross nitrogen balance. European Commission, 2021.",
+      "url": "https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Agri-environmental_indicator_-_gross_nitrogen_balance",
+      "used_for": "Gross nitrogen balance boundary, input and output categories, nitrogen surplus, and nitrogen use efficiency (NUE)."
+    },
+    {
+      "reference_id": "REF-22",
+      "citation": "Eck KJ, Brown DE. Estimating Corn and Soybean Residue Cover. Purdue University Cooperative Extension, AY-269-W.",
+      "url": "https://www.extension.purdue.edu/extmedia/AY/AY-269-W.pdf",
+      "used_for": "Thirty percent residue-cover conservation-tillage definition and erosion-reduction rationale."
+    }
+  ],
+  "integration_notes": {
+    "evaluation_keys": "Indicator evaluation_key values are intended to match rule evaluation keys in rotation_rules.json so the Rotation Lab can join scores, rules, and display text without a translation layer.",
+    "outputs_per_rotation": [
+      "overall_score or insufficient_data",
+      "five criterion scores",
+      "indicator scores and raw input values",
+      "constraint and advisory flags",
+      "data coverage fraction",
+      "confidence level",
+      "list of missing inputs and assumptions applied"
+    ],
+    "custom_weights": "Weights must be adjustable per farmer priorities or expert review. When changed, the output must record the weight set used.",
+    "clarifications_version": "1.1",
+    "method_metadata_required": [
+      "water_balance_method for W1",
+      "water_balance_terms (P, RO, I, CR, DP, S_start, S_end) for W1",
+      "depletion_fraction_p and ETc adjustment for W2",
+      "nitrogen_balance_boundary (gross_soil_surface or full_soil) for F2",
+      "metric_used for C3",
+      "indicator_status for every indicator",
+      "data_quality tag for every input"
+    ],
+    "coverage_outputs": [
+      "per-criterion coverage cov_i",
+      "overall coverage cov_overall",
+      "per-criterion confidence",
+      "overall confidence (weakest link)",
+      "insufficient_data status and reasons"
+    ]
+  },
+  "change_log": [
+    {
+      "version": "1.2",
+      "date": "2026-11-14",
+      "changes": [
+        "Audited the agricultural assumptions against FAO-56 and the Eurostat/OECD nutrient-balance methodology.",
+        "W1 now uses gross rainfall P and explicit runoff RO, matching FAO-56 Eq. 85, so effective rainfall cannot double-count runoff.",
+        "W2 now uses crop-specific FAO-56 Table 22 depletion fractions p; the stress threshold is 1 - p, not a universal 0.5.",
+        "F2 now uses the Eurostat/OECD gross soil-surface balance: gross fixation is counted and losses are not netted from fixation alone; N surplus and NUE are reported with NBR.",
+        "D1 documents that it normalizes by ln(n seasons), not ln(k families), so it is not Pielou evenness; the worked example was corrected from 0.63 to 0.58.",
+        "Added a threshold register that names every configurable threshold, its type, basis, and calibration owner; corrected the unsupported '3-day limit' reference.",
+        "Added normal-path acceptance tests T16-T26 and a scientific validation audit."
+      ]
+    },
+    {
+      "version": "1.1",
+      "date": "2026-11-14",
+      "changes": [
+        "Clarified the water balance to prevent double counting of inflows and soil-moisture change (W1, W2).",
+        "Reworked the nitrogen balance to count external inputs once and treat in-situ residue as an internal transfer (F2).",
+        "Defined diversity edge cases for short windows, single occurrences, varieties, fallow, and cover crops (D1, D2, D3).",
+        "Separated saturation-based waterlogging from heavy-rainfall proxy and labeled cover/waterlogging thresholds as conventions (S1, S3, C3).",
+        "Finalized criterion coverage, overall coverage, confidence, and insufficient-data rules."
+      ]
+    },
+    {
+      "version": "1.0",
+      "date": "2026-11-14",
+      "changes": [
+        "Initial framework."
+      ]
+    }
+  ],
+  "clarifications": {
+    "version": "1.2",
+    "note": "Normative implementation clarifications. They resolve review ambiguities without changing the five criterion weights. v1.2 also records the scientific-validation corrections to the water, nitrogen, and diversity methods.",
+    "water_balance": {
+      "issue": "The v1.0 definition of AW_season added effective rainfall, applied irrigation, and net soil-moisture change without stating the accounting method. A daily simulation and a seasonal total could therefore double count storage or irrigation.",
+      "decision": "Compute AW_net with exactly one of two mutually exclusive methods, both consistent with FAO-56 Eq. 85. Record water_balance_method and the balance terms in the result evidence.",
+      "methods": [
+        {
+          "method_id": "daily_root_zone_balance",
+          "use_when": "A daily root-zone water balance is available.",
+          "definition": "AW_net = sum over the growing period of (P - RO + I + CR - DP).",
+          "soil_moisture_term": "Delta S is an internal state variable of the daily balance and MUST NOT be added again.",
+          "notes": "This is the preferred method. P is gross rainfall and RO is runoff, as in FAO-56 Eq. 85. The daily balance also supplies W2."
+        },
+        {
+          "method_id": "seasonal_totals",
+          "use_when": "Only seasonal totals or measured start and end storage are available.",
+          "definition": "AW_net = (P - RO) + I + CR + (S_start - S_end) - DP.",
+          "soil_moisture_term": "Delta S is included exactly once as (S_start - S_end).",
+          "notes": "Use only when a daily balance is unavailable. Lower confidence because timing is lost. Do not add a separate runoff term if P is already net of runoff."
+        }
+      ],
+      "guards": [
+        "Use gross rainfall P and subtract runoff RO explicitly, as in FAO-56 Eq. 85.",
+        "If an effective-rainfall product is used, it must already equal P - RO; do not add P_eff and then subtract RO again.",
+        "Count each inflow once: rainfall or effective rainfall, irrigation, and capillary rise.",
+        "Do not add measured soil-moisture change on top of a daily simulation that already updates storage.",
+        "If irrigation is rainfall-adjusted or already included in effective rainfall, do not add it again.",
+        "Subtract runoff and deep percolation once. Do not also subtract a simulated drainage term that already includes them.",
+        "Record P, RO, I, CR, DP, S_start, S_end, CWR, and method_id with every W1 result.",
+        "W2 must use daily soil water from the same balance used for W1."
+      ],
+      "affected_indicators": [
+        "W1",
+        "W2"
+      ],
+      "status": "decided_v1.2",
+      "reference_equation": "FAO-56 Eq. 85: Dr,i = Dr,i-1 - (P - RO)i - Ii - CRi + ETc,i + DPi. Over the growing period, sum(P - RO + I + CR - DP) = sum(ETc) + (S_end - S_start)."
+    },
+    "nitrogen_balance": {
+      "issue": "The v1.0 numerator could count the same nitrogen twice when residue came from a legume, or when an organic amendment already contained residue. v1.1 then used net fixation (gross minus losses) while counting fertilizer nitrogen gross, mixing two balance boundaries.",
+      "decision": "Use the Eurostat/OECD gross soil-surface balance by default. Count nitrogen at the point it enters the rotation window. Count gross biological fixation, not net fixation, and report gaseous and leaching losses separately. If a full soil balance is required, subtract losses from all inputs consistently and label the boundary.",
+      "formula": "NBR = (N_fertilizer + N_amendment_external + N_fixed_gross + N_deposition) / (N_harvest_removal + N_residue_removed)",
+      "definitions": {
+        "N_fertilizer": "Synthetic or mineral nitrogen applied in the window, counted once.",
+        "N_amendment_external": "Organic nitrogen imported from outside the window (manure, compost, imported residue). In-situ residue is not included here.",
+        "N_fixed_gross": "Gross legume nitrogen fixation, counted once. Under the gross balance, do not deduct gaseous or leaching losses from fixation alone.",
+        "N_deposition": "Atmospheric nitrogen deposition, if a local estimate exists; otherwise 0 with a note.",
+        "N_harvest_removal": "Nitrogen removed in harvested grain, roots, or tubers.",
+        "N_residue_removed": "Nitrogen removed when residue is grazed, burned, or exported. Retained in-situ residue is not a removal."
+      },
+      "guards": [
+        "Do not deduct gaseous or leaching losses from fixation unless the same deduction is applied to all inputs (full soil balance). Never net only fixation.",
+        "Do not add in-situ residue nitrogen as a separate input; it is an internal transfer from the crop that produced it.",
+        "Do not count legume residue nitrogen and N_fixed_gross separately. Gross fixation already represents the legume contribution; legume harvest removal stays in the denominator.",
+        "If N_amendment_external includes residue imported from outside the window, count it here and not again as residue return.",
+        "If residue is retained, do not count it as removal. If residue is removed, do not also count its nitrogen as an input.",
+        "Record every pool and its source. State whether N_fixed_gross is measured, estimated from a local trial, or a default assumption.",
+        "Record the balance boundary: gross_soil_surface or full_soil."
+      ],
+      "affected_indicators": [
+        "F2"
+      ],
+      "status": "decided_v1.2",
+      "companion_outputs": {
+        "N_surplus_kg_per_ha": "N_inputs_total - N_outputs_total",
+        "NUE": "N_outputs_total / N_inputs_total",
+        "note": "NBR = 1 / NUE. Report all three so a ratio cannot hide the absolute surplus or deficit."
+      }
+    },
+    "diversity_edge_cases": {
+      "minimum_window_seasons": 3,
+      "interval_definition": "Return interval = season index difference. Adjacent seasons = 1; one full season between plantings = 2.",
+      "decisions": [
+        {
+          "case": "n = 0",
+          "D1": "null",
+          "D2": "null",
+          "D3": "null",
+          "status": "not_evaluable"
+        },
+        {
+          "case": "n = 1",
+          "D1": "null because ln(1) = 0 and diversity is undefined",
+          "D2": "null",
+          "D3": "null",
+          "status": "not_evaluable",
+          "note": "A single season cannot express rotation diversity."
+        },
+        {
+          "case": "n = 2",
+          "D1": "computable (0 or 1)",
+          "D2": "one adjacent pair",
+          "D3": "null below the 3-season minimum",
+          "status": "low_confidence",
+          "note": "Report the species repeat separately rather than scoring D3."
+        },
+        {
+          "case": "n >= 3 with no species repeat",
+          "D3": "100 with basis = no_repeat",
+          "status": "decided_v1.1",
+          "note": "No repeat means no return-interval penalty; do not treat it as missing data."
+        },
+        {
+          "case": "multiple repeats of a species",
+          "D3": "minimum index difference across all consecutive occurrences",
+          "status": "decided_v1.1"
+        },
+        {
+          "case": "same species, different variety",
+          "D3": "treated as the same species",
+          "status": "decided_v1.1"
+        },
+        {
+          "case": "fallow season",
+          "D1_D2_D3": "excluded from the diversity denominator and reported separately as fallow_seasons",
+          "status": "decided_v1.1_pending_developer_confirmation",
+          "note": "Fallow still counts in the window for water, cover, and climate criteria."
+        },
+        {
+          "case": "cover crop planted as a crop",
+          "D1_D2_D3": "counts as its own family and species",
+          "status": "decided_v1.1_pending_developer_confirmation",
+          "note": "A cover crop is not fallow."
+        }
+      ],
+      "affected_indicators": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "status": "decided_v1.1"
+    },
+    "cover_and_waterlogging": {
+      "ground_cover": {
+        "issue": "The v1.0 cover definition did not state how cover is measured or how a calendar-only proxy is handled, and the 30 percent threshold could be read as universally validated.",
+        "decision": "Define cover as fractional ground cover at the soil surface, 0-1, including living canopy and managed residue. Use field observation, drone or satellite fractional cover, or a documented crop-calendar proxy. Report the method.",
+        "proxy_rule": "With only a crop calendar, assume cover = 1 from canopy closure to senescence and cover = 0 after harvest unless residue is retained. Flag the result as a proxy and cap confidence at medium.",
+        "threshold_basis": "Thirty percent residue cover is the common conservation-tillage definition and is associated with roughly halving water erosion in the cited extension guidance (Purdue AY-269-W, REF-22). It is a configurable screening threshold, not a site-specific validated constant.",
+        "affected_indicators": [
+          "S1",
+          "S2",
+          "S3"
+        ],
+        "status": "decided_v1.2"
+      },
+      "waterlogging": {
+        "issue": "v1.0 treated root-zone water above field capacity and heavy rainfall as one metric. Field capacity is not saturation, so the indicator conflated plant-available water with air exclusion.",
+        "decision": "Use saturation-based days when a water balance is available. Otherwise use heavy-rain days as an explicit proxy and lower confidence. Never add the two metrics.",
+        "primary_metric": {
+          "name": "saturation_excess_days",
+          "definition": "Days where root-zone water content exceeds saturation minus air-filled porosity, or the water table is within the root zone."
+        },
+        "proxy_metric": {
+          "name": "heavy_rain_days",
+          "definition": "Days with rainfall at or above a configurable threshold, adjusted for soil drainage class. Default threshold 50 mm/day."
+        },
+        "precedence": [
+          "saturation_excess_days",
+          "heavy_rain_days"
+        ],
+        "prohibited_interpretation": "Do not label field-capacity exceedance as waterlogging. Field capacity is not saturation.",
+        "threshold_basis": "Crop sensitivity classes come from crop_database.csv. The 24-hour tolerance notes for sweet potato and cassava are documented; the 3-day limit and the 2/10/20 multipliers are project conventions, not validated dose-response functions. The 50 mm/day heavy-rain proxy is a configurable default; calibrate it to the local 95th-99th percentile of daily rainfall and to soil drainage.",
+        "affected_indicators": [
+          "C3"
+        ],
+        "status": "decided_v1.2",
+        "heavy_rain_default_rationale": "50 mm/day is used as an upper-tail daily rainfall stand-in for saturation risk. It is not a measured waterlogging threshold and must not be interpreted as one. The preferred metric is saturation_excess_days from a water balance."
+      }
+    },
+    "coverage_and_confidence": "See scoring_scales.missing_data for the normative formulas, confidence rules, and insufficient-data conditions."
+  },
+  "threshold_register": {
+    "purpose": "Name every configurable threshold, state whether it is evidence-based, a screening convention, or a proxy default, and name who calibrates it.",
+    "types": {
+      "evidence_based": "Taken directly from a cited method or table.",
+      "screening_convention": "A deliberate prototype choice, not a validated universal constant.",
+      "proxy_default": "A stand-in metric with a stated rationale and a calibration path."
+    },
+    "entries": [
+      {
+        "parameter": "Criterion weights",
+        "value": "0.25 / 0.25 / 0.20 / 0.15 / 0.15",
+        "unit": "fraction",
+        "type": "screening_convention",
+        "basis": "Starting weights from the project specification.",
+        "source": "REF-20",
+        "calibration": "Product owner and agronomist"
+      },
+      {
+        "parameter": "WSDR advisory / constraint",
+        "value": "0.8 / 0.6",
+        "unit": "ratio",
+        "type": "screening_convention",
+        "basis": "Screening bands around the FAO-56 supply-demand ratio; not a yield-response threshold.",
+        "source": "REF-01, REF-02",
+        "calibration": "Agronomist"
+      },
+      {
+        "parameter": "W2 depletion fraction p",
+        "value": "crop-specific",
+        "unit": "fraction",
+        "type": "evidence_based",
+        "basis": "FAO-56 Table 22 p values; stress threshold is 1 - p.",
+        "source": "REF-01",
+        "calibration": "Local ETc adjustment"
+      },
+      {
+        "parameter": "W2 critical-stage deficit days",
+        "value": "3 / 7 / 14 / 21",
+        "unit": "days",
+        "type": "screening_convention",
+        "basis": "Proposed scoring breakpoints.",
+        "source": "REF-01, REF-02",
+        "calibration": "Agronomist"
+      },
+      {
+        "parameter": "F1 legume season fraction",
+        "value": "0.2 / 0.33 / 0.5 / 0.67",
+        "unit": "fraction",
+        "type": "screening_convention",
+        "basis": "Reflects the common one-legume-every-two-to-three-seasons guidance, not a measured response curve.",
+        "source": "REF-03, REF-05",
+        "calibration": "Agronomist"
+      },
+      {
+        "parameter": "F2 NBR deficit / excess",
+        "value": "0.8 / 1.5",
+        "unit": "ratio",
+        "type": "screening_convention",
+        "basis": "Inverse NUE screening bands around the Eurostat/OECD gross balance.",
+        "source": "REF-21",
+        "calibration": "Agronomist"
+      },
+      {
+        "parameter": "D1 diversity breakpoints",
+        "value": "0.3 / 0.5 / 0.7 / 0.9",
+        "unit": "index",
+        "type": "screening_convention",
+        "basis": "Prototype scoring bands for a normalized family-diversity index.",
+        "source": "REF-05, REF-06",
+        "calibration": "Agronomist"
+      },
+      {
+        "parameter": "D2 same-family pair penalty",
+        "value": "0 / 1 / 2 / 3 pairs",
+        "unit": "count",
+        "type": "screening_convention",
+        "basis": "Descriptive count with prototype penalties.",
+        "source": "REF-05",
+        "calibration": "Agronomist"
+      },
+      {
+        "parameter": "D3 return interval",
+        "value": "2 / 3 / 4",
+        "unit": "seasons",
+        "type": "screening_convention",
+        "basis": "Default rotation break; pest-specific intervals override it.",
+        "source": "REF-05",
+        "calibration": "Crop protection specialist"
+      },
+      {
+        "parameter": "S1 ground-cover threshold",
+        "value": "0.30",
+        "unit": "fraction",
+        "type": "evidence_based",
+        "basis": "Common conservation-tillage definition; about 50 percent water-erosion reduction in the cited guidance. Site-specific calibration still required.",
+        "source": "REF-22",
+        "calibration": "Soil conservation specialist"
+      },
+      {
+        "parameter": "S2 bare-soil gap",
+        "value": "7 / 14 / 30 / 60 / 90",
+        "unit": "days",
+        "type": "screening_convention",
+        "basis": "Proposed scoring breakpoints; adjust for slope and rainfall erosivity.",
+        "source": "REF-06, REF-10, REF-11",
+        "calibration": "Soil conservation specialist"
+      },
+      {
+        "parameter": "S3 erosion class scores",
+        "value": "100 / 60 / 20",
+        "unit": "score",
+        "type": "screening_convention",
+        "basis": "Qualitative screen, not a RUSLE estimate.",
+        "source": "REF-10",
+        "calibration": "Soil conservation specialist"
+      },
+      {
+        "parameter": "C1 temperature suitability breakpoints",
+        "value": "0.5 / 0.7 / 0.85 / 1.0",
+        "unit": "fraction of days",
+        "type": "screening_convention",
+        "basis": "Prototype scoring bands.",
+        "source": "REF-01, REF-04",
+        "calibration": "Agronomist"
+      },
+      {
+        "parameter": "C2 heat-stress days",
+        "value": "2 / 5 / 10 / 15",
+        "unit": "days",
+        "type": "screening_convention",
+        "basis": "Prototype scoring bands around documented crop thresholds.",
+        "source": "REF-09, REF-04",
+        "calibration": "Agronomist"
+      },
+      {
+        "parameter": "C3 heavy-rain proxy",
+        "value": "50",
+        "unit": "mm/day",
+        "type": "proxy_default",
+        "basis": "Upper-tail daily rainfall used as a saturation stand-in; not a measured waterlogging threshold. Calibrate to the local 95th-99th percentile and drainage class.",
+        "source": "REF-12, REF-13",
+        "calibration": "Agronomist and hydrologist"
+      },
+      {
+        "parameter": "C3 waterlogging multipliers",
+        "value": "2 / 10 / 20",
+        "unit": "score per day",
+        "type": "screening_convention",
+        "basis": "Screening weights, not dose-response functions.",
+        "source": "REF-04, REF-07, REF-08",
+        "calibration": "Agronomist"
+      },
+      {
+        "parameter": "C3 sensitive-crop day limits",
+        "value": "1 / 3",
+        "unit": "days",
+        "type": "screening_convention",
+        "basis": "The 24-hour tolerance notes for sweet potato and cassava are documented; the 3-day limit is a project convention.",
+        "source": "REF-07, REF-08",
+        "calibration": "Agronomist"
+      },
+      {
+        "parameter": "D3 minimum window",
+        "value": "3",
+        "unit": "seasons",
+        "type": "screening_convention",
+        "basis": "A two-season window cannot express a return interval.",
+        "source": "REF-05",
+        "calibration": "Rotation Lab developer"
+      },
+      {
+        "parameter": "Coverage minimum",
+        "value": "0.50 and 3 criteria",
+        "unit": "fraction / count",
+        "type": "screening_convention",
+        "basis": "Prototype reporting guardrail.",
+        "source": "REF-20",
+        "calibration": "Product owner"
+      },
+      {
+        "parameter": "Confidence coverage cutoffs",
+        "value": "0.80 / 0.50",
+        "unit": "fraction",
+        "type": "screening_convention",
+        "basis": "Prototype confidence bands with weakest-link aggregation.",
+        "source": "REF-20",
+        "calibration": "Product owner and developer"
+      }
+    ]
+  },
+  "scientific_validation": {
+    "date": "2026-11-14",
+    "status": "audited_with_documented_conventions",
+    "summary": "The water balance now follows FAO-56 Eq. 85, the nitrogen balance follows the Eurostat/OECD gross soil-surface balance, the diversity index is explicitly a project index rather than Pielou evenness, every configurable threshold is registered, and the test set now includes normal-path numeric cases. The framework remains a screening tool: weights and many breakpoints are conventions and still require agronomist calibration.",
+    "checks": [
+      {
+        "area": "water_balance",
+        "verdict": "scientifically_supported",
+        "evidence": "FAO-56 Eq. 85 defines the root-zone balance with gross P, explicit RO, I, CR, ETc, and DP. W1 now uses P - RO + I + CR - DP; W2 uses the FAO-56 p values in Table 22.",
+        "disposition": "Formula aligned to the cited method. WSDR remains a screening ratio, not a yield prediction."
+      },
+      {
+        "area": "nitrogen_balance",
+        "verdict": "scientifically_supported_with_boundary_choice",
+        "evidence": "Eurostat/OECD gross nitrogen balance counts mineral fertilizer, manure, organic amendments, deposition, and gross fixation as inputs, and harvest plus removed residues as outputs; NUE = outputs/inputs.",
+        "disposition": "F2 now uses the gross balance, reports N surplus and NUE with NBR, and forbids netting losses from fixation alone."
+      },
+      {
+        "area": "diversity",
+        "verdict": "project_convention_explicit",
+        "evidence": "Shannon H is standard, but H/ln(n seasons) is not Pielou evenness H/ln(k families); the 2/3/4-season return interval is pest-specific in the literature.",
+        "disposition": "Normalization and breakpoints are labeled project conventions; the worked example was corrected to 0.58."
+      },
+      {
+        "area": "configurable_thresholds",
+        "verdict": "documented",
+        "evidence": "Every numeric threshold now appears in threshold_register with a type, basis, source, and calibration owner.",
+        "disposition": "The 30 percent cover threshold is tied to the conservation-tillage definition; the 50 mm/day proxy is labeled and given a calibration path."
+      },
+      {
+        "area": "test_coverage",
+        "verdict": "improved",
+        "evidence": "T01-T15 covered accounting guards and edge cases but almost no normal-path numeric cases.",
+        "disposition": "T16-T26 add normal-path, numeric, renormalization, confidence, and end-to-end tests."
+      }
+    ]
+  }
+}

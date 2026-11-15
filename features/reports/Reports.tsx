@@ -5,6 +5,7 @@ import { useState } from "react";
 import { LogoMark } from "@/components/brand/Logo";
 import { SeriesChart } from "@/components/charts/SeriesChart";
 import { Badge, Button, ErrorState, Loading, PageHeader, provenanceLabel, SourceTag, TABLE, TD, TH } from "@/components/ui";
+import { CropImage, CropSequence } from "@/components/visual/Crop";
 import { CROPS } from "@/data/crops";
 import { HISTORICAL, SCENARIOS } from "@/data/scenarios";
 import { SERIES } from "@/lib/chartTheme";
@@ -34,8 +35,8 @@ type SectionKey = (typeof SECTIONS)[number]["key"];
 
 function ReportSection({ n, title, children }: { n: number; title: string; children: React.ReactNode }) {
   return (
-    <section className="print-avoid border-t border-line py-8">
-      <h2 className="mb-4 text-lg font-semibold tracking-tight text-ink"><span className="tabular mr-2.5 text-faint">{n}</span>{title}</h2>
+    <section className="border-t border-line py-8">
+      <h2 className="mb-4 text-lg font-semibold tracking-tight text-ink [break-after:avoid]"><span className="tabular mr-2.5 text-faint">{n}</span>{title}</h2>
       {children}
     </section>
   );
@@ -56,8 +57,8 @@ export function Reports() {
   const req = { fieldId: field.id, plans: compared, settings, priorities, scenarios: SCENARIOS };
   const simQ = useService(JSON.stringify(req), () => simulateScenarios(req));
 
-  const header = <PageHeader title="Field report" lead="A printable summary of what TERRA has observed, discovered and tested for this field."
-    actions={<Button variant="primary" onClick={() => window.print()}><Printer size={15} aria-hidden /> Print or save as PDF</Button>} />;
+  const header = <div className="no-print"><PageHeader title="Field report" lead="A printable summary of what TERRA has observed, discovered and tested for this field."
+    actions={<Button variant="primary" onClick={() => window.print()}><Printer size={15} aria-hidden /> Print or save as PDF</Button>} /></div>;
 
   const report = reportQ.data;
   const sims = simQ.data;
@@ -72,7 +73,8 @@ export function Reports() {
   const open = report.discoveries.filter((d) => d.status !== "resolved");
   const q = report.quality;
   const extremes = q.issues.filter((i) => i.kind === "extreme");
-  const allDemo = report.sources.every((src) => src.integration === "demo");
+  // The live NASA map (smap-gibs) supplies pictures only, not values in this report
+  const allDemo = report.sources.every((src) => src.integration === "demo" || src.id === "smap-gibs");
   let n = 0;
 
   const measurements: { label: string; value: string; change: string; kind: "measurement" | "satellite" | "model"; date: string }[] = [
@@ -103,11 +105,16 @@ export function Reports() {
       <article className="mx-auto max-w-[880px] rounded-xl border border-line bg-surface px-6 pb-4 pt-8 shadow-card sm:px-12 sm:pt-10 print:max-w-none print:border-0 print:p-0 print:shadow-none">
         <header className="pb-8">
           <div className="flex items-center justify-between gap-4">
-            <span className="flex items-center gap-2"><LogoMark size={26} /><span className="text-[15px] font-semibold tracking-[0.14em] text-ink">TERRA</span></span>
+            <span className="flex items-center gap-2"><LogoMark size={22} /><span className="text-[15px] font-semibold tracking-[0.14em] text-ink">TERRA</span></span>
             <span className="text-[13px] text-muted">Generated {longDate(report.generatedOn)}</span>
           </div>
-          <h1 className="mt-8 text-[30px] font-semibold leading-tight tracking-tight text-ink">{report.field.name}</h1>
-          <p className="mt-1 text-[15px] text-muted">Field report · {report.field.location}</p>
+          <div className="mt-8 flex items-center gap-5">
+            <CropImage id={report.field.currentCrop} size="lg" />
+            <div>
+              <h1 className="text-[30px] font-semibold leading-tight tracking-tight text-ink">{report.field.name}</h1>
+              <p className="mt-1 text-[15px] text-muted">Field report · {report.field.location}</p>
+            </div>
+          </div>
           <p className="mt-5 rounded-lg border border-amber-line bg-amber-soft px-4 py-3 text-[13px] leading-relaxed text-ink-soft">
             <strong className="font-medium text-ink">Demonstration report.</strong> The time series in this report were generated locally to demonstrate TERRA: no field station is connected.{allDemo ? " No NASA service was connected either." : " Records marked “Retrieved” in the data sources are real NASA values."} Do not use this report for a real farm decision.
           </p>
@@ -170,11 +177,12 @@ export function Reports() {
           <ReportSection n={++n} title="Rotation comparisons">
             {matched.length === 0 ? <p className="text-sm text-muted">No rotation plans are included in the comparison in the Rotation Lab.</p> : (
               <>
-                <ul className="mb-4 space-y-2 text-sm leading-relaxed text-ink-soft">
+                <ul className="mb-4 space-y-4 text-sm leading-relaxed text-ink-soft">
                   {matched.map((p, i) => {
                     const t = tradeoffs(evals[i], evals);
                     return (
                       <li key={p.id}>
+                        <span className="mb-1.5 block"><CropSequence crops={p.crops} size="xs" /></span>
                         <span className="font-semibold text-ink">{p.name}</span> <span className="text-muted">({p.crops.map((c) => CROPS[c].name).join(" → ")})</span>
                         {t.gains.length > 0 && <span>: {t.gains.join("; ")}.</span>}
                         {t.costs.length > 0 && <span>{t.gains.length > 0 ? " However, it " : ": "}{t.costs.join("; ")}.</span>}

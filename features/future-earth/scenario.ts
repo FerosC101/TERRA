@@ -2,10 +2,11 @@ import { fmt, pct, signed } from "@/lib/format";
 import type { RotationEvaluation, Scenario } from "@/types";
 
 export function describeScenario(s: Scenario): string {
-  if (s.rainChange === 0 && s.tempChangeC === 0) return "Average climate, unchanged";
-  const rain = s.rainChange === 0 ? "Rain unchanged" : `${signed(s.rainChange * 100, 0)}% rain`;
-  const temp = s.tempChangeC === 0 ? "temperature unchanged" : `${signed(s.tempChangeC, 1)} °C`;
-  return `${rain}, ${temp}`;
+  if (s.rainChange === 0 && s.tempChangeC === 0) return "Average climate";
+  const parts: string[] = [];
+  if (s.rainChange !== 0) parts.push(`${signed(s.rainChange * 100, 0)}% rain`);
+  if (s.tempChangeC !== 0) parts.push(`${signed(s.tempChangeC, 1)} °C`);
+  return parts.join(", ");
 }
 
 export type StressKey = "reserve" | "unmet" | "met" | "heat" | "excess";

@@ -2,6 +2,8 @@
 
 import clsx from "clsx";
 import { ArrowDownRight, ArrowRight, ArrowUpRight, ChevronDown, CircleAlert, Info } from "lucide-react";
+import { InfoTip } from "@/components/visual/InfoTip";
+import { Sparkline } from "@/components/visual/Sparkline";
 import type { Provenance } from "@/types";
 
 /* ───────────────────────── Layout ───────────────────────── */
@@ -25,12 +27,12 @@ export function PageHeader({ title, lead, actions, children }: { title: string; 
 }
 
 /** A titled region of a page. Separation comes from space and the heading, not a box. */
-export function Section({ title, description, actions, children, className }: { title: string; description?: React.ReactNode; actions?: React.ReactNode; children: React.ReactNode; className?: string }) {
+export function Section({ title, description, info, actions, children, className }: { title: string; description?: React.ReactNode; info?: React.ReactNode; actions?: React.ReactNode; children: React.ReactNode; className?: string }) {
   return (
     <section className={clsx("print-avoid", className)}>
       <div className="mb-4 flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
         <div className="min-w-0 max-w-2xl">
-          <h2 className="text-[17px] font-semibold tracking-tight text-ink">{title}</h2>
+          <h2 className="flex items-center gap-1.5 text-[17px] font-semibold tracking-tight text-ink">{title}{info && <InfoTip label={title}>{info}</InfoTip>}</h2>
           {description && <p className="mt-1 text-sm leading-relaxed text-muted">{description}</p>}
         </div>
         {actions && <div className="no-print flex flex-wrap items-center gap-2">{actions}</div>}
@@ -41,11 +43,11 @@ export function Section({ title, description, actions, children, className }: { 
 }
 
 /** Heading row inside a Card. */
-export function CardHeader({ title, description, actions }: { title: string; description?: React.ReactNode; actions?: React.ReactNode }) {
+export function CardHeader({ title, description, info, actions }: { title: string; description?: React.ReactNode; info?: React.ReactNode; actions?: React.ReactNode }) {
   return (
     <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3 px-5 pt-5 sm:px-6">
       <div className="min-w-0">
-        <h3 className="text-[15px] font-semibold text-ink">{title}</h3>
+        <h3 className="flex items-center gap-1.5 text-[15px] font-semibold text-ink">{title}{info && <InfoTip label={title}>{info}</InfoTip>}</h3>
         {description && <p className="mt-0.5 text-[13px] leading-relaxed text-muted">{description}</p>}
       </div>
       {actions && <div className="no-print flex flex-wrap items-center gap-2">{actions}</div>}
@@ -55,11 +57,11 @@ export function CardHeader({ title, description, actions }: { title: string; des
 
 /* ───────────────────────── Data provenance ───────────────────────── */
 
-const PROVENANCE: Record<Provenance, { label: string; dot: string; help: string }> = {
-  measurement: { label: "Field measurement", dot: "bg-green", help: "Read by a sensor in the field." },
-  satellite: { label: "Satellite estimate", dot: "bg-blue", help: "Estimated from orbit over an area larger than the field." },
-  model: { label: "Model output", dot: "bg-violet", help: "Calculated from other data using stated assumptions." },
-  simulated: { label: "Simulation", dot: "bg-amber", help: "A what-if result, not an observation or a forecast." },
+const PROVENANCE: Record<Provenance, { label: string; short: string; dot: string; help: string }> = {
+  measurement: { label: "Field measurement", short: "Sensor", dot: "bg-green", help: "Field measurement: read by a sensor in the field." },
+  satellite: { label: "Satellite estimate", short: "Satellite", dot: "bg-blue", help: "Satellite estimate: from orbit, over an area larger than the field." },
+  model: { label: "Model output", short: "Model", dot: "bg-violet", help: "Model output: calculated from other data using stated assumptions." },
+  simulated: { label: "Simulation", short: "Simulation", dot: "bg-amber", help: "Simulation: a what-if result, not an observation or a forecast." },
 };
 
 export function provenanceLabel(kind: Provenance): string {
@@ -70,12 +72,12 @@ export function provenanceLabel(kind: Provenance): string {
  * States how a value came to exist: a quiet dot and label. `retrieved` marks a
  * real record; otherwise the tooltip reminds the reader the value is demo data.
  */
-export function SourceTag({ kind, detail, retrieved = false, className }: { kind: Provenance; detail?: string; retrieved?: boolean; className?: string }) {
+export function SourceTag({ kind, detail, retrieved = false, short = false, className }: { kind: Provenance; detail?: string; retrieved?: boolean; short?: boolean; className?: string }) {
   const p = PROVENANCE[kind];
   return (
     <span title={`${p.help}${retrieved ? " Retrieved record." : " Demo data in this build."}`} className={clsx("inline-flex items-center gap-1.5 whitespace-nowrap text-xs text-muted", className)}>
       <span className={clsx("h-1.5 w-1.5 shrink-0 rounded-full", p.dot)} aria-hidden />
-      {p.label}{detail ? ` · ${detail}` : ""}
+      {short ? p.short : p.label}{detail ? ` · ${detail}` : ""}
     </span>
   );
 }
@@ -91,10 +93,14 @@ export interface MetricProps {
   source: Provenance;
   /** Observation date or measurement period */
   when: string;
+  /** Recent values for a sparkline; nulls are gaps */
+  spark?: (number | null)[];
 }
 
-/** One measurement: value, unit, what changed, where it came from and when. */
-export function Metric({ label, value, unit, trend, source, when }: MetricProps) {
+const SOURCE_COLOR: Record<Provenance, string> = { measurement: "#2F7D46", satellite: "#2F6FB2", model: "#7A5AC2", simulated: "#B7791F" };
+
+/** One measurement: value and unit first, then a sparkline, the change, the source and the date. */
+export function Metric({ label, value, unit, trend, source, when, spark }: MetricProps) {
   const TrendIcon = trend?.direction === "up" ? ArrowUpRight : trend?.direction === "down" ? ArrowDownRight : ArrowRight;
   return (
     <div className="min-w-0">
@@ -103,15 +109,15 @@ export function Metric({ label, value, unit, trend, source, when }: MetricProps)
         <span className="tabular text-[26px] font-semibold leading-none tracking-tight text-ink">{value}</span>
         {unit && <span className="text-sm text-muted">{unit}</span>}
       </div>
+      {spark && <div className="mt-2.5"><Sparkline values={spark} color={SOURCE_COLOR[source]} label={`${label}, recent trend`} /></div>}
       {trend && (
-        <div className={clsx("mt-2 flex items-start gap-1 text-[13px] leading-snug", trend.tone === "warning" ? "text-amber" : "text-ink-soft")}>
-          <TrendIcon size={14} className="mt-0.5 shrink-0" aria-hidden />
+        <div className={clsx("mt-1.5 flex items-center gap-1 text-[13px] font-medium", trend.tone === "warning" ? "text-amber" : "text-ink-soft")}>
+          <TrendIcon size={14} className="shrink-0" aria-hidden />
           <span>{trend.text}</span>
         </div>
       )}
-      <div className="mt-2 flex flex-col gap-0.5">
-        <SourceTag kind={source} />
-        <span className="text-xs text-faint">{when}</span>
+      <div className="mt-2 truncate text-xs text-faint">
+        <SourceTag kind={source} short detail={when} className="!text-faint" />
       </div>
     </div>
   );

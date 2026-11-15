@@ -4,7 +4,7 @@ import clsx from "clsx";
 import { CloudRain, Droplets, SlidersHorizontal, Sun, Thermometer, ThermometerSun } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Disclosure, ErrorState, Loading, Notice, PageHeader, Section, Swatch } from "@/components/ui";
-import { CROPS } from "@/data/crops";
+import { CropSequence } from "@/components/visual/Crop";
 import { SCENARIOS } from "@/data/scenarios";
 import { fmt, signed } from "@/lib/format";
 import { ASSUMPTIONS } from "@/lib/science/waterBalance";
@@ -38,10 +38,10 @@ export function FutureEarth() {
 
   return (
     <div>
-      <PageHeader title="Future Earth" lead="See how your rotation plans respond to different climate conditions: less rain, more rain, more heat, or both." />
+      <PageHeader title="Future Earth" lead="How your rotation plans hold up under a different climate." />
 
       <div className="space-y-12">
-        <Section title="Choose the conditions" description="Each scenario applies a fixed change to this field's average climate.">
+        <Section title="Choose the conditions" info="Each scenario applies a fixed change to this field's average climate.">
           <div role="radiogroup" aria-label="Climate scenario" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
             {scenarios.map((s) => {
               const Icon = ICONS[s.id] ?? Sun;
@@ -78,11 +78,11 @@ export function FutureEarth() {
               {plans.map((p) => {
                 const on = !excluded.includes(p.id);
                 return (
-                  <label key={p.id} className={clsx("inline-flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-[13px]", on ? "border-line-strong bg-surface text-ink" : "border-line text-muted")}>
+                  <label key={p.id} className={clsx("inline-flex cursor-pointer items-center gap-2.5 rounded-xl border px-3 py-2 text-[13px]", on ? "border-line-strong bg-surface text-ink" : "border-line text-muted opacity-60")}>
                     <input type="checkbox" checked={on} disabled={on && included.length === 1} onChange={() => setExcluded((x) => (on ? [...x, p.id] : x.filter((i) => i !== p.id)))} className="h-4 w-4" />
                     <Swatch color={planColor(p)} />
                     <span className="font-medium">{p.name}</span>
-                    <span className="hidden text-muted sm:inline">{p.crops.map((c) => CROPS[c].name).join(" → ")}</span>
+                    <CropSequence crops={p.crops} size="xs" />
                   </label>
                 );
               })}
@@ -91,11 +91,11 @@ export function FutureEarth() {
         </Section>
 
         <Section title={focus.id === "historical" ? "Results under historical conditions" : `What changes under ${focus.name.toLowerCase()}`}
-          description={`${describeScenario(focus)}. The same rotation plans, with the same crops and seasons.`}>
+          description={describeScenario(focus)}>
           {error ? <ErrorState message={error} /> : !ready ? <Loading label="Running scenario simulations" /> : (
             <div className="space-y-10">
               <Notice tone="caution">
-                These are <strong className="font-medium text-ink">simulations, not weather forecasts or climate projections</strong>. They show how a rotation responds to a kind of season, not what any particular year will bring.
+                <strong className="font-medium text-ink">Simulations</strong>, not forecasts or climate projections.
               </Notice>
               <ChangeTable {...shared} />
               <ScenarioCharts {...shared} />

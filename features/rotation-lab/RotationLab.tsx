@@ -2,7 +2,8 @@
 
 import { ArrowRight, RotateCcw } from "lucide-react";
 import Link from "next/link";
-import { Button, EmptyState, ErrorState, LINK, Loading, Notice, PageHeader, Section, Segmented } from "@/components/ui";
+import { Button, EmptyState, ErrorState, LINK, Loading, PageHeader, Section, Segmented } from "@/components/ui";
+import { InfoTip } from "@/components/visual/InfoTip";
 import { HISTORICAL } from "@/data/scenarios";
 import { MONTH_NAMES } from "@/lib/dates";
 import { fmt } from "@/lib/format";
@@ -24,11 +25,11 @@ export function RotationLab() {
   return (
     <div>
       <PageHeader title="Rotation Lab"
-        lead="Plan crop sequences for this field and compare how they differ in water use, diversity, soil cover, nutrients and climate exposure. The aim is to understand the trade-offs, not to crown a winner."
+        lead="Plan crop sequences and compare their trade-offs."
         actions={<Button onClick={resetRotations}><RotateCcw size={15} aria-hidden /> Reset to examples</Button>} />
 
       <div className="space-y-12">
-        <Section title="1. Build your rotations" description="Each row is one plan. Read the seasons from left to right, choose a crop for each, and reorder or remove them.">
+        <Section title="1. Build your rotations" info="Each row is one plan, read left to right. Tap a crop to change it; use the arrows to reorder seasons.">
           <div className="mb-5 flex flex-wrap items-end gap-x-8 gap-y-4">
             <div>
               <p className="mb-1.5 text-[13px] text-ink-soft">Seasons per year</p>
@@ -41,27 +42,25 @@ export function RotationLab() {
                 {MONTH_NAMES.map((m, i) => <option key={m} value={i}>{m}</option>)}
               </select>
             </label>
-            <p className="text-[13px] leading-relaxed text-muted">
-              {field.name} · {field.soil.texture.toLowerCase()} soil<br />
-              About {fmt(annualRain)} mm of rain a year · root zone holds up to {field.soil.awcMmPerM * field.soil.profileDepthM} mm
-            </p>
+            <ul className="flex flex-wrap gap-2 text-[13px] text-ink-soft">
+              <li className="rounded-full bg-sunken px-3 py-1">{field.soil.texture} soil</li>
+              <li className="rounded-full bg-sunken px-3 py-1">~{fmt(annualRain)} mm rain / year</li>
+              <li className="rounded-full bg-sunken px-3 py-1">Soil holds {field.soil.awcMmPerM * field.soil.profileDepthM} mm</li>
+            </ul>
           </div>
           <RotationBuilder evaluations={evaluations} />
         </Section>
 
-        <Section title="2. Compare the plans" description={`${compared.length} of ${plans.length} plans included, under average historical conditions for this field.`}
+        <Section title="2. Compare the plans" description={`${compared.length} of ${plans.length} plans · average historical climate`}
+          info={`Model estimates from ${field.climate.basis === "retrieved" ? "the NASA POWER climatology for this area" : "an illustrative climatology"} and typical crop parameters. They compare plans with each other; they are not yield forecasts.`}
           actions={<Link href="/future-earth" className={LINK}>Test these under climate scenarios <ArrowRight size={15} aria-hidden /></Link>}>
           {all.error ? <ErrorState message={all.error} /> : !all.data ? <Loading label="Evaluating rotations" /> : compared.length === 0 ? (
             <EmptyState title="No plans are included in the comparison">Tick &ldquo;Include in comparison&rdquo; on at least one plan above.</EmptyState>
           ) : (
             <div className="space-y-10">
-              <Notice>
-                These are model estimates from {field.climate.basis === "retrieved" ? "the NASA POWER climatology for this area" : "an illustrative climatology for this area"} and typical crop parameters. They compare plans with each other. They are not yield forecasts.
-              </Notice>
               <div>
-                <h3 className="mb-4 text-[15px] font-semibold text-ink">Trade-offs at a glance</h3>
+                <h3 className="mb-4 flex items-center gap-1.5 text-[15px] font-semibold text-ink">Trade-offs at a glance<InfoTip label="trade-offs">No plan is best on everything. Gains and costs are relative to the other plans compared here.</InfoTip></h3>
                 <Tradeoffs plans={compared} evaluations={comparedEvals} />
-                <p className="mt-4 text-[13px] text-muted">No plan is best on everything. Gains and costs are relative to the other plans compared here.</p>
               </div>
               <WaterCharts plans={compared} evaluations={comparedEvals} />
               <div>
@@ -76,11 +75,11 @@ export function RotationLab() {
           )}
         </Section>
 
-        <Section title="3. Weigh what matters on your farm" description="Optional. Set how much each consideration matters to you. This changes only the match figure below: every indicator above stays the same.">
+        <Section title="3. Weigh what matters on your farm" description="Optional" info="Set how much each consideration matters to you. This changes only the match figure: every indicator above stays the same.">
           <Priorities plans={compared} evaluations={comparedEvals} />
         </Section>
 
-        <Section title="Methods and assumptions" description="The calculations behind every figure on this page.">
+        <Section title="Methods and assumptions">
           <Assumptions field={field} />
         </Section>
       </div>

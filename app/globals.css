@@ -90,39 +90,145 @@ input[type="checkbox"] {
   color: var(--faint);
 }
 
-/* Leaflet controls, matched to the light interface */
-.leaflet-container {
-  background: #eef1ea;
+/* MapLibre controls, matched to the light interface */
+.maplibregl-map {
   font-family: var(--font-sans);
-  border-radius: inherit;
 }
-.leaflet-control-attribution {
-  background: rgba(255, 255, 255, 0.85) !important;
-  color: var(--muted) !important;
+.maplibregl-ctrl-group {
+  border-radius: 10px !important;
+  box-shadow: var(--shadow-pop) !important;
+  overflow: hidden;
+}
+.maplibregl-ctrl-attrib {
   font-size: 10px;
+  background: rgba(255, 255, 255, 0.85) !important;
+  color: var(--muted);
 }
-.leaflet-control-attribution a {
+.maplibregl-ctrl-attrib a {
   color: var(--ink-soft) !important;
 }
-.leaflet-bar {
-  border: 1px solid var(--line-strong) !important;
-  box-shadow: var(--shadow-card) !important;
-}
-.leaflet-bar a {
-  background: var(--surface) !important;
+.maplibregl-ctrl-scale {
+  border-color: var(--ink-soft) !important;
   color: var(--ink) !important;
-  border-color: var(--line) !important;
+  background: rgba(255, 255, 255, 0.8) !important;
 }
-.leaflet-tooltip.terra-tip {
-  background: var(--surface);
+.terra-pop .maplibregl-popup-content {
+  padding: 6px 10px;
+  border-radius: 8px;
   border: 1px solid var(--line-strong);
   color: var(--ink);
   font-size: 12px;
-  border-radius: 6px;
   box-shadow: var(--shadow-pop);
 }
-.leaflet-tooltip.terra-tip::before {
+.terra-pop .maplibregl-popup-tip {
   display: none;
+}
+/* Value tag floating above a 3D soil-moisture beacon */
+.terra-beacon-tag {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px 2px 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid var(--line-strong);
+  color: var(--ink);
+  font-size: 11px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(24, 59, 42, 0.18);
+  will-change: transform;
+}
+.terra-beacon-tag::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--dot);
+}
+/* Animated TERRA mark (components/brand/LogoLoader.tsx) */
+.terra-logo-anim g { transform-box: fill-box; }
+.terra-logo-planet { animation: terra-planet 900ms cubic-bezier(0.22, 1, 0.36, 1) 100ms both; }
+.terra-logo-orbit { animation: terra-orbit 850ms cubic-bezier(0.65, 0, 0.35, 1) 550ms both; }
+.terra-logo-leafLow { transform-origin: 0% 100%; animation: terra-leaf 700ms cubic-bezier(0.34, 1.56, 0.64, 1) 1050ms both; }
+.terra-logo-leafHigh { transform-origin: 0% 100%; animation: terra-leaf 700ms cubic-bezier(0.34, 1.56, 0.64, 1) 1200ms both; }
+.terra-logo-letter { display: inline-block; animation: terra-letter 500ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+.terra-logo-tagline { animation: terra-fade 600ms ease-out 1800ms both; }
+.terra-logo-progress > span { transform-origin: left; animation: terra-progress 2400ms cubic-bezier(0.65, 0, 0.35, 1) both; }
+@keyframes terra-planet {
+  from { clip-path: circle(0% at 0% 100%); opacity: 0.4; }
+  to { clip-path: circle(150% at 0% 100%); opacity: 1; }
+}
+@keyframes terra-orbit {
+  from { clip-path: inset(0 100% 0 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
+@keyframes terra-leaf {
+  from { transform: scale(0) rotate(-12deg); opacity: 0; }
+  to { transform: scale(1) rotate(0); opacity: 1; }
+}
+@keyframes terra-letter {
+  from { transform: translateY(14px); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+@keyframes terra-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes terra-progress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@media (prefers-reduced-motion: reduce) {
+  .terra-logo-anim g, .terra-logo-letter, .terra-logo-tagline, .terra-logo-progress > span { animation: none; }
+}
+
+/* Landing page: sections fade up as they scroll into view */
+.terra-reveal { opacity: 0; transform: translateY(18px); transition: opacity 700ms ease-out, transform 700ms cubic-bezier(0.22, 1, 0.36, 1); }
+.terra-reveal.is-visible { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .terra-reveal { opacity: 1; transform: none; transition: none; }
+}
+
+/* Readouts that pop up inside the field environment scene */
+@keyframes terra-callout-in {
+  from { opacity: 0; transform: translateY(6px) scale(0.92); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes terra-callout-dot-in {
+  from { scale: 0; }
+  60% { scale: 1.5; }
+  to { scale: 1; }
+}
+@keyframes terra-callout-line-in {
+  from { stroke-opacity: 0; }
+  to { stroke-opacity: 0.55; }
+}
+.terra-callout {
+  transform-origin: bottom center;
+  animation: terra-callout-in 420ms cubic-bezier(0.2, 0.9, 0.3, 1.2) var(--d, 0ms) both;
+}
+.terra-callout-dot {
+  position: absolute;
+  left: -5px;
+  top: -5px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 2.5px solid var(--ink);
+  animation: terra-callout-dot-in 380ms ease-out var(--d, 0ms) both;
+}
+.terra-callout-line {
+  stroke: var(--ink);
+  animation: terra-callout-line-in 300ms ease-out var(--d, 0ms) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .terra-callout, .terra-callout-dot, .terra-callout-line { animation: none; }
+  .terra-callout-line { stroke-opacity: 0.55; }
+}
+.terra-beacon-tag.is-selected {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
 }
 
 @keyframes terra-pulse {
@@ -144,6 +250,8 @@ input[type="checkbox"] {
   .no-print { display: none !important; }
   .print-break { break-before: page; }
   .print-avoid { break-inside: avoid; }
+  tr, figure, h3 { break-inside: avoid; }
+  h2, h3 { break-after: avoid; }
   main { padding: 0 !important; max-width: none !important; }
   @page { margin: 14mm; }
 }

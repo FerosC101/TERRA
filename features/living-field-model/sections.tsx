@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { SeriesChart } from "@/components/charts/SeriesChart";
 import { Fact, LINK, Notice } from "@/components/ui";
+import { CropImage, CropSequence } from "@/components/visual/Crop";
 import { CROPS } from "@/data/crops";
 import { SERIES } from "@/lib/chartTheme";
 import { daysBetween, longDate, shortDate } from "@/lib/dates";
@@ -17,10 +18,10 @@ interface SectionProps {
   state: ModelState;
 }
 
-function Block({ title, children }: { title: string; children: React.ReactNode }) {
+function Block({ title, children }: { title?: string; children: React.ReactNode }) {
   return (
     <div>
-      <h3 className="mb-3 text-[13px] font-medium uppercase tracking-wide text-muted">{title}</h3>
+      {title && <h3 className="mb-3 text-[13px] font-medium uppercase tracking-wide text-muted">{title}</h3>}
       {children}
     </div>
   );
@@ -76,7 +77,7 @@ export function WaterSection({ field, state }: SectionProps) {
           </div>
         </div>
       </Block>
-      <Block title="Data provenance">
+      <Block>
         <ProvenanceList items={[
           { kind: "measurement", text: `Soil moisture and rainfall: ${field.station.name}, one point in the field, observed ${longDate(at.date)}.` },
           { kind: "model", text: "Root-zone water: a daily two-layer FAO-56 soil-water balance with crop water use ETc = Kc × ET0, corrected each day by the soil-moisture readings in proportion to their uncertainty. Soil properties are indicative, not measured at this field. An estimate, not a measurement." },
@@ -110,9 +111,9 @@ export function SoilSection({ field, state }: SectionProps) {
         </div>
       </Block>
       <Notice tone="caution">
-        <strong className="font-medium text-ink">What these sensors cannot tell you.</strong> They do not measure organic matter, nutrients (N, P, K) or long-term soil health: those need a laboratory soil test. Bulk EC rises and falls with moisture and temperature, so a change in EC is not by itself a change in salinity or fertility. All readings come from one point, and soil varies across a field.
+        These sensors don&apos;t measure nutrients or soil health: that needs a lab test. EC moves with moisture, so it isn&apos;t a salinity reading on its own.
       </Notice>
-      <Block title="Data provenance">
+      <Block>
         <ProvenanceList items={[
           { kind: "measurement", text: `Temperature and EC: ${field.station.name}, observed ${longDate(at.date)}.` },
           { kind: "model", text: field.soil.note },
@@ -128,9 +129,12 @@ export function VegetationSection({ field, model, state }: SectionProps) {
   return (
     <div className="space-y-9">
       <Block title="Current measurements">
-        <div className={FACTS}>
+        <div className="flex flex-wrap items-center gap-6">
+          <CropImage id={field.currentCrop} size="lg" />
+          <div className={`${FACTS} flex-1`}>
           <Fact label="Vegetation index (NDVI)" value={ndviAt ? fmt(ndviAt.ndvi, 2) : "Unavailable"} sub={ndviAt ? `16-day composite to ${shortDate(ndviAt.date)} · satellite` : "No composite received yet"} />
           <Fact label="Crop" value={crop.name} sub={dap >= 0 ? `Day ${dap} after planting` : "Not yet planted"} />
+          </div>
         </div>
       </Block>
       <Block title="Model estimates">
@@ -140,13 +144,12 @@ export function VegetationSection({ field, model, state }: SectionProps) {
         </div>
       </Block>
       <Block title="Historical trend">
-        <ChartBlock title="Vegetation index over the record" source="satellite">
+        <ChartBlock title="Vegetation index over the record" source="satellite" info="NDVI runs from about 0.2 for bare soil to above 0.8 for a dense, healthy canopy. It tracks how green and full the canopy is. It does not measure yield, and it stops rising once the canopy closes.">
           <SeriesChart xKey="date" xFormat={shortDate} markerX={state.isLatest ? undefined : state.at.date} data={model.observations.slice(0, Math.max(state.upTo.length, 120))} unit="NDVI (0 to 1, unitless)" digits={2} domain={[0, 1]} ariaLabel="NDVI composites"
             series={[{ key: "ndvi", label: "NDVI, 16-day composite", color: SERIES.blue, sparse: true }]} />
         </ChartBlock>
-        <p className="mt-3 max-w-3xl text-[13px] leading-relaxed text-muted">NDVI runs from about 0.2 for bare soil to above 0.8 for a dense, healthy canopy. It tracks how green and full the canopy is. It does not measure yield, and it stops rising once the canopy closes.</p>
       </Block>
-      <Block title="Data provenance">
+      <Block>
         <ProvenanceList items={[
           { kind: "satellite", text: `NDVI: MODIS MOD13Q1, 250 m pixels, 16-day composite${ndviAt ? ` to ${longDate(ndviAt.date)}` : ""}. Edge pixels include neighbouring land.` },
           { kind: "model", text: `Growth stage and Kc: planting date ${longDate(field.plantedOn)} with FAO-56 style stage lengths.` },
@@ -192,7 +195,7 @@ export function ClimateSection({ field, model, state, snapshot }: SectionProps &
           </div>
         </div>
       </Block>
-      <Block title="Data provenance">
+      <Block>
         <ProvenanceList items={[
           { kind: "measurement", text: `Daily rainfall and air temperature: ${field.station.name}.` },
           { kind: "model", text: `Monthly baseline: ${field.climate.source}. Regional, not field-specific.` },
@@ -220,24 +223,24 @@ export function RotationSection({ field, state, plans }: SectionProps & { plans:
             const repeat = i > 0 && CROPS[field.rotationHistory[i - 1].crop].family === c.family;
             const current = i === field.rotationHistory.length - 1;
             return (
-              <li key={r.season} className={clsx("p-4", current ? "bg-green-soft" : "bg-surface")}>
-                <p className="text-xs text-muted">{r.season}{current ? " · current" : ""}</p>
-                <p className="mt-1 text-[15px] font-medium text-ink">{c.name}</p>
-                <p className="text-[13px] text-muted">{c.familyCommon} family</p>
-                {repeat && <p className="mt-1.5 text-xs font-medium text-amber">Same family as the season before</p>}
+              <li key={r.season} className={clsx("flex flex-col items-center p-4 text-center", current ? "bg-green-soft" : "bg-surface")}>
+                <p className="text-xs text-muted">{r.season}{current ? " · now" : ""}</p>
+                <CropImage id={r.crop} size="lg" tile={false} />
+                <p className="text-[15px] font-medium text-ink">{c.name}</p>
+                <p className="text-[13px] text-muted">{c.familyCommon}</p>
+                {repeat && <p className="mt-1 text-xs font-medium text-amber">Same family again</p>}
               </li>
             );
           })}
         </ol>
-        <p className="mt-3 max-w-3xl text-[13px] leading-relaxed text-muted">Growing the same crop family back to back gives that family&apos;s pests and diseases a continuous host.</p>
       </Block>
       <Block title="Rotation plans being compared">
-        <ul className="space-y-1.5 text-sm text-ink-soft">
-          {plans.map((p) => <li key={p.id}><span className="font-medium text-ink">{p.name}:</span> {p.crops.map((c) => CROPS[c].name).join(" → ")}</li>)}
+        <ul className="space-y-2 text-sm text-ink-soft">
+          {plans.map((p) => <li key={p.id} className="flex flex-wrap items-center gap-3"><span className="w-24 font-medium text-ink">{p.name}</span><CropSequence crops={p.crops} size="xs" /></li>)}
         </ul>
         <Link href="/rotation-lab" className={clsx(LINK, "mt-3")}>Compare them in the Rotation Lab <ArrowRight size={15} aria-hidden /></Link>
       </Block>
-      <Block title="Data provenance">
+      <Block>
         <ProvenanceList items={[{ kind: "measurement", text: "Crop history: entered in the field record by the farmer. Not sensed." }]} />
       </Block>
     </div>
