@@ -11,7 +11,11 @@
     "experiment:discovery": "tsx scripts/evaluate-discovery.ts",
     "experiment:e002": "tsx scripts/evaluate-discovery-e002.ts",
     "experiment:e003": "tsx scripts/evaluate-discovery-e003.ts",
-    "experiment:e004": "tsx scripts/evaluate-discovery-e004.ts"
+    "experiment:e004": "tsx scripts/evaluate-discovery-e004.ts",
+    "discovery:lipa": "tsx scripts/run-discovery-lipa.ts",
+    "discovery:plot-a": "tsx scripts/run-discovery-plot-a.ts",
+    "water:lipa": "tsx scripts/run-water-lipa.ts",
+    "export:graphs": "tsx scripts/export-graphs.ts"
   },
   "dependencies": {
     "clsx": "^2.1.1",

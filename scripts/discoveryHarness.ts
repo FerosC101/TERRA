@@ -42,11 +42,14 @@ export function wilson(k: number, n: number): [number, number] | null {
   return [round(c - h), round(c + h)];
 }
 
-/** Commit, dirty flag and short source hashes, so a run identifies its exact code. */
+/**
+ * Commit, dirty flag and short source hashes, so a run identifies its exact code.
+ * The dirty flag ignores experiments/, where runs write their own results.
+ */
 export function provenance(files: string[]) {
   return {
     commit: execSync("git rev-parse --short HEAD").toString().trim(),
-    workingTreeDirty: execSync("git status --porcelain").toString().trim().length > 0,
+    workingTreeDirty: execSync('git status --porcelain -- . ":(exclude)experiments"').toString().trim().length > 0,
     sourceSha256: Object.fromEntries(files.map((f) => [f, createHash("sha256").update(readFileSync(f)).digest("hex").slice(0, 16)])),
   };
 }
